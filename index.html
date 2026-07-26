@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Laporan Realisasi Kredit Harian AO</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Library untuk Ekspor PDF Otomatis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .table-hover tbody tr:hover { background-color: #f1f3f5; }
+        
+        #areaPdf {
+            background-color: #ffffff;
+            padding: 20px;
+            color: #000000;
+        }
+
+        .pdf-report-title {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2px;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .pdf-report-subtitle {
+            font-size: 9.5pt;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 8.5pt;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #000 !important;
+            padding: 5px 6px !important;
+            vertical-align: middle;
+            color: #000 !important;
+        }
+
+        .pdf-table th {
+            background-color: #e2e8f0 !important;
+            text-align: center;
+            font-weight: bold;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .section-heading {
+            font-size: 10.5pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            color: #000;
+            border-left: 3px solid #0d6efd;
+            padding-left: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-4">
+        <div class="row mb-3 no-print">
+            <div class="col-md-12 text-center">
+                <h3 class="fw-bold text-primary">Laporan Realisasi Kredit Harian AO</h3>
+                <p class="text-muted small">Divisi Konsumer & Ritel (Pemisahan Data Baru, Mengulang, dan Pelunasan)</p>
+            </div>
+        </div>
+
+        <!-- Form Input -->
+        <div class="card mb-4 no-print">
+            <div class="card-header bg-primary text-white fw-bold">Form Input Realisasi AO</div>
+            <div class="card-body p-3">
+                <form id="formRealisasi" onsubmit="tambahData(event)">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Divisi</label>
+                            <select id="divisi" class="form-select">
+                                <option value="Konsumer">Konsumer</option>
+                                <option value="Ritel">Ritel</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nama Kantor</label>
+                            <select id="namaKantor" class="form-select">
+                                <option value="" disabled selected>-- Pilih Kantor --</option>
+                                <option value="Cabang">Cabang</option>
+                                <option value="Rengasdengklok">Rengasdengklok</option>
+                                <option value="Cikampek">Cikampek</option>
+                                <option value="Klari">Klari</option>
+                                <option value="Cilamaya">Cilamaya</option>
+                                <option value="Telagasari">Telagasari</option>
+                                <option value="Pemda">Pemda</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nama Account Officer (AO)</label>
+                            <select id="namaAo" class="form-select">
+                                <option value="" disabled selected>-- Pilih Nama AO --</option>
+                                <option value="Didin Koharudin">Didin Koharudin</option>
+                                <option value="Dindin Aminudin">Dindin Aminudin</option>
+                                <option value="Devi Silviani">Devi Silviani</option>
+                                <option value="Intan Permata">Intan Permata</option>
+                                <option value="Ika Herlina">Ika Herlina</option>
+                                <option value="Indradi Rizky">Indradi Rizky</option>
+                                <option value="Budi Prasandani P">Budi Prasandani P</option>
+                                <option value="Jehan Hariadhi">Jehan Hariadhi</option>
+                                <option value="Imas Kartika">Imas Kartika</option>
+                            </select>
+                        </div>
+
+                        <!-- Data Baru -->
+                        <div class="col-md-3">
+                            <label class="form-label text-primary fw-bold">NoA Baru</label>
+                            <input type="text" id="noaBaru" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-primary fw-bold">OS Baru (Rp)</label>
+                            <input type="text" id="osBaru" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+
+                        <!-- Data Mengulang -->
+                        <div class="col-md-3">
+                            <label class="form-label text-secondary fw-bold">NoA Mengulang</label>
+                            <input type="text" id="noaMengulang" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-secondary fw-bold">OS Mengulang (Rp)</label>
+                            <input type="text" id="osMengulang" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+
+                        <!-- Pelunasan -->
+                        <div class="col-md-3">
+                            <label class="form-label text-danger fw-bold">NoA Pelunasan</label>
+                            <input type="text" id="noaLunas" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-danger fw-bold">Nominal Pelunasan (Rp)</label>
+                            <input type="text" id="osLunas" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
+                        </div>
+
+                        <!-- Preview Kalkulasi Otomatis -->
+                        <div class="col-md-3">
+                            <label class="form-label text-success fw-bold">Total NoA (Baru + Ulang)</label>
+                            <input type="text" id="totalNoa" class="form-control bg-light fw-bold text-success" readonly value="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-success fw-bold">Net Booking OS (Rp)</label>
+                            <input type="text" id="netOs" class="form-control bg-light fw-bold text-success" readonly value="0">
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-success px-4">Simpan Laporan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Area Khusus PDF -->
+        <div id="areaPdf">
+            <div class="pdf-report-title">REALISASI KREDIT KONSUMER DAN RITEL CABANG KARAWANG</div>
+            <div class="pdf-report-subtitle" id="tanggalCetakPDF"></div>
+
+            <!-- Tabel Divisi Konsumer -->
+            <div class="section-heading">REKAPITULASI - DIVISI KONSUMER</div>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">No</th>
+                        <th style="width: 14%;">Kantor</th>
+                        <th style="width: 14%;">Nama AO</th>
+                        <th style="width: 6%;">NoA Baru</th>
+                        <th style="width: 11%;">OS Baru (Rp)</th>
+                        <th style="width: 6%;">NoA Ulang</th>
+                        <th style="width: 11%;">OS Ulang (Rp)</th>
+                        <th style="width: 6%;">NoA Lunas</th>
+                        <th style="width: 11%;">Nominal Lunas (Rp)</th>
+                        <th style="width: 8%;">Total NoA</th>
+                        <th style="width: 9%;">Net OS (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelKonsumerPdf"></tbody>
+            </table>
+
+            <!-- Tabel Divisi Ritel -->
+            <div class="section-heading">REKAPITULASI - DIVISI RITEL</div>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">No</th>
+                        <th style="width: 14%;">Kantor</th>
+                        <th style="width: 14%;">Nama AO</th>
+                        <th style="width: 6%;">NoA Baru</th>
+                        <th style="width: 11%;">OS Baru (Rp)</th>
+                        <th style="width: 6%;">NoA Ulang</th>
+                        <th style="width: 11%;">OS Ulang (Rp)</th>
+                        <th style="width: 6%;">NoA Lunas</th>
+                        <th style="width: 11%;">Nominal Lunas (Rp)</th>
+                        <th style="width: 8%;">Total NoA</th>
+                        <th style="width: 9%;">Net OS (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelRitelPdf"></tbody>
+            </table>
+        </div>
+
+        <!-- Tampilan Web Konsumer -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                <span>Data Laporan - Divisi Konsumer</span>
+                <button class="btn btn-sm btn-outline-light" onclick="exportToCSV('Konsumer')">Ekspor CSV Konsumer</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Kantor</th>
+                                <th>Nama AO</th>
+                                <th>NoA Baru</th>
+                                <th>OS Baru (Rp)</th>
+                                <th>NoA Mengulang</th>
+                                <th>OS Mengulang (Rp)</th>
+                                <th>NoA Lunas</th>
+                                <th>Nominal Lunas (Rp)</th>
+                                <th>Total NoA</th>
+                                <th>Net OS (Rp)</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelKonsumerWeb"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tampilan Web Ritel -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+                <span>Data Laporan - Divisi Ritel</span>
+                <button class="btn btn-sm btn-outline-light" onclick="exportToCSV('Ritel')">Ekspor CSV Ritel</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Kantor</th>
+                                <th>Nama AO</th>
+                                <th>NoA Baru</th>
+                                <th>OS Baru (Rp)</th>
+                                <th>NoA Mengulang</th>
+                                <th>OS Mengulang (Rp)</th>
+                                <th>NoA Lunas</th>
+                                <th>Nominal Lunas (Rp)</th>
+                                <th>Total NoA</th>
+                                <th>Net OS (Rp)</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelRitelWeb"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Download PDF Langsung -->
+        <div class="d-flex justify-content-end gap-2 mt-4 no-print">
+            <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="downloadPDF()">Download PDF Laporan Resmi</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logika Aplikasi -->
+    <script>
+        let databaseLaporan = JSON.parse(localStorage.getItem('data_laporan_ao_v13')) || [];
+        const urutanKantorBaku = ["Cabang", "Rengasdengklok", "Cilamaya", "Klari", "Cikampek", "Telagasari", "Pemda"];
+        tampilkanData();
+
+        function formatRatusan(input) {
+            let value = input.value.replace(/[^,\d]/g, '').toString();
+            let split = value.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            input.value = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        }
+
+        function parseAngka(id) {
+            let val = document.getElementById(id).value;
+            if (!val) return 0;
+            return parseFloat(val.replace(/\./g, '').replace(/,/g, '.')) || 0;
+        }
+
+        function formatRibuan(angka) {
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function hitungNet() {
+            let noaBaru = parseAngka('noaBaru');
+            let osBaru = parseAngka('osBaru');
+            let noaMengulang = parseAngka('noaMengulang');
+            let osMengulang = parseAngka('osMengulang');
+            let osLunas = parseAngka('osLunas');
+
+            let totalNoa = noaBaru + noaMengulang;
+            let netOs = (osBaru + osMengulang) - osLunas;
+
+            document.getElementById('totalNoa').value = formatRibuan(totalNoa);
+            document.getElementById('netOs').value = formatRibuan(netOs);
+        }
+
+        function tambahData(event) {
+            event.preventDefault();
+
+            let noaBaru = parseAngka('noaBaru');
+            let osBaru = parseAngka('osBaru');
+            let noaMengulang = parseAngka('noaMengulang');
+            let osMengulang = parseAngka('osMengulang');
+            let noaLunas = parseAngka('noaLunas');
+            let osLunas = parseAngka('osLunas');
+
+            let laporan = {
+                id: Date.now(),
+                divisi: document.getElementById('divisi').value || '-',
+                namaKantor: document.getElementById('namaKantor').value || '-',
+                namaAo: document.getElementById('namaAo').value || '-',
+                noaBaru: noaBaru,
+                osBaru: osBaru,
+                noaMengulang: noaMengulang,
+                osMengulang: osMengulang,
+                noaLunas: noaLunas,
+                osLunas: osLunas,
+                totalNoa: noaBaru + noaMengulang,
+                netOs: (osBaru + osMengulang) - osLunas
+            };
+
+            databaseLaporan.push(laporan);
+            localStorage.setItem('data_laporan_ao_v13', JSON.stringify(databaseLaporan));
+            
+            tampilkanData();
+            document.getElementById('formRealisasi').reset();
+            document.getElementById('totalNoa').value = '0';
+            document.getElementById('netOs').value = '0';
+            alert('Laporan berhasil disimpan!');
+        }
+
+        function groupDataByKantorBaku(dataArray) {
+            let grouped = {};
+            // Inisialisasi urutan baku agar tersusun sesuai urutan array
+            urutanKantorBaku.forEach(k => { grouped[k] = []; });
+
+            dataArray.forEach(item => {
+                let kantor = item.namaKantor;
+                if (!grouped[kantor]) {
+                    grouped[kantor] = []; // Tangani jika ada kantor di luar daftar baku
+                }
+                grouped[kantor].push(item);
+            });
+
+            // Filter hanya kantor yang memiliki data
+            let result = {};
+            for (let kantor in grouped) {
+                if (grouped[kantor].length > 0) {
+                    result[kantor] = grouped[kantor];
+                }
+            }
+            return result;
+        }
+
+        function tampilkanData() {
+            let tbodyKonsumerWeb = document.getElementById('tabelKonsumerWeb');
+            let tbodyRitelWeb = document.getElementById('tabelRitelWeb');
+            let tbodyKonsumerPdf = document.getElementById('tabelKonsumerPdf');
+            let tbodyRitelPdf = document.getElementById('tabelRitelPdf');
+            
+            tbodyKonsumerWeb.innerHTML = '';
+            tbodyRitelWeb.innerHTML = '';
+            tbodyKonsumerPdf.innerHTML = '';
+            tbodyRitelPdf.innerHTML = '';
+
+            let dataKonsumer = databaseLaporan.filter(item => item.divisi === 'Konsumer');
+            let dataRitel = databaseLaporan.filter(item => item.divisi === 'Ritel');
+
+            // --- Render Konsumer ---
+            if (dataKonsumer.length === 0) {
+                tbodyKonsumerWeb.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Belum ada data untuk Divisi Konsumer.</td></tr>`;
+                tbodyKonsumerPdf.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Belum ada data rekapitulasi.</td></tr>`;
+            } else {
+                let sumK = hitungTotal(dataKonsumer);
+                let groupedK = groupDataByKantorBaku(dataKonsumer);
+                let noCounter = 1;
+
+                for (let kantor in groupedK) {
+                    let items = groupedK[kantor];
+                    items.forEach((item, index) => {
+                        tbodyKonsumerWeb.innerHTML += buatBarisWeb(item, noCounter, kantor, index === 0, items.length);
+                        tbodyKonsumerPdf.innerHTML += buatBarisPdf(item, noCounter, kantor, index === 0, items.length);
+                        noCounter++;
+                    });
+                }
+
+                // Baris Total Web
+                tbodyKonsumerWeb.innerHTML += `
+                    <tr class="table-secondary fw-bold">
+                        <td colspan="3" class="text-end">TOTAL KONSUMER:</td>
+                        <td class="text-center">${formatRibuan(sumK.noaBaru)}</td>
+                        <td class="text-end">${formatRibuan(sumK.osBaru)}</td>
+                        <td class="text-center">${formatRibuan(sumK.noaMengulang)}</td>
+                        <td class="text-end">${formatRibuan(sumK.osMengulang)}</td>
+                        <td class="text-center">${formatRibuan(sumK.noaLunas)}</td>
+                        <td class="text-end">${formatRibuan(sumK.osLunas)}</td>
+                        <td class="text-center text-success">${formatRibuan(sumK.totalNoa)}</td>
+                        <td class="text-end text-success">${formatRibuan(sumK.netOs)}</td>
+                        <td></td>
+                    </tr>`;
+                // Baris Total PDF
+                tbodyKonsumerPdf.innerHTML += `
+                    <tr style="background-color: #edf2f7; font-weight: bold;">
+                        <td colspan="3" style="text-align: right;">TOTAL KONSUMER:</td>
+                        <td style="text-align: center;">${formatRibuan(sumK.noaBaru)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumK.osBaru)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumK.noaMengulang)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumK.osMengulang)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumK.noaLunas)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumK.osLunas)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumK.totalNoa)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumK.netOs)}</td>
+                    </tr>`;
+            }
+
+            // --- Render Ritel ---
+            if (dataRitel.length === 0) {
+                tbodyRitelWeb.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Belum ada data untuk Divisi Ritel.</td></tr>`;
+                tbodyRitelPdf.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Belum ada data rekapitulasi.</td></tr>`;
+            } else {
+                let sumR = hitungTotal(dataRitel);
+                let groupedR = groupDataByKantorBaku(dataRitel);
+                let noCounter = 1;
+
+                for (let kantor in groupedR) {
+                    let items = groupedR[kantor];
+                    items.forEach((item, index) => {
+                        tbodyRitelWeb.innerHTML += buatBarisWeb(item, noCounter, kantor, index === 0, items.length);
+                        tbodyRitelPdf.innerHTML += buatBarisPdf(item, noCounter, kantor, index === 0, items.length);
+                        noCounter++;
+                    });
+                }
+
+                // Baris Total Web
+                tbodyRitelWeb.innerHTML += `
+                    <tr class="table-secondary fw-bold">
+                        <td colspan="3" class="text-end">TOTAL RITEL:</td>
+                        <td class="text-center">${formatRibuan(sumR.noaBaru)}</td>
+                        <td class="text-end">${formatRibuan(sumR.osBaru)}</td>
+                        <td class="text-center">${formatRibuan(sumR.noaMengulang)}</td>
+                        <td class="text-end">${formatRibuan(sumR.osMengulang)}</td>
+                        <td class="text-center">${formatRibuan(sumR.noaLunas)}</td>
+                        <td class="text-end">${formatRibuan(sumR.osLunas)}</td>
+                        <td class="text-center text-success">${formatRibuan(sumR.totalNoa)}</td>
+                        <td class="text-end text-success">${formatRibuan(sumR.netOs)}</td>
+                        <td></td>
+                    </tr>`;
+                // Baris Total PDF
+                tbodyRitelPdf.innerHTML += `
+                    <tr style="background-color: #edf2f7; font-weight: bold;">
+                        <td colspan="3" style="text-align: right;">TOTAL RITEL:</td>
+                        <td style="text-align: center;">${formatRibuan(sumR.noaBaru)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumR.osBaru)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumR.noaMengulang)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumR.osMengulang)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumR.noaLunas)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumR.osLunas)}</td>
+                        <td style="text-align: center;">${formatRibuan(sumR.totalNoa)}</td>
+                        <td style="text-align: right;">${formatRibuan(sumR.netOs)}</td>
+                    </tr>`;
+            }
+        }
+
+        function hitungTotal(dataArray) {
+            return dataArray.reduce((acc, curr) => {
+                acc.noaBaru += curr.noaBaru;
+                acc.osBaru += curr.osBaru;
+                acc.noaMengulang += curr.noaMengulang;
+                acc.osMengulang += curr.osMengulang;
+                acc.noaLunas += curr.noaLunas;
+                acc.osLunas += curr.osLunas;
+                acc.totalNoa += curr.totalNoa;
+                acc.netOs += curr.netOs;
+                return acc;
+            }, { noaBaru: 0, osBaru: 0, noaMengulang: 0, osMengulang: 0, noaLunas: 0, osLunas: 0, totalNoa: 0, netOs: 0 });
+        }
+
+        function buatBarisWeb(item, no, kantor, isFirstInGroup, groupLength) {
+            let kantorCell = isFirstInGroup ? `<td rowspan="${groupLength}" class="align-middle fw-bold bg-light">${kantor}</td>` : '';
+            return `<tr>
+                <td class="text-center">${no}</td>
+                ${kantorCell}
+                <td>${item.namaAo}</td>
+                <td class="text-center">${formatRibuan(item.noaBaru)}</td>
+                <td class="text-end">${formatRibuan(item.osBaru)}</td>
+                <td class="text-center">${formatRibuan(item.noaMengulang)}</td>
+                <td class="text-end">${formatRibuan(item.osMengulang)}</td>
+                <td class="text-center">${formatRibuan(item.noaLunas)}</td>
+                <td class="text-end">${formatRibuan(item.osLunas)}</td>
+                <td class="text-center fw-bold text-success">${formatRibuan(item.totalNoa)}</td>
+                <td class="text-end fw-bold text-success">${formatRibuan(item.netOs)}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-danger" onclick="hapusData(${item.id})">Hapus</button>
+                </td>
+            </tr>`;
+        }
+
+        function buatBarisPdf(item, no, kantor, isFirstInGroup, groupLength) {
+            let kantorCell = isFirstInGroup ? `<td rowspan="${groupLength}" style="vertical-align: middle; font-weight: bold; background-color: #f7fafc;">${kantor}</td>` : '';
+            return `<tr>
+                <td style="text-align: center;">${no}</td>
+                ${kantorCell}
+                <td>${item.namaAo}</td>
+                <td style="text-align: center;">${formatRibuan(item.noaBaru)}</td>
+                <td style="text-align: right;">${formatRibuan(item.osBaru)}</td>
+                <td style="text-align: center;">${formatRibuan(item.noaMengulang)}</td>
+                <td style="text-align: right;">${formatRibuan(item.osMengulang)}</td>
+                <td style="text-align: center;">${formatRibuan(item.noaLunas)}</td>
+                <td style="text-align: right;">${formatRibuan(item.osLunas)}</td>
+                <td style="text-align: center; font-weight: bold;">${formatRibuan(item.totalNoa)}</td>
+                <td style="text-align: right; font-weight: bold;">${formatRibuan(item.netOs)}</td>
+            </tr>`;
+        }
+
+        function hapusData(id) {
+            if (confirm('Yakin ingin menghapus data laporan ini?')) {
+                databaseLaporan = databaseLaporan.filter(item => item.id !== id);
+                localStorage.setItem('data_laporan_ao_v13', JSON.stringify(databaseLaporan));
+                tampilkanData();
+            }
+        }
+
+        function downloadPDF() {
+            let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            let tanggalHariIni = new Date().toLocaleDateString('id-ID', options);
+            document.getElementById('tanggalCetakPDF').innerText = 'Tanggal: ' + tanggalHariIni;
+
+            let element = document.getElementById('areaPdf');
+            
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                let imgData = canvas.toDataURL('image/png');
+                let { jsPDF } = window.jspdf;
+                let pdf = new jsPDF('l', 'mm', 'a4');
+                
+                let imgWidth = 287; 
+                let pageHeight = 210; 
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 5;
+
+                pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save('Laporan_Rekapitulasi_Realisasi_Kredit_Karawang.pdf');
+            });
+        }
+
+        function exportToCSV(divisiTarget) {
+            let dataFiltered = databaseLaporan.filter(item => item.divisi === divisiTarget);
+            if (dataFiltered.length === 0) {
+                alert('Tidak ada data untuk diexport pada divisi ' + divisiTarget + '!');
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Divisi,Kantor,Nama AO,NoA Baru,OS Baru,NoA Mengulang,OS Mengulang,NoA Lunas,Nominal Lunas,Total NoA,Net OS\r\n";
+            dataFiltered.forEach(row => {
+                csvContent += `${row.divisi},"${row.namaKantor}","${row.namaAo}",${row.noaBaru},${row.osBaru},${row.noaMengulang},${row.osMengulang},${row.noaLunas},${row.osLunas},${row.totalNoa},${row.netOs}\r\n`;
+            });
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `laporan_realisasi_${divisiTarget.toLowerCase()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
