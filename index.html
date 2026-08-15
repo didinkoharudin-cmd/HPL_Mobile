@@ -2609,6 +2609,57 @@ body.app-locked > main { display:none !important; }
     }
   };
 
+  function normalizeServerKreditData(rows){
+    return rows.map(row => {
+      const m = {};
+      Object.keys(row || {}).forEach(k => {
+        const norm = normalizeKey(k);
+        const value = row[k];
+        if (norm.includes('nopinjam') || norm.includes('norek')) m.no_pinjaman = value;
+        else if (norm.includes('cif')) m.cif = value;
+        else if (norm.includes('tipe') || norm.includes('jenis') || norm.includes('produk')) m.tipe_pinjaman = value;
+        else if (norm.includes('bakidebet') || norm === 'baki' || norm.includes('os')) m.baki_debet = parseNumber(value);
+        else if (norm.includes('bungaberjalan') || norm === 'bunga') m.bunga_berjalan = parseNumber(value);
+        else if (norm.includes('musisi') || norm.includes('musisiasuransi') || norm.includes('asuransimusisi')) m.musisi_asuransi = parseNumber(value);
+        else if (norm.includes('angsuran')) m.angsuran_eksisting = parseNumber(value);
+        else if (norm.includes('mulai') || norm.includes('realisasi') || norm.includes('tglawal')) m.tgl_mulai = value;
+        else if (norm.includes('berakhir') || norm.includes('jatuhtempo') || norm.includes('akhir')) m.tgl_berakhir = value;
+        else if (isPhoneColumn(norm)) m.no_hp = value;
+      });
+      return m;
+    });
+  }
+
+  function normalizeServerPenghasilanData(rows){
+    return rows.map(row => {
+      const m = {};
+      let detectedStatus = null;
+      Object.keys(row || {}).forEach(k => {
+        const norm = normalizeKey(k);
+        const value = row[k];
+        if (norm.includes('cif')) m.cif = value;
+        else if (isAoColumn(norm)) m.kode_ao = value;
+        else if (norm.includes('nama')) m.nama = value;
+        else if (norm.includes('dinas') || norm.includes('instansi') || norm.includes('skpd') || norm.includes('unit')) m.dinas = value;
+        else if (isPhoneColumn(norm)) m.no_hp = value;
+        else if (norm.includes('gaji') || norm.includes('thp') || norm.includes('pokok')) m.gaji = parseNumber(value);
+        else if (norm.includes('sertifikasi')) m.sertifikasi = parseNumber(value);
+        else if (norm.includes('tpp') || norm.includes('tukin')) m.tpp = parseNumber(value);
+        else if (norm === 'bup') m.bup = parseInt(value) || 60;
+        else if (norm.includes('lahir')) m.tgl_lahir = value;
+        if (isStatusColumn(norm)) {
+          const parsed = parseStatusPegawai(value);
+          if (parsed) detectedStatus = parsed;
+        }
+      });
+      m.status_pegawai = detectedStatus || parseStatusPegawai(row['Status Pegawai'] || row['Status'] || row['Jenis Pegawai']) || 'PNS';
+      const detectedPhone = normalizePhoneFromRow(row);
+      if (detectedPhone) m.no_hp = detectedPhone;
+      else if (m.no_hp) m.no_hp = formatPhoneForWA(m.no_hp);
+      return m;
+    });
+  }
+
   async function callApi(action,credential){
     const response=await fetch(AUTH_CONFIG.API_URL,{
       method:'POST',
@@ -2628,8 +2679,14 @@ body.app-locked > main { display:none !important; }
     try{
       const data=await callApi('getData',googleCredential);
       if(!data.success) throw new Error(data.error||'Akses data ditolak.');
-      kreditRawData=Array.isArray(data.kredit)?data.kredit:[];
-      penghasilanRawData=Array.isArray(data.penghasilan)?data.penghasilan:[];
+      // Normalisasi data server agar format Apps Script (header Excel asli)
+      // sama dengan format yang digunakan processor lokal.
+      kreditRawData = normalizeServerKreditData(
+        Array.isArray(data.kredit) ? data.kredit : []
+      );
+      penghasilanRawData = normalizeServerPenghasilanData(
+        Array.isArray(data.penghasilan) ? data.penghasilan : []
+      );
       // Data dari server menjadi sumber utama sesi ini; jangan gunakan data lokal lama.
       try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
       if(typeof updateGoogleDataCounts==='function') updateGoogleDataCounts();
