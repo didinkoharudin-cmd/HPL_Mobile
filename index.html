@@ -965,7 +965,22 @@ body.app-locked > main { display:none !important; }
 
         function normalizeCif(val) {
             if (val === null || val === undefined) return '';
-            return val.toString().trim().toUpperCase();
+
+            let s = String(val).trim().toUpperCase();
+
+            // Samakan bentuk CIF dari Excel/Google Sheets:
+            // 12345.0 -> 12345
+            s = s.replace(/\.0+$/, '');
+
+            // Hilangkan spasi tersembunyi.
+            s = s.replace(/[\s\u00A0]+/g, '');
+
+            // Jika CIF hanya angka, samakan 0012345 dengan 12345.
+            if (/^\d+$/.test(s)) {
+                s = s.replace(/^0+(?=\d)/, '');
+            }
+
+            return s;
         }
 
         function parseNumber(val) {
@@ -2660,6 +2675,30 @@ body.app-locked > main { display:none !important; }
     });
   }
 
+  function diagnoseIncomeLink(){
+    const incomeCifs = new Set(
+      penghasilanRawData.map(r => normalizeCif(r && r.cif)).filter(Boolean)
+    );
+    const creditCifs = new Set(
+      kreditRawData.map(r => normalizeCif(r && r.cif)).filter(Boolean)
+    );
+
+    let matched = 0;
+    creditCifs.forEach(cif => {
+      if (incomeCifs.has(cif)) matched++;
+    });
+
+    return {
+      incomeRows: penghasilanRawData.length,
+      creditRows: kreditRawData.length,
+      incomeCifs: incomeCifs.size,
+      creditCifs: creditCifs.size,
+      matchedCifs: matched,
+      sampleIncomeCif: penghasilanRawData.slice(0, 5).map(r => r.cif),
+      sampleCreditCif: kreditRawData.slice(0, 5).map(r => r.cif)
+    };
+  }
+
   async function callApi(action,credential){
     const response=await fetch(AUTH_CONFIG.API_URL,{
       method:'POST',
@@ -2687,6 +2726,9 @@ body.app-locked > main { display:none !important; }
       penghasilanRawData = normalizeServerPenghasilanData(
         Array.isArray(data.penghasilan) ? data.penghasilan : []
       );
+
+      console.info('[ANALISA KREDIT] Pemeriksaan hubungan CIF Kredit ↔ Penghasilan:', diagnoseIncomeLink());
+
       // Data dari server menjadi sumber utama sesi ini; jangan gunakan data lokal lama.
       try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
       if(typeof updateGoogleDataCounts==='function') updateGoogleDataCounts();
