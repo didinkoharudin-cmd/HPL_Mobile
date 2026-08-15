@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style id="modern-mobile-ui">
 :root{
@@ -179,6 +181,19 @@ main{padding:12px!important;max-width:1280px!important}
   header .flex.gap-1\.5.ml-2 button{min-height:42px;white-space:nowrap;flex:1 0 auto}
   #dashboardSection>.grid{grid-template-columns:1fr 1fr!important}
 }
+
+/* ===== GOOGLE AUTH PROTECTION ===== */
+body.app-locked > header,
+body.app-locked > main { display:none !important; }
+#googleAuthGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 10%,rgba(79,70,229,.18),transparent 35%),radial-gradient(circle at 90% 90%,rgba(8,145,178,.14),transparent 35%),#f5f7fb;}
+#googleAuthGate.hidden{display:none!important}
+.auth-card{width:min(440px,100%);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border:1px solid rgba(226,232,240,.9);border-radius:28px;box-shadow:0 24px 80px rgba(15,23,42,.16);padding:30px;text-align:center}
+.auth-logo{width:68px;height:68px;margin:0 auto 18px;border-radius:20px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 12px 30px rgba(79,70,229,.25)}
+.auth-error{display:none;margin-top:16px;padding:11px 13px;border-radius:12px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:13px;text-align:left}
+#userSessionBadge{display:none;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:rgba(15,23,42,.35);border:1px solid rgba(255,255,255,.18);font-size:11px;color:white}
+#userSessionBadge.show{display:flex}
+#logoutBtn{display:none}
+#logoutBtn.show{display:inline-flex}
 </style>
 
 <style id="mobile-upload-fix">
@@ -188,7 +203,56 @@ main{padding:12px!important;max-width:1280px!important}
 .mobile-file-picker .mobile-file-button{position:relative!important;z-index:10!important;pointer-events:none!important;width:100%!important;min-height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:14px!important;font-weight:800!important}
 }
 </style></head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
+
+
+    <!-- ================= GOOGLE LOGIN GATE ================= -->
+    <div id="googleAuthGate" role="dialog" aria-modal="true" aria-labelledby="googleAuthTitle">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="text-xs font-bold uppercase tracking-widest text-indigo-600 mb-2">
+                Akses Terproteksi
+            </div>
+
+            <h1 id="googleAuthTitle" class="text-2xl font-black text-slate-800">
+                Analisis Kredit Presisi
+            </h1>
+
+            <p class="text-sm text-slate-500 mt-2 mb-6">
+                Silakan masuk menggunakan akun Google yang telah
+                terdaftar pada sistem.
+            </p>
+
+            <div class="flex justify-center">
+                <div id="g_id_onload"
+                     data-client_id="94354317033-r8r1doo4j8evnk389vdrgi799mcmj4js.apps.googleusercontent.com"
+                     data-callback="handleGoogleLogin"
+                     data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+
+            <div id="googleAuthError" class="auth-error"></div>
+
+            <div class="mt-6 text-[11px] text-slate-400 leading-relaxed">
+                Hanya akun yang terdaftar dan berstatus
+                <strong>AKTIF</strong> pada database pengguna
+                yang dapat mengakses data.
+            </div>
+        </div>
+    </div>
+    <!-- ================= END GOOGLE LOGIN GATE ================= -->
 
     <!-- Header & Main Navigation -->
     <header class="bg-indigo-900 text-white shadow-lg py-4 px-6 sticky top-0 z-40">
@@ -206,7 +270,9 @@ main{padding:12px!important;max-width:1280px!important}
             <!-- Navigation Tabs & Action Buttons -->
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="bg-indigo-950/80 p-1 rounded-xl flex items-center gap-1 border border-indigo-700/50">
-                    <button id="navBtnAO" onclick="switchView('AO')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
+                    <div id="userSessionBadge"><i class="fa-solid fa-circle-user"></i><span id="userSessionText">-</span></div>
+                <button id="logoutBtn" onclick="logoutGoogleUser()" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold items-center gap-1.5 shadow"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+                <button id="navBtnAO" onclick="switchView('AO')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
                         <i class="fa-solid fa-user-gear"></i> Tampilan AO
                     </button>
                     <button id="navBtnAdmin" onclick="switchView('ADMIN')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60">
@@ -2463,38 +2529,136 @@ main{padding:12px!important;max-width:1280px!important}
 
         // --- INISIALISASI HALAMAN & PERSISTENSI DATA ---
         window.addEventListener('DOMContentLoaded', async () => {
-            // Parameter tetap menggunakan localStorage versi lama agar kompatibel.
             const savedProd = safeLocalStorageGet('productParams_v3');
-            if (savedProd) {
-                try { productParams = JSON.parse(savedProd); } catch (e) { console.error(e); }
-            }
+            if (savedProd) { try { productParams = JSON.parse(savedProd); } catch (e) { console.error(e); } }
 
             const savedFee = safeLocalStorageGet('feeParams_v3');
-            if (savedFee) {
-                try { feeParams = JSON.parse(savedFee); } catch (e) { console.error(e); }
-            }
+            if (savedFee) { try { feeParams = JSON.parse(savedFee); } catch (e) { console.error(e); } }
 
             renderAdminProductParamTable();
             populateAdminFeeParamsForm();
 
-            // Load data penghasilan/kredit dari v4 localStorage, fallback IndexedDB, lalu v3 lama.
-            try {
-                const [savedKreditData, savedPenghasilanData] = await Promise.all([
-                    loadDataset('kreditRawData', 'kreditRawData_v3'),
-                    loadDataset('penghasilanRawData', 'penghasilanRawData_v3')
-                ]);
-
-                if (Array.isArray(savedKreditData)) kreditRawData = savedKreditData;
-                if (Array.isArray(savedPenghasilanData)) penghasilanRawData = savedPenghasilanData;
-            } catch (e) {
-                console.error('Gagal memuat data tersimpan:', e);
-                kreditRawData = [];
-                penghasilanRawData = [];
-            }
-
+            // Data kredit/penghasilan TIDAK dimuat dari localStorage sebelum autentikasi.
+            kreditRawData = [];
+            penghasilanRawData = [];
             processBothData();
+
+            // Jika masih ada session token di memory, sesi dianggap tidak ada setelah refresh.
+            // Pengguna wajib login ulang agar data server tidak terbuka sebelum autentikasi.
         });
     </script>
+<script id="google-auth-controller">
+(function(){
+  const AUTH_CONFIG = {
+    CLIENT_ID: '94354317033-r8r1doo4j8evnk389vdrgi799mcmj4js.apps.googleusercontent.com',
+    API_URL: 'https://script.google.com/macros/s/AKfycbzTHlGFz8UAOMBbjHdgNW3JWpzpkwEzweT0pVOZdIv_kgwE_VUWbjNcUVSXBta3lLwH/exec'
+  };
+
+  window.googleCredential = null;
+  window.currentUser = null;
+
+  function showAuthError(message){
+    const el=document.getElementById('googleAuthError');
+    if(!el)return;
+    el.textContent=message||'';
+    el.style.display=message?'block':'none';
+  }
+
+  function esc(v){
+    return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+
+  function showApp(user){
+    document.body.classList.remove('app-locked');
+    document.getElementById('googleAuthGate')?.classList.add('hidden');
+    const badge=document.getElementById('userSessionBadge');
+    const text=document.getElementById('userSessionText');
+    const logout=document.getElementById('logoutBtn');
+    if(badge){ badge.classList.add('show'); }
+    if(logout){ logout.classList.add('show'); }
+    if(text){
+      text.innerHTML=esc(user.name||user.email)+' • '+esc(user.role||'');
+      if(user.kodeAO) text.innerHTML += ' • '+esc(user.kodeAO);
+    }
+    const adminBtn=document.getElementById('navBtnAdmin');
+    if(adminBtn){
+      const isAdmin=['ADMIN','SUPERVISOR'].includes(String(user.role||'').toUpperCase());
+      adminBtn.style.display=isAdmin?'':'none';
+    }
+  }
+
+  window.handleGoogleLogin = async function(response){
+    if(!response || !response.credential){
+      showAuthError('Google tidak memberikan credential. Silakan coba lagi.');
+      return;
+    }
+    googleCredential=response.credential;
+    showAuthError('');
+    try{
+      const result=await callApi('login',googleCredential);
+      if(!result.success) throw new Error(result.error||'Akses ditolak.');
+      currentUser=result.user;
+      showApp(currentUser);
+      await loadProtectedData();
+    }catch(err){
+      console.error(err);
+      googleCredential=null;
+      currentUser=null;
+      document.body.classList.add('app-locked');
+      showAuthError(err.message||'Login gagal.');
+    }
+  };
+
+  async function callApi(action,credential){
+    const response=await fetch(AUTH_CONFIG.API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action,credential})
+    });
+    const text=await response.text();
+    let result;
+    try{ result=JSON.parse(text); }catch(e){ throw new Error('Respons server bukan JSON. Periksa deployment Apps Script dan akses Web App.'); }
+    return result;
+  }
+
+  window.loadProtectedData = async function(){
+    if(!googleCredential) throw new Error('Sesi Google tidak tersedia.');
+    const badge=document.getElementById('adminDataStatusBadge');
+    if(badge) badge.textContent='Mengambil data sesuai hak akses...';
+    try{
+      const data=await callApi('getData',googleCredential);
+      if(!data.success) throw new Error(data.error||'Akses data ditolak.');
+      kreditRawData=Array.isArray(data.kredit)?data.kredit:[];
+      penghasilanRawData=Array.isArray(data.penghasilan)?data.penghasilan:[];
+      // Data dari server menjadi sumber utama sesi ini; jangan gunakan data lokal lama.
+      try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
+      if(typeof updateGoogleDataCounts==='function') updateGoogleDataCounts();
+      processBothData();
+    }catch(err){
+      console.error(err);
+      logoutGoogleUser();
+      showAuthError(err.message||'Data gagal dimuat.');
+    }
+  };
+
+  window.logoutGoogleUser=function(){
+    googleCredential=null;
+    currentUser=null;
+    kreditRawData=[];
+    penghasilanRawData=[];
+    try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
+    document.body.classList.add('app-locked');
+    document.getElementById('googleAuthGate')?.classList.remove('hidden');
+    document.getElementById('userSessionBadge')?.classList.remove('show');
+    document.getElementById('logoutBtn')?.classList.remove('show');
+    const badge=document.getElementById('adminDataStatusBadge');
+    if(badge) badge.textContent='Status Data: Menunggu Login';
+    const dash=document.getElementById('dashboardSection');
+    if(dash) dash.classList.add('hidden');
+    try{ if(window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
+  };
+})();
+</script>
 <script id="mobile-upload-enhancer">
 (function(){
 function bind(zoneId,inputId){
