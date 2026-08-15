@@ -2,607 +2,2476 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Laporan Realisasi Kredit Harian AO</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Library untuk Ekspor PDF Otomatis -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body { background-color: #f8f9fa; }
-        .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .table-hover tbody tr:hover { background-color: #f1f3f5; }
-        
-        #areaPdf {
-            background-color: #ffffff;
-            padding: 20px;
-            color: #000000;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (XLSX) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .pdf-report-title {
-            font-size: 14pt;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2px;
-            color: #000;
-            text-transform: uppercase;
-        }
+<style id="modern-mobile-ui">
+:root{
+  --ui-primary:#4f46e5;--ui-primary-2:#7c3aed;--ui-cyan:#0891b2;
+  --ui-bg:#f5f7fb;--ui-card:rgba(255,255,255,.88);--ui-border:#e5e7eb;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(99,102,241,.10),transparent 30%),
+    radial-gradient(circle at 90% 10%,rgba(6,182,212,.08),transparent 25%),
+    var(--ui-bg)!important;
+  overflow-x:hidden;
+}
+button,input,select,textarea{touch-action:manipulation}
+input,select,textarea{font-size:16px!important}
+header{
+  background:linear-gradient(135deg,#312e81 0%,#4338ca 48%,#6d28d9 100%)!important;
+  box-shadow:0 10px 30px rgba(49,46,129,.20)!important;
+  padding:12px 14px!important;
+}
+header h1{letter-spacing:-.025em}
+main{padding:12px!important;max-width:1280px!important}
+#viewAO,#viewAdmin{gap:14px!important}
+#aoDataNotification{
+  background:linear-gradient(135deg,#fff7ed,#fffbeb)!important;
+  border-color:#fed7aa!important;border-radius:16px!important;
+  box-shadow:0 8px 25px rgba(245,158,11,.08)!important;
+}
+#dashboardSection>.grid{
+  gap:10px!important;
+}
+#dashboardSection>.grid>div{
+  border:1px solid rgba(226,232,240,.9)!important;
+  border-radius:18px!important;
+  background:var(--ui-card)!important;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 25px rgba(15,23,42,.055)!important;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+#dashboardSection>.grid>div:active{transform:scale(.985)}
+#dashboardSection>.grid h3{letter-spacing:-.02em}
+#viewAO .bg-white.rounded-xl.border.shadow-sm.overflow-hidden,
+#viewAdmin .bg-white{
+  border-color:rgba(226,232,240,.85)!important;
+  border-radius:20px!important;
+  box-shadow:0 10px 30px rgba(15,23,42,.055)!important;
+}
+#viewAO .bg-white.rounded-xl.border.shadow-sm.overflow-hidden>.p-5{
+  padding:14px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(248,250,252,.88));
+}
+#viewAO .relative:has(#searchInput){width:100%}
+#searchInput{
+  width:100%!important;height:44px!important;
+  border-radius:14px!important;
+  border-color:#dbe2ea!important;
+  background:#fff!important;
+  box-shadow:0 4px 14px rgba(15,23,42,.04);
+}
+#searchInput:focus{box-shadow:0 0 0 4px rgba(99,102,241,.12)!important}
+#viewAO .flex.flex-wrap.items-center.gap-2\.5{
+  display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;
+  padding-top:12px!important;
+}
+#viewAO .flex.flex-wrap.items-center.gap-2\.5>span{grid-column:1/-1}
+#viewAO .flex.flex-wrap.items-center.gap-2\.5 select{
+  width:100%;height:42px;border-radius:12px!important;
+  border-color:#dbe2ea!important;background:#fff;
+  font-weight:700;box-shadow:0 2px 8px rgba(15,23,42,.03);
+}
+#loanTableWrap{overflow:visible!important}
+#loanTable{display:block;width:100%}
+#loanTable thead{display:none}
+#loanTable tbody{display:block;width:100%}
+#loanTable tbody tr{
+  display:block;width:100%;margin:0 0 12px;padding:10px;
+  border:1px solid #e2e8f0;border-radius:18px!important;
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  box-shadow:0 8px 22px rgba(15,23,42,.055);
+  position:relative;overflow:hidden;
+}
+#loanTable tbody tr:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,#6366f1,#06b6d4);
+}
+#loanTable tbody td{
+  display:grid;grid-template-columns:40% 60%;gap:6px;
+  width:100%;padding:7px 4px!important;border:0!important;
+  background:transparent!important;text-align:left!important;
+  align-items:center;overflow-wrap:anywhere;
+}
+#loanTable tbody td:before{
+  font-size:9px;line-height:1rem;font-weight:800;color:#64748b;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+#loanTable tbody td:nth-child(1):before{content:"Prioritas"}
+#loanTable tbody td:nth-child(2):before{content:"No. Pinjaman"}
+#loanTable tbody td:nth-child(3):before{content:"Debitur"}
+#loanTable tbody td:nth-child(4):before{content:"Produk / Sumber"}
+#loanTable tbody td:nth-child(5):before{content:"Tenor Berjalan"}
+#loanTable tbody td:nth-child(6):before{content:"Angsuran Eksisting"}
+#loanTable tbody td:nth-child(7):before{content:"Sisa RPC"}
+#loanTable tbody td:nth-child(8):before{content:"Tenor Top-Up"}
+#loanTable tbody td:nth-child(9):before{content:"NET Top-Up"}
+#loanTable tbody td:nth-child(10):before{content:"Gross Mengulang"}
+#loanTable tbody td:nth-child(11):before{content:"NET Mengulang"}
+#loanTable tbody td:nth-child(12):before{content:"Aksi"}
+#loanTable tbody td:first-child{
+  margin-bottom:3px;padding:9px 8px!important;border-radius:12px!important;
+  background:linear-gradient(135deg,#eef2ff,#ecfeff)!important;
+}
+#loanTable tbody td:nth-child(9),#loanTable tbody td:nth-child(11){
+  font-size:16px!important;font-weight:900;
+}
+#loanTable tbody td:nth-child(12) button{
+  width:100%;min-height:44px;border-radius:12px!important;
+  justify-content:center;box-shadow:0 5px 14px rgba(79,70,229,.14);
+}
+#loanTable tbody .tenor-num-input{width:70px!important;min-height:40px;border-radius:10px!important}
+#loanTable tbody .tenor-range-input{width:100%!important}
+#viewAdmin .overflow-x-auto{
+  overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;
+}
+#viewAdmin table{min-width:760px}
+#viewAdmin input,#viewAdmin select,#viewAdmin button{min-height:42px;border-radius:11px}
+#viewAdmin .border-dashed{border-radius:18px!important;min-height:170px!important}
+#debtorModal,#mengulangDetailModal{padding:8px!important;align-items:flex-start!important}
+#debtorModal>div,#mengulangDetailModal>div{
+  width:100%!important;max-width:none!important;
+  max-height:calc(100dvh - 16px)!important;margin-top:0;
+  border-radius:20px!important;
+}
+#debtorModal .p-6,#debtorModal .p-5,#mengulangDetailModal .p-5{padding:12px!important}
+#debtorModal .bg-indigo-900.p-5{padding:14px!important}
+#debtorModal .grid.grid-cols-1.md\:grid-cols-4,
+#mengulangDetailModal .grid.grid-cols-2.md\:grid-cols-4{
+  grid-template-columns:1fr 1fr!important;
+}
+#debtorModal .overflow-x-auto,#mengulangDetailModal .overflow-x-auto{
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+#debtorModal .overflow-x-auto table{min-width:760px}
+#debtorModal .bg-slate-100.p-4{flex-direction:column;align-items:stretch;gap:8px}
+#debtorModal .bg-slate-100.p-4 button{width:100%;min-height:44px;border-radius:12px}
+#waPreviewText{min-height:140px!important;border-radius:13px!important}
+.mobile-section-title{
+  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;
+  color:#0f172a;letter-spacing:-.015em;
+}
+.modern-pulse{animation:modernPulse 2.8s ease-in-out infinite}
+@keyframes modernPulse{0%,100%{box-shadow:0 8px 25px rgba(15,23,42,.05)}50%{box-shadow:0 12px 34px rgba(79,70,229,.12)}}
+@media(min-width:769px){
+  .mobile-section-title{display:none}
+}
+@media(max-width:768px){
+  header>div{gap:10px!important}
+  header .bg-indigo-950\/80{
+    width:100%;overflow-x:auto;justify-content:stretch;
+    -webkit-overflow-scrolling:touch;border-radius:14px!important;
+  }
+  header .bg-indigo-950\/80 button{min-height:42px;white-space:nowrap;flex:1 0 auto}
+  header .flex.gap-1\.5.ml-2{
+    width:100%;margin-left:0!important;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  header .flex.gap-1\.5.ml-2 button{min-height:42px;white-space:nowrap;flex:1 0 auto}
+  #dashboardSection>.grid{grid-template-columns:1fr 1fr!important}
+}
+</style>
 
-        .pdf-report-subtitle {
-            font-size: 9.5pt;
-            text-align: center;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 8.5pt;
-        }
-
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #000 !important;
-            padding: 5px 6px !important;
-            vertical-align: middle;
-            color: #000 !important;
-        }
-
-        .pdf-table th {
-            background-color: #e2e8f0 !important;
-            text-align: center;
-            font-weight: bold;
-            -webkit-print-color-adjust: exact;
-        }
-
-        .section-heading {
-            font-size: 10.5pt;
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 6px;
-            color: #000;
-            border-left: 3px solid #0d6efd;
-            padding-left: 6px;
-        }
-    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
-    <div class="container my-4">
-        <div class="row mb-3 no-print">
-            <div class="col-md-12 text-center">
-                <h3 class="fw-bold text-primary">Laporan Realisasi Kredit Harian AO</h3>
-                <p class="text-muted small">Krdit Konsumer & Ritel Cabang Karawang </p>
+    <!-- Header & Main Navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg py-4 px-6 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2.5">
+                    <i class="fa-solid fa-calculator text-amber-400"></i>
+                    Sistem Analisis Kredit & Penawaran Debitur
+                </h1>
+                <p class="text-indigo-200 text-xs mt-0.5">
+                    Presisi Per No Pinjaman, RPC, Tenor Pegawai & Configurator WA
+                </p>
             </div>
-        </div>
-
-        <!-- Form Input -->
-        <div class="card mb-4 no-print">
-            <div class="card-header bg-primary text-white fw-bold">Form Input Realisasi AO</div>
-            <div class="card-body p-3">
-                <form id="formRealisasi" onsubmit="tambahData(event)">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Divisi</label>
-                            <select id="divisi" class="form-select">
-                                <option value="Konsumer">Konsumer</option>
-                                <option value="Ritel">Ritel</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Nama Kantor</label>
-                            <select id="namaKantor" class="form-select">
-                                <option value="" disabled selected>-- Pilih Kantor --</option>
-                                <option value="Cabang">Cabang</option>
-                                <option value="Rengasdengklok">Rengasdengklok</option>
-                                <option value="Cikampek">Cikampek</option>
-                                <option value="Klari">Klari</option>
-                                <option value="Cilamaya">Cilamaya</option>
-                                <option value="Telagasari">Telagasari</option>
-                                <option value="Pemda">Pemda</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Nama Account Officer (AO)</label>
-                            <select id="namaAo" class="form-select">
-                                <option value="" disabled selected>-- Pilih Nama AO --</option>
-                                <option value="Didin Koharudin">Didin Koharudin</option>
-                                <option value="Dindin Aminudin">Dindin Aminudin</option>
-                                <option value="Devi Silviani">Devi Silviani</option>
-                                <option value="Intan Permata">Intan Permata</option>
-                                <option value="Ika Herlina">Ika Herlina</option>
-                                <option value="Indradi Rizky">Indradi Rizky</option>
-                                <option value="Budi Prasandani P">Budi Prasandani P</option>
-                                <option value="Jehan Hariadhi">Jehan Hariadhi</option>
-                                <option value="Imas Kartika">Imas Kartika</option>
-                            </select>
-                        </div>
-
-                        <!-- Data Baru -->
-                        <div class="col-md-3">
-                            <label class="form-label text-primary fw-bold">NoA Baru</label>
-                            <input type="text" id="noaBaru" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-primary fw-bold">OS Baru (Rp)</label>
-                            <input type="text" id="osBaru" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-
-                        <!-- Data Mengulang -->
-                        <div class="col-md-3">
-                            <label class="form-label text-secondary fw-bold">NoA Mengulang</label>
-                            <input type="text" id="noaMengulang" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-secondary fw-bold">OS Mengulang (Rp)</label>
-                            <input type="text" id="osMengulang" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-
-                        <!-- Pelunasan -->
-                        <div class="col-md-3">
-                            <label class="form-label text-danger fw-bold">NoA Pelunasan</label>
-                            <input type="text" id="noaLunas" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-danger fw-bold">Nominal Pelunasan (Rp)</label>
-                            <input type="text" id="osLunas" class="form-control" placeholder="0" onkeyup="formatRatusan(this); hitungNet();">
-                        </div>
-
-                        <!-- Preview Kalkulasi Otomatis -->
-                        <div class="col-md-3">
-                            <label class="form-label text-success fw-bold">Total NoA (Baru + Ulang)</label>
-                            <input type="text" id="totalNoa" class="form-control bg-light fw-bold text-success" readonly value="0">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-success fw-bold">Net Booking OS (Rp)</label>
-                            <input type="text" id="netOs" class="form-control bg-light fw-bold text-success" readonly value="0">
-                        </div>
-                    </div>
-                    <div class="mt-3 text-end">
-                        <button type="submit" class="btn btn-success px-4">Simpan Laporan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Area Khusus PDF -->
-        <div id="areaPdf">
-            <div class="pdf-report-title">REALISASI KREDIT KONSUMER DAN RITEL CABANG KARAWANG</div>
-            <div class="pdf-report-subtitle" id="tanggal"></div>
-
-            <!-- Tabel Divisi Konsumer -->
-            <div class="section-heading">REKAPITULASI - KREDIT KONSUMER</div>
-            <table class="pdf-table">
-                <thead>
-                    <tr>
-                        <th style="width: 4%;">No</th>
-                        <th style="width: 14%;">Kantor</th>
-                        <th style="width: 14%;">Nama AO</th>
-                        <th style="width: 6%;">NoA Baru</th>
-                        <th style="width: 11%;">OS Baru (Rp)</th>
-                        <th style="width: 6%;">NoA Ulang</th>
-                        <th style="width: 11%;">OS Ulang (Rp)</th>
-                        <th style="width: 6%;">NoA Lunas</th>
-                        <th style="width: 11%;">Nominal Lunas (Rp)</th>
-                        <th style="width: 8%;">Total NoA</th>
-                        <th style="width: 9%;">Net OS (Rp)</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelKonsumerPdf"></tbody>
-            </table>
-
-            <!-- Tabel Divisi Ritel -->
-            <div class="section-heading">REKAPITULASI - KREDIT RITEL</div>
-            <table class="pdf-table">
-                <thead>
-                    <tr>
-                        <th style="width: 4%;">No</th>
-                        <th style="width: 14%;">Kantor</th>
-                        <th style="width: 14%;">Nama AO</th>
-                        <th style="width: 6%;">NoA Baru</th>
-                        <th style="width: 11%;">OS Baru (Rp)</th>
-                        <th style="width: 6%;">NoA Ulang</th>
-                        <th style="width: 11%;">OS Ulang (Rp)</th>
-                        <th style="width: 6%;">NoA Lunas</th>
-                        <th style="width: 11%;">Nominal Lunas (Rp)</th>
-                        <th style="width: 8%;">Total NoA</th>
-                        <th style="width: 9%;">Net OS (Rp)</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelRitelPdf"></tbody>
-            </table>
-        </div>
-
-        <!-- Tampilan Web Konsumer -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
-                <span>Data Laporan - Divisi Konsumer</span>
-                <button class="btn btn-sm btn-outline-light" onclick="exportToCSV('Konsumer')">Ekspor CSV Konsumer</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>No</th>
-                                <th>Kantor</th>
-                                <th>Nama AO</th>
-                                <th>NoA Baru</th>
-                                <th>OS Baru (Rp)</th>
-                                <th>NoA Mengulang</th>
-                                <th>OS Mengulang (Rp)</th>
-                                <th>NoA Lunas</th>
-                                <th>Nominal Lunas (Rp)</th>
-                                <th>Total NoA</th>
-                                <th>Net OS (Rp)</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelKonsumerWeb"></tbody>
-                    </table>
+            
+            <!-- Navigation Tabs & Action Buttons -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="bg-indigo-950/80 p-1 rounded-xl flex items-center gap-1 border border-indigo-700/50">
+                    <button id="navBtnAO" onclick="switchView('AO')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
+                        <i class="fa-solid fa-user-gear"></i> Tampilan AO
+                    </button>
+                    <button id="navBtnAdmin" onclick="switchView('ADMIN')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60">
+                        <i class="fa-solid fa-sliders"></i> Panel Admin & Upload
+                    </button>
+                </div>
+                
+                <div class="flex gap-1.5 ml-2">
+                    <button onclick="downloadTemplateKredit()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 font-semibold shadow">
+                        <i class="fa-solid fa-file-excel"></i> Template Kredit
+                    </button>
+                    <button onclick="downloadTemplatePenghasilan()" class="bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 font-semibold shadow">
+                        <i class="fa-solid fa-file-excel"></i> Template Penghasilan
+                    </button>
                 </div>
             </div>
         </div>
+    </header>
 
-        <!-- Tampilan Web Ritel -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
-                <span>Data Laporan - Divisi Ritel</span>
-                <button class="btn btn-sm btn-outline-light" onclick="exportToCSV('Ritel')">Ekspor CSV Ritel</button>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>No</th>
-                                <th>Kantor</th>
-                                <th>Nama AO</th>
-                                <th>NoA Baru</th>
-                                <th>OS Baru (Rp)</th>
-                                <th>NoA Mengulang</th>
-                                <th>OS Mengulang (Rp)</th>
-                                <th>NoA Lunas</th>
-                                <th>Nominal Lunas (Rp)</th>
-                                <th>Total NoA</th>
-                                <th>Net OS (Rp)</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelRitelWeb"></tbody>
-                    </table>
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- ==================== Halaman 1: TAMPILAN AO (ANALISIS KREDIT) ==================== -->
+        <div id="viewAO" class="space-y-6">
+            
+            <!-- Data Notification Banner -->
+            <div id="aoDataNotification" class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 text-xs shadow-sm">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-database text-amber-600 text-base"></i>
+                    <span id="aoDataNotificationText">Memuat status data dari penyimpanan lokal...</span>
                 </div>
+                <button onclick="switchView('ADMIN')" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-lg font-semibold text-[11px] transition shadow">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Buka Panel Admin untuk Upload Data
+                </button>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="hidden space-y-6">
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total Fasilitas Pinjaman</p>
+                            <h3 id="cardTotalLoans" class="text-xl font-bold text-slate-800 mt-1">0</h3>
+                        </div>
+                        <div class="p-2.5 bg-slate-100 text-slate-600 rounded-lg"><i class="fa-solid fa-list-check text-lg"></i></div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm bg-blue-50/30 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">Potensi NEW (Debitur Baru)</p>
+                            <h3 id="cardTotalNew" class="text-lg font-bold text-blue-900 mt-1">Rp 0</h3>
+                            <p class="text-[9px] text-blue-600">Net Pencairan Bersih Baru</p>
+                        </div>
+                        <div class="p-2.5 bg-blue-100 text-blue-700 rounded-lg"><i class="fa-solid fa-user-plus text-lg"></i></div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm bg-emerald-50/30 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">Potensi Mengulang (Per No Pinjam)</p>
+                            <h3 id="cardTotalMengulang" class="text-lg font-bold text-emerald-800 mt-1">Rp 0</h3>
+                            <p class="text-[9px] text-emerald-600">Net Pencairan Bersih</p>
+                        </div>
+                        <div class="p-2.5 bg-emerald-100 text-emerald-600 rounded-lg"><i class="fa-solid fa-rotate-right text-lg"></i></div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-amber-50/30 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-semibold text-amber-600 uppercase tracking-wider">Total Maksimal Angsuran Top-Up</p>
+                            <h3 id="cardTotalTopUpAngsuran" class="text-lg font-bold text-amber-800 mt-1">Rp 0 / bln</h3>
+                            <p id="cardTotalTopUpPlafon" class="text-[9px] text-amber-600 font-semibold">Net Top-Up: Rp 0</p>
+                        </div>
+                        <div class="p-2.5 bg-amber-100 text-amber-600 rounded-lg"><i class="fa-solid fa-arrow-up-right-dots text-lg"></i></div>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="mobile-section-title px-1 pt-1"><i class="fa-solid fa-chart-line text-indigo-600"></i><span>Prioritas Penawaran & Potensi Debitur</span></div>
+<div class="p-5 border-b border-slate-200 space-y-3">
+                        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Daftar Analisis Pinjaman, Sisa RPC & Tenor Penawaran</h3>
+                                <p class="text-xs text-slate-500">Sesuaikan tenor penawaran langsung melalui <span class="font-bold text-amber-700">slider / input angka</span> pada kolom Tenor Top-Up. <span class="text-emerald-700 font-medium">Klik nominal Potensi Mengulang (Net) atau Nett Plafon Top-Up untuk lihat rincian biaya dinamis (Anuitas).</span></p>
+                            </div>
+
+                            <!-- Search -->
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="searchInput" oninput="filterData()" placeholder="Cari No Pinjaman / CIF / Nama / Produk / No HP..." 
+                                    class="pl-8 pr-4 py-1.5 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none w-72">
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 text-xs">
+                            <span class="font-semibold text-slate-500"><i class="fa-solid fa-filter mr-1"></i>Filter:</span>
+                            
+                            <select id="filterProduk" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
+                                <option value="ALL">Semua Produk</option>
+                            </select>
+
+                            <select id="filterSumber" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
+                                <option value="ALL">Semua Sumber Penghasilan</option>
+                                <option value="GAJI">GAJI</option>
+                                <option value="TPP">TPP</option>
+                                <option value="SERTIFIKASI">SERTIFIKASI</option>
+                            </select>
+
+                            <select id="filterJenisPegawai" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
+                                <option value="ALL">Semua Jenis Pegawai (PNS/PPPK)</option>
+                                <option value="PPPK">Khusus PPPK</option>
+                                <option value="PNS">Khusus PNS</option>
+                            </select>
+
+                            <select id="filterAO" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
+                                <option value="ALL">Semua Kode AO</option>
+                            </select>
+
+                            <select id="filterStatus" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
+                                <option value="ALL">Semua Status Pinjaman</option>
+                                <option value="NEW">Potensi NEW (Debitur Baru)</option>
+                                <option value="ELIGIBLE_MENGULANG">Eligible Mengulang (Tenor ≥ 50%)</option>
+                                <option value="HAS_TOPUP">Memiliki Sisa RPC (Top-Up &gt; 0)</option>
+                            </select>
+                            <select id="sortPotensi" onchange="filterData()" class="py-1 px-2 border border-indigo-300 rounded bg-indigo-50 font-bold text-indigo-800">
+                                <option value="NET_DESC">🔥 Potensi NET Terbesar</option>
+                                <option value="NET_ASC">Potensi NET Terkecil</option>
+                                <option value="ORIGINAL">Urutan Data Awal</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="loanTableWrap" class="overflow-x-auto">
+                        <table id="loanTable" class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                    <th class="p-2.5 text-center">No</th>
+                                    <th class="p-2.5">No Pinjaman</th>
+                                    <th class="p-2.5">CIF, Nama, Pegawai & No HP</th>
+                                    <th class="p-2.5 text-center">Produk & Sumber</th>
+                                    <th class="p-2.5 text-center">Tenor Berjalan</th>
+                                    <th class="p-2.5 text-right text-slate-600">Angsuran Eksisting</th>
+                                    <th class="p-2.5 text-right font-bold text-amber-800 bg-amber-50">Max Angsuran Top-Up (Sisa RPC)</th>
+                                    <th class="p-2.5 text-center bg-amber-100/60 font-bold text-amber-900 border-x border-amber-200">
+                                        Tenor Top-Up (Edit)
+                                    </th>
+                                    <th class="p-2.5 text-right bg-amber-100/30 font-bold text-amber-900">Nett Plafon Top-Up <i class="fa-solid fa-circle-info text-amber-600 text-[10px]"></i></th>
+                                    <th class="p-2.5 text-right bg-blue-50 text-blue-900">Plafon Mengulang (Gross)</th>
+                                    <th class="p-2.5 text-right bg-emerald-50 text-emerald-900">Potensi Mengulang (Net) <i class="fa-solid fa-circle-info text-emerald-600 text-[10px]"></i></th>
+                                    <th class="p-2.5 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="loanTableBody" class="divide-y divide-slate-100">
+                                <!-- Rows generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- Tombol Download PDF Langsung -->
-        <div class="d-flex justify-content-end gap-2 mt-4 no-print">
-            <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="downloadPDF()">Download PDF Laporan Resmi</button>
+        <!-- ==================== Halaman 2: PANEL ADMIN & UPLOAD DATA ==================== -->
+        <div id="viewAdmin" class="hidden space-y-6">
+            
+            <!-- Admin Top Status Banner -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Panel Administrasi & Pengaturan Parameter
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Upload file excel nominatif kredit & penghasilan, serta sesuaikan skema suku bunga, tenor & tarif biaya kredit.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span id="adminDataStatusBadge" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200">
+                        Status Data: Belum Diupload
+                    </span>
+                    <button onclick="resetAllDataAndParams()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Data & Reset All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- File Nominatif Kredit -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <div class="flex items-center gap-2 text-indigo-800 font-bold mb-3 border-b pb-2">
+                        <i class="fa-solid fa-file-invoice-dollar text-lg text-indigo-600"></i>
+                        <h3 class="text-xs uppercase tracking-wider">1. File Nominatif Kredit (.xlsx)</h3>
+                    </div>
+                    <div id="dropZoneKredit" class="border-2 border-dashed border-indigo-300 rounded-xl p-5 bg-indigo-50/40 hover:bg-indigo-50 transition cursor-pointer flex flex-col items-center">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-indigo-500 mb-1"></i>
+                        <span class="text-xs font-semibold text-slate-700">Upload Data Kredit Aktif</span>
+                        <span class="text-[10px] text-slate-500 mt-0.5">No Pinjaman, CIF, Tipe Pinjaman, Baki Debet, Bunga Berjalan, Angsuran, No HP</span>
+                        <input type="file" id="excelKreditInput" accept=".xlsx, .xls" class="hidden" onchange="handleKreditUpload(event)">
+                        <label for="excelKreditInput" class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition shadow">
+                            Pilih File Kredit
+                        </label>
+                    </div>
+                    <div id="fileInfoKredit" class="hidden mt-2 text-xs text-emerald-700 font-semibold"></div>
+                </div>
+
+                <!-- File Data Penghasilan -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <div class="flex items-center gap-2 text-teal-800 font-bold mb-3 border-b pb-2">
+                        <i class="fa-solid fa-wallet text-lg text-teal-600"></i>
+                        <h3 class="text-xs uppercase tracking-wider">2. File Data Penghasilan Pegawai (.xlsx)</h3>
+                    </div>
+                    <div id="dropZonePenghasilan" class="border-2 border-dashed border-teal-300 rounded-xl p-5 bg-teal-50/40 hover:bg-teal-50 transition cursor-pointer flex flex-col items-center">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-teal-500 mb-1"></i>
+                        <span class="text-xs font-semibold text-slate-700">Upload Data Gaji / TPP / Sertifikasi</span>
+                        <span class="text-[10px] text-slate-500 mt-0.5">CIF, Kode AO, Nama, Status Pegawai, No HP, Gaji, TPP, Sertifikasi</span>
+                        <input type="file" id="excelPenghasilanInput" accept=".xls, .xlsx" class="hidden" onchange="handlePenghasilanUpload(event)">
+                        <label for="excelPenghasilanInput" class="mt-3 bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition shadow">
+                            Pilih File Penghasilan
+                        </label>
+                    </div>
+                    <div id="fileInfoPenghasilan" class="hidden mt-2 text-xs text-emerald-700 font-semibold"></div>
+                </div>
+            </div>
+
+            <!-- Pengaturan Parameter Suku Bunga & Max Tenor Produk -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center border-b pb-3 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-percent text-indigo-600"></i> Pengaturan Parameter Suku Bunga & Maksimal Tenor Per Produk
+                        </h3>
+                        <p class="text-xs text-slate-500">Daftar produk spesifik (G6B, J9K, G6J, G6G, J9J, J9L, dll). Perubahan akan tersimpan otomatis di browser.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resetProductParamsToDefault()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition">
+                            Reset Default Produk
+                        </button>
+                        <button onclick="saveProductParams()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Parameter Produk
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-semibold border-b">
+                                <th class="p-2.5">Kode Produk</th>
+                                <th class="p-2.5">Sumber Penghasilan</th>
+                                <th class="p-2.5 text-center">Batas RPC</th>
+                                <th class="p-2.5 text-center">Jenis Pegawai</th>
+                                <th class="p-2.5 text-center">Max Tenor (Bulan)</th>
+                                <th class="p-2.5 text-center">Bunga Top-Up / NEW (% p.a.)</th>
+                                <th class="p-2.5 text-center">Bunga Mengulang (% p.a.)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productParamTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Generated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pengaturan Tarif & Biaya-Biaya Kredit -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center border-b pb-3 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-coins text-amber-600"></i> Pengaturan Tarif & Biaya-Biaya Kredit
+                        </h3>
+                        <p class="text-xs text-slate-500">Pengaturan biaya provisi, jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resetFeeParamsToDefault()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition">
+                            Reset Default Biaya
+                        </button>
+                        <button onclick="saveFeeParams()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Parameter Biaya
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Biaya Provisi & Administrasi -->
+                    <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-indigo-900 text-xs border-b pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-signature"></i> 1. Tarif Provisi & Biaya Administrasi
+                        </h4>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block text-slate-600 font-medium mb-1">Provisi Tenor &lt; 84 Bln (%):</label>
+                                <input type="number" step="0.01" id="cfgProvisiLow" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-medium mb-1">Provisi Tenor &ge; 84 Bln (%):</label>
+                                <input type="number" step="0.01" id="cfgProvisiHigh" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t text-xs">
+                            <span class="font-semibold text-slate-700 block">Jenjang Biaya Administrasi (Rp):</span>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[10px] text-slate-500">&le; Rp 100 Jt</label>
+                                    <input type="number" id="cfgAdminTier1" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-500">100 Jt - 350 Jt</label>
+                                    <input type="number" id="cfgAdminTier2" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-500">&gt; Rp 350 Jt</label>
+                                    <input type="number" id="cfgAdminTier3" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarif Asuransi Usia & Tabungan Wajib -->
+                    <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-indigo-900 text-xs border-b pb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved"></i> 2. Tarif Asuransi Usia & Multiplier Tab. Wajib
+                        </h4>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-medium mb-1">Usia &lt; 40 Thn (%):</label>
+                                <input type="number" step="0.001" id="cfgAsrUnder40" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-medium mb-1">Usia 40-49 Thn (%):</label>
+                                <input type="number" step="0.001" id="cfgAsr40To49" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-medium mb-1">Usia 50-54 Thn (%):</label>
+                                <input type="number" step="0.001" id="cfgAsr50To54" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-medium mb-1">Usia &ge; 55 Thn (%):</label>
+                                <input type="number" step="0.001" id="cfgAsr55Up" class="w-full p-1.5 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 pt-2 border-t text-xs">
+                            <div>
+                                <label class="block text-slate-600 font-medium mb-1">Tab. Wajib Gaji PNS (x Angsuran):</label>
+                                <input type="number" id="cfgTabWajibGajiPns" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-medium mb-1">Tab. Wajib Produk Lain (x Angsuran):</label>
+                                <input type="number" id="cfgTabWajibOthers" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold text-xs">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Detail Debitur & WA Penawaran -->
+    <div id="debtorModal" class="fixed inset-0 bg-slate-900/60 hidden backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-150">
+            
+            <!-- Modal Header -->
+            <div class="bg-indigo-900 text-white p-5 flex justify-between items-start">
+                <div>
+                    <span id="modalStatusBadge" class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Fasilitas Aktif</span>
+                    <h2 id="modalNama" class="text-lg font-bold mt-1">Nama Debitur</h2>
+                    <p id="modalCifDinas" class="text-xs text-indigo-200">CIF: - | Dinas Pendidikan | Usia: 40 Thn (PPPK)</p>
+                </div>
+                <button onclick="closeDebtorModal()" class="text-indigo-200 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto space-y-5 text-xs">
+
+                <!-- Income & Rules Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">GAJI POKOK (RPC 90%)</span>
+                        <strong id="modalGaji" class="text-slate-700 text-sm">Rp 0</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">TPP / TUKIN (RPC 60%)</span>
+                        <strong id="modalTpp" class="text-slate-700 text-sm">Rp 0</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">SERTIFIKASI (RPC 90%)</span>
+                        <strong id="modalSertifikasi" class="text-slate-700 text-sm">Rp 0</strong>
+                    </div>
+                    <div class="bg-indigo-100/50 p-1.5 rounded-lg border border-indigo-200">
+                        <span class="text-indigo-600 font-bold block text-[10px]">MAX TENOR PEGAWAI</span>
+                        <strong id="modalMaxTenorText" class="text-indigo-900 text-sm">120 Bulan (PPPK)</strong>
+                    </div>
+                </div>
+
+                <!-- Existing Credit Facilities -->
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-credit-card text-indigo-600"></i> Rincian Fasilitas Kredit Aktif & Analisis Sisa RPC
+                    </h4>
+                    <div class="border rounded-xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 text-[11px]">
+                                    <th class="p-2">No Pinjaman</th>
+                                    <th class="p-2">Produk</th>
+                                    <th class="p-2 text-center">Sumber</th>
+                                    <th class="p-2 text-center">Tenor Berjalan</th>
+                                    <th class="p-2 text-right">Baki Debet</th>
+                                    <th class="p-2 text-right">Bunga Berjalan</th>
+                                    <th class="p-2 text-right text-red-600">Musisi Asuransi</th>
+                                    <th class="p-2 text-right">Angsuran</th>
+                                    <th class="p-2 text-right bg-amber-50 font-bold text-amber-900">Max Angsuran Top-Up</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalFacilityTable" class="divide-y divide-slate-100">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Offer Configurator -->
+                <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-200 space-y-3">
+                    <h4 class="font-bold text-indigo-900 flex items-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Configurator Penawaran WhatsApp
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Target Fasilitas:</label>
+                            <select id="modalLoanTarget" onchange="onModalLoanChange()" class="w-full p-2 border border-indigo-300 rounded-lg text-xs bg-white font-medium text-slate-800">
+                                <!-- Generated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Jenis Penawaran:</label>
+                            <div class="flex gap-1.5 pt-1">
+                                <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
+                                    <input type="radio" name="offerType" value="TOPUP" onchange="updateWaPreview()" checked>
+                                    <span class="text-amber-700">Top-Up</span>
+                                </label>
+                                <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
+                                    <input type="radio" name="offerType" value="MENGULANG" onchange="updateWaPreview()">
+                                    <span class="text-emerald-700">Mengulang</span>
+                                </label>
+                                <label id="labelOfferNew" class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400 hidden">
+                                    <input type="radio" name="offerType" value="NEW" onchange="updateWaPreview()">
+                                    <span class="text-blue-700">NEW</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Opsi Jenis Nominal WA (Gross vs Net) -->
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Nominal Disampaikan di WA:</label>
+                            <div class="flex gap-1.5 pt-1">
+                                <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
+                                    <input type="radio" name="nominalType" value="NET" onchange="updateWaPreview()" checked>
+                                    <span class="text-emerald-800">Nett Pencairan</span>
+                                </label>
+                                <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
+                                    <input type="radio" name="nominalType" value="GROSS" onchange="updateWaPreview()">
+                                    <span class="text-indigo-800">Plafon Gross</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Tenor Adjuster in Modal -->
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Tenor Penawaran (Bulan):</label>
+                            <div class="flex items-center gap-2 bg-white p-1 rounded-lg border border-indigo-200">
+                                <input type="number" id="modalTenorInput" min="1" oninput="onModalTenorChange(this.value)" 
+                                    class="w-16 p-1 text-center font-mono font-bold text-indigo-900 border border-indigo-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <span class="text-[10px] text-slate-500 font-semibold">Bln</span>
+                                <input type="range" id="modalTenorRange" min="1" oninput="onModalTenorChange(this.value)" 
+                                    class="w-full h-1.5 bg-indigo-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WA Preview Box -->
+                    <div>
+                        <label class="block text-slate-600 font-semibold mb-1">Preview Pesan WhatsApp:</label>
+                        <textarea id="waPreviewText" rows="5" class="w-full p-2.5 text-xs font-mono bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-700"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-100 p-4 flex justify-between items-center border-t">
+                <span class="text-slate-600 text-xs font-medium"><i class="fa-solid fa-phone text-emerald-600 mr-1"></i> WhatsApp: <b id="modalNoHpText" class="font-mono text-indigo-900">-</b></span>
+                <div class="flex gap-2">
+                    <button onclick="closeDebtorModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold">Tutup</button>
+                    <button onclick="sendWaDirect()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center gap-2 shadow">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Kirim WA Penawaran
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- JavaScript Logika Aplikasi -->
+    <!-- Modal Pop-Up Rincian Potensi Mengulang & Top-Up (Nett) -->
+    <div id="mengulangDetailModal" class="fixed inset-0 bg-slate-900/60 hidden backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col animate-in fade-in zoom-in duration-150">
+            <!-- Header -->
+            <div id="modalDetailHeader" class="bg-emerald-800 text-white p-4 flex justify-between items-center transition-colors">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-amber-300 text-xl"></i>
+                    <div>
+                        <h3 id="modalDetailTitle" class="font-bold text-sm">Simulasi Rincian Biaya Dinamis & Net Pencairan Bersih</h3>
+                        <p id="mNoPinjamanTitle" class="text-[11px] text-emerald-200 font-mono">No. Pinjaman: -</p>
+                    </div>
+                </div>
+                <button onclick="closeMengulangDetailModal()" class="text-emerald-200 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-5 space-y-4 text-xs overflow-y-auto max-h-[80vh]">
+                <!-- Info Debitur & Parameter -->
+                <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-200 grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">DEBITUR</span>
+                        <strong id="mNamaDebitur" class="text-slate-800 text-xs truncate block">-</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">PRODUK / PENGAJUAN</span>
+                        <strong id="mProduk" class="text-indigo-900 text-xs">-</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">SUKU BUNGA (ANUITAS)</span>
+                        <strong id="mBungaRate" class="text-indigo-900 text-xs">0% p.a.</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 font-semibold block text-[10px]">JANGKA WAKTU</span>
+                        <strong id="mTenorBulan" class="text-indigo-900 text-xs">0 Bulan</strong>
+                    </div>
+                </div>
+
+                <!-- Breakdown Plafon & Biaya -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-100 p-2.5 font-bold text-slate-700 text-xs flex justify-between items-center">
+                        <span>Komponen Perhitungan Kredit (Anuitas) & Potongan Biaya Dinamis</span>
+                        <span class="text-[10px] text-slate-500 font-normal">*Presisi Parameter Biaya</span>
+                    </div>
+
+                    <div class="p-3 space-y-2 divide-y divide-slate-100">
+                        <div class="flex justify-between items-center pt-1 font-bold text-indigo-900 text-sm">
+                            <span>1. Plafon Kredit Baru (Gross)</span>
+                            <span id="mPlafonGross" class="font-mono">Rp 0</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-2 text-slate-600">
+                            <span>Estimasi Angsuran Baru / bln (Anuitas)</span>
+                            <span id="mAngsuranBaru" class="font-mono font-semibold text-slate-800">Rp 0</span>
+                        </div>
+
+                        <!-- Sub Biaya Biaya -->
+                        <div class="pt-3 space-y-1.5">
+                            <span class="font-bold text-amber-900 block pb-1">2. Rincian Biaya Dinamis & Potongan Pelunasan:</span>
+                            
+                            <div class="flex justify-between items-center pl-3 text-slate-700">
+                                <span id="lblBiayaProvisi">• Biaya Provisi</span>
+                                <span id="mBiayaProvisi" class="font-mono">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center pl-3 text-slate-700">
+                                <span id="lblBiayaAdmin">• Biaya Administrasi</span>
+                                <span id="mBiayaAdmin" class="font-mono">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center pl-3 text-slate-700">
+                                <span id="lblBiayaAsuransi">• Biaya Asuransi (Roundup Usia & Tenor)</span>
+                                <span id="mBiayaAsuransi" class="font-mono">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center pl-3 text-slate-700">
+                                <span id="lblTabunganWajib">• Tabungan Wajib</span>
+                                <span id="mTabunganWajib" class="font-mono">Rp 0</span>
+                            </div>
+                            <div id="rowPelunasanBakiDebet" class="flex justify-between items-center pl-3 text-red-700 font-semibold">
+                                <span>• Pelunasan Baki Debet Eksisting</span>
+                                <span id="mPelunasanBakiDebet" class="font-mono">Rp 0</span>
+                            </div>
+                            <div id="rowPelunasanBungaBerjalan" class="flex justify-between items-center pl-3 text-red-700 font-semibold">
+                                <span>• Pelunasan Bunga Berjalan</span>
+                                <span id="mPelunasanBungaBerjalan" class="font-mono">Rp 0</span>
+                            </div>
+                            <div id="rowBiayaMusisiAsuransi" class="flex justify-between items-center pl-3 text-red-700 font-semibold">
+                                <span>• Biaya Musisi Asuransi</span>
+                                <span id="mBiayaMusisiAsuransi" class="font-mono">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2 font-bold text-slate-700">
+                            <span>Total Estimasi Biaya & Potongan Pelunasan</span>
+                            <span id="mTotalPotongan" class="font-mono text-red-700">Rp 0</span>
+                        </div>
+
+                        <!-- Result Highlight -->
+                        <div id="boxNetPencairan" class="flex justify-between items-center pt-3 bg-emerald-50 p-3 rounded-lg border border-emerald-300 text-emerald-900 font-extrabold text-sm">
+                            <span>3. Estimasi Net Pencairan Bersih (Nett)</span>
+                            <span id="mNetPencairan" class="font-mono text-base text-emerald-700">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-slate-100 p-3.5 flex justify-end gap-2 border-t">
+                <button onclick="closeMengulangDetailModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold">Tutup</button>
+                <button id="btnMengulangOpenWa" onclick="" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold flex items-center gap-1.5 shadow">
+                    <i class="fa-brands fa-whatsapp"></i> Buka WA Penawaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript & Logic Core -->
     <script>
-        let databaseLaporan = JSON.parse(localStorage.getItem('data_laporan_ao_v13')) || [];
-        const urutanKantorBaku = ["Cabang", "Rengasdengklok", "Cilamaya", "Klari", "Cikampek", "Telagasari", "Pemda"];
-        tampilkanData();
+        // State Variabel Raw Data
+        let kreditRawData = [];
+        let penghasilanRawData = [];
+        let cifDatabase = {}; 
+        let loanDatabase = []; 
+        let selectedLoanId = null;
 
-        function formatRatusan(input) {
-            let value = input.value.replace(/[^,\d]/g, '').toString();
-            let split = value.split(',');
-            let sisa = split[0].length % 3;
-            let rupiah = split[0].substr(0, sisa);
-            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        // Default Master Parameter Produk & Suku Bunga (Berdasarkan Spesifikasi Asal)
+        const DEFAULT_PRODUCT_MASTER = {
+            'G6B': { name: 'G6B', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 300, jenisPegawai: 'PNS', rateTopUp: 0.119, rateMengulang: 0.125 },
+            'G6K': { name: 'G6K', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 300, jenisPegawai: 'PNS', rateTopUp: 0.119, rateMengulang: 0.125 },
+            'G6L': { name: 'G6L', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 300, jenisPegawai: 'PNS', rateTopUp: 0.119, rateMengulang: 0.125 },
+            'J9K': { name: 'J9K', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 120, jenisPegawai: 'PPPK', rateTopUp: 0.129, rateMengulang: 0.135 },
+            'G6M': { name: 'G6M', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 120, jenisPegawai: 'PPPK', rateTopUp: 0.129, rateMengulang: 0.135 },
+            'G6N': { name: 'G6N', sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 120, jenisPegawai: 'PPPK', rateTopUp: 0.129, rateMengulang: 0.135 },
+            'G6H': { name: 'G6H', sumber: 'TPP', rpcPercent: 0.60, maxTenorProduct: 180, jenisPegawai: 'PNS', rateTopUp: 0.130, rateMengulang: 0.130 },
+            'G6G': { name: 'G6G', sumber: 'TPP', rpcPercent: 0.60, maxTenorProduct: 180, jenisPegawai: 'PNS', rateTopUp: 0.130, rateMengulang: 0.130 },
+            'J9L': { name: 'J9L', sumber: 'TPP', rpcPercent: 0.60, maxTenorProduct: 120, jenisPegawai: 'PPPK', rateTopUp: 0.135, rateMengulang: 0.135 },
+            'G6J': { name: 'G6J', sumber: 'SERTIFIKASI', rpcPercent: 0.90, maxTenorProduct: 180, jenisPegawai: 'PNS', rateTopUp: 0.135, rateMengulang: 0.150 },
+            'J9J': { name: 'J9J', sumber: 'SERTIFIKASI', rpcPercent: 0.90, maxTenorProduct: 120, jenisPegawai: 'PPPK', rateTopUp: 0.135, rateMengulang: 0.150 }
+        };
 
-            if (ribuan) {
-                let separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
+        // Default Master Tarif & Biaya Kredit
+        const DEFAULT_FEE_PARAMS = {
+            provisiLow: 0.2,    // < 84 bln (%) -> 0.002
+            provisiHigh: 1.5,   // >= 84 bln (%) -> 0.015
+            adminTier1: 200000, // <= 100 Jt
+            adminTier2: 350000, // 100Jt - 350Jt
+            adminTier3: 600000, // > 350Jt
+            asrUnder40: 0.500,  // %
+            asr40To49: 0.700,   // %
+            asr50To54: 1.525,   // %
+            asr55Up: 2.033,     // %
+            tabWajibGajiPns: 1, // multiplier
+            tabWajibOthers: 3   // multiplier
+        };
+
+        // Active Configurations (Loaded from LocalStorage or Defaults)
+        let productParams = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_MASTER));
+        let feeParams = JSON.parse(JSON.stringify(DEFAULT_FEE_PARAMS));
+
+        // Switch Halaman (Tampilan AO vs Panel Admin)
+        function switchView(viewName) {
+            const viewAO = document.getElementById('viewAO');
+            const viewAdmin = document.getElementById('viewAdmin');
+            const navBtnAO = document.getElementById('navBtnAO');
+            const navBtnAdmin = document.getElementById('navBtnAdmin');
+
+            if (viewName === 'AO') {
+                viewAO.classList.remove('hidden');
+                viewAdmin.classList.add('hidden');
+                navBtnAO.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+                navBtnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60";
+            } else {
+                viewAdmin.classList.remove('hidden');
+                viewAO.classList.add('hidden');
+                navBtnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+                navBtnAO.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60";
             }
-            input.value = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
         }
 
-        function parseAngka(id) {
-            let val = document.getElementById(id).value;
-            if (!val) return 0;
-            return parseFloat(val.replace(/\./g, '').replace(/,/g, '.')) || 0;
+        // Helper String & Normalisasi
+        function normalizeKey(key) {
+            return key.toString().toLowerCase().trim().replace(/[^a-z0-9]/g, '');
         }
 
-        function formatRibuan(angka) {
-            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        function normalizeCif(val) {
+            if (val === null || val === undefined) return '';
+            return val.toString().trim().toUpperCase();
         }
 
-        function hitungNet() {
-            let noaBaru = parseAngka('noaBaru');
-            let osBaru = parseAngka('osBaru');
-            let noaMengulang = parseAngka('noaMengulang');
-            let osMengulang = parseAngka('osMengulang');
-            let osLunas = parseAngka('osLunas');
-
-            let totalNoa = noaBaru + noaMengulang;
-            let netOs = (osBaru + osMengulang) - osLunas;
-
-            document.getElementById('totalNoa').value = formatRibuan(totalNoa);
-            document.getElementById('netOs').value = formatRibuan(netOs);
-        }
-
-        function tambahData(event) {
-            event.preventDefault();
-
-            let noaBaru = parseAngka('noaBaru');
-            let osBaru = parseAngka('osBaru');
-            let noaMengulang = parseAngka('noaMengulang');
-            let osMengulang = parseAngka('osMengulang');
-            let noaLunas = parseAngka('noaLunas');
-            let osLunas = parseAngka('osLunas');
-
-            let laporan = {
-                id: Date.now(),
-                divisi: document.getElementById('divisi').value || '-',
-                namaKantor: document.getElementById('namaKantor').value || '-',
-                namaAo: document.getElementById('namaAo').value || '-',
-                noaBaru: noaBaru,
-                osBaru: osBaru,
-                noaMengulang: noaMengulang,
-                osMengulang: osMengulang,
-                noaLunas: noaLunas,
-                osLunas: osLunas,
-                totalNoa: noaBaru + noaMengulang,
-                netOs: (osBaru + osMengulang) - osLunas
-            };
-
-            databaseLaporan.push(laporan);
-            localStorage.setItem('data_laporan_ao_v13', JSON.stringify(databaseLaporan));
+        function parseNumber(val) {
+            if (val === null || val === undefined) return 0;
+            if (typeof val === 'number') return isNaN(val) ? 0 : val;
+            let str = val.toString().trim();
+            if (!str) return 0;
             
-            tampilkanData();
-            document.getElementById('formRealisasi').reset();
-            document.getElementById('totalNoa').value = '0';
-            document.getElementById('netOs').value = '0';
-            alert('Laporan berhasil disimpan!');
+            str = str.replace(/[^0-9,-.]/g, '');
+            if (!str) return 0;
+            
+            if (str.includes('.') && str.includes(',')) {
+                if (str.indexOf('.') < str.indexOf(',')) {
+                    str = str.replace(/\./g, '').replace(',', '.');
+                } else {
+                    str = str.replace(/,/g, '');
+                }
+            } else if (str.includes('.')) {
+                const parts = str.split('.');
+                if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+                    str = str.replace(/\./g, '');
+                }
+            } else if (str.includes(',')) {
+                const parts = str.split(',');
+                if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+                    str = str.replace(/,/g, '');
+                } else {
+                    str = str.replace(',', '.');
+                }
+            }
+            return parseFloat(str) || 0;
         }
 
-        function groupDataByKantorBaku(dataArray) {
-            let grouped = {};
-            // Inisialisasi urutan baku agar tersusun sesuai urutan array
-            urutanKantorBaku.forEach(k => { grouped[k] = []; });
+        function isPhoneColumn(normKey) {
+            const key = (normKey || '').toString().toLowerCase().trim();
+            return key.includes('nohp') || key.includes('hpwa') || key.includes('nohpon') ||
+                   key.includes('nomorhp') || key.includes('nomorwa') || key.includes('nomorhandphone') ||
+                   key.includes('handphone') || key.includes('telephone') || key.includes('telepon') ||
+                   key.includes('telp') || key.includes('phone') || key.includes('mobile') ||
+                   key.includes('whatsapp') || key.includes('whatapp') || key.includes('wa') ||
+                   key.includes('kontak') || key.includes('cell');
+        }
 
-            dataArray.forEach(item => {
-                let kantor = item.namaKantor;
-                if (!grouped[kantor]) {
-                    grouped[kantor] = []; // Tangani jika ada kantor di luar daftar baku
+        function isPhoneValue(val) {
+            if (val === null || val === undefined) return false;
+            const raw = val.toString().trim();
+            if (!raw) return false;
+            const digits = raw.replace(/[^0-9]/g, '');
+            return digits.length >= 9 && digits.length <= 16;
+        }
+
+        function isAoColumn(normKey) {
+            return normKey === 'ao' || normKey.includes('kodeao') || normKey.includes('petugasao') || normKey.includes('officer');
+        }
+
+        function isStatusColumn(normKey) {
+            if (normKey.includes('nama') || normKey.includes('rekening') || normKey.includes('pinjaman') || normKey.includes('kredit')) return false;
+            return normKey.includes('statuspegawai') || 
+                   normKey.includes('jenispegawai') || 
+                   normKey.includes('tipepegawai') || 
+                   normKey.includes('jenisdebitur') ||
+                   normKey.includes('tipedebitur') ||
+                   normKey.includes('statusdebitur') ||
+                   normKey.includes('pppk') || 
+                   normKey.includes('p3k') || 
+                   normKey.includes('pns') ||
+                   normKey === 'status' ||
+                   normKey === 'pegawai';
+        }
+
+        function isPppkDebtor(status) {
+            if (!status) return false;
+            const str = status.toString().trim().toUpperCase();
+            return str.includes('PPPK') || str.includes('P3K') || str.includes('KONTRAK') || str.includes('HONOR') || str.includes('NON ASN') || str.includes('NON-ASN') || str.includes('PEGAWAI PEMERINTAH');
+        }
+
+        function parseStatusPegawai(val) {
+            if (!val) return null;
+            const str = val.toString().trim().toUpperCase();
+            if (isPppkDebtor(str)) return 'PPPK';
+            if (str.includes('PNS') || str.includes('ASN') || str.includes('TETAP') || str.includes('CIVIL')) return 'PNS';
+            return null;
+        }
+
+        function parseExcelDate(val) {
+            if (!val) return null;
+            if (val instanceof Date) return val;
+            if (typeof val === 'number') return new Date(Math.round((val - 25569) * 86400 * 1000));
+            if (typeof val === 'string') {
+                const parsed = new Date(val);
+                if (!isNaN(parsed.getTime())) return parsed;
+            }
+            return null;
+        }
+
+        function formatPhoneForWA(phone) {
+            if (phone === null || phone === undefined) return '';
+
+            let raw = phone.toString().trim();
+            if (!raw) return '';
+
+            // Tangani angka Excel yang berubah menjadi notasi ilmiah, mis. 8.123456789E+11.
+            if (/^[0-9]+(?:[.,][0-9]+)?e[+-]?[0-9]+$/i.test(raw)) {
+                const numeric = Number(raw.replace(',', '.'));
+                if (Number.isFinite(numeric)) raw = Math.round(numeric).toString();
+            }
+
+            let cleaned = raw.replace(/[^0-9]/g, '');
+            if (!cleaned) return '';
+
+            if (cleaned.startsWith('620')) {
+                cleaned = '62' + cleaned.substring(3);
+            } else if (cleaned.startsWith('0')) {
+                cleaned = '62' + cleaned.substring(1);
+            } else if (cleaned.startsWith('8')) {
+                cleaned = '62' + cleaned;
+            }
+
+            return cleaned;
+        }
+
+        // --- PERSISTENSI BROWSER: LOCALSTORAGE + INDEXEDDB FALLBACK ---
+        const APP_STORAGE_PREFIX = 'analisisKredit_v4_';
+        const STORAGE_DB_NAME = 'AnalisisKreditDB';
+        const STORAGE_DB_VERSION = 1;
+        const STORAGE_STORE_NAME = 'datasets';
+
+        function getStorageKey(name) {
+            return APP_STORAGE_PREFIX + name;
+        }
+
+        function safeLocalStorageGet(key) {
+            try { return window.localStorage.getItem(key); }
+            catch (e) { console.warn('localStorage.getItem gagal:', e); return null; }
+        }
+
+        function safeLocalStorageSet(key, value) {
+            try {
+                window.localStorage.setItem(key, value);
+                return true;
+            } catch (e) {
+                console.warn('localStorage.setItem gagal, fallback ke IndexedDB:', e);
+                return false;
+            }
+        }
+
+        function openAppDatabase() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('IndexedDB tidak tersedia di browser ini.'));
+                    return;
                 }
-                grouped[kantor].push(item);
+                const req = indexedDB.open(STORAGE_DB_NAME, STORAGE_DB_VERSION);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains(STORAGE_STORE_NAME)) {
+                        db.createObjectStore(STORAGE_STORE_NAME);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('Gagal membuka IndexedDB.'));
             });
+        }
 
-            // Filter hanya kantor yang memiliki data
-            let result = {};
-            for (let kantor in grouped) {
-                if (grouped[kantor].length > 0) {
-                    result[kantor] = grouped[kantor];
+        async function idbSet(key, value) {
+            const db = await openAppDatabase();
+            try {
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORAGE_STORE_NAME, 'readwrite');
+                    tx.objectStore(STORAGE_STORE_NAME).put(value, key);
+                    tx.oncomplete = resolve;
+                    tx.onerror = () => reject(tx.error || new Error('Gagal menyimpan IndexedDB.'));
+                    tx.onabort = () => reject(tx.error || new Error('Transaksi IndexedDB dibatalkan.'));
+                });
+            } finally {
+                db.close();
+            }
+        }
+
+        async function idbGet(key) {
+            const db = await openAppDatabase();
+            try {
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORAGE_STORE_NAME, 'readonly');
+                    const req = tx.objectStore(STORAGE_STORE_NAME).get(key);
+                    req.onsuccess = () => resolve(req.result ?? null);
+                    req.onerror = () => reject(req.error || new Error('Gagal membaca IndexedDB.'));
+                });
+            } finally {
+                db.close();
+            }
+        }
+
+        async function persistDataset(name, data) {
+            const serialized = JSON.stringify(data);
+            const v4Key = getStorageKey(name);
+
+            if (safeLocalStorageSet(v4Key, serialized)) return 'localStorage';
+
+            try {
+                await idbSet(v4Key, serialized);
+                return 'indexedDB';
+            } catch (e) {
+                console.error('Persistensi dataset gagal:', name, e);
+                throw new Error(`Data ${name} tidak dapat disimpan di browser.`);
+            }
+        }
+
+        async function loadDataset(name, legacyKey) {
+            const v4Key = getStorageKey(name);
+            const localValue = safeLocalStorageGet(v4Key);
+            if (localValue) {
+                try { return JSON.parse(localValue); }
+                catch (e) { console.warn('Data v4 rusak, mencoba sumber lain:', e); }
+            }
+
+            try {
+                const idbValue = await idbGet(v4Key);
+                if (idbValue) {
+                    try { return JSON.parse(idbValue); }
+                    catch (e) { console.warn('Data IndexedDB rusak:', e); }
+                }
+            } catch (e) {
+                console.warn('Pembacaan IndexedDB gagal:', e);
+            }
+
+            const legacyValue = safeLocalStorageGet(legacyKey);
+            if (legacyValue) {
+                try {
+                    const parsed = JSON.parse(legacyValue);
+                    try { await persistDataset(name, parsed); } catch (e) { console.warn('Migrasi data lama gagal:', e); }
+                    return parsed;
+                } catch (e) {
+                    console.error(`Data lama ${legacyKey} tidak valid:`, e);
                 }
             }
-            return result;
+            return null;
         }
 
-        function tampilkanData() {
-            let tbodyKonsumerWeb = document.getElementById('tabelKonsumerWeb');
-            let tbodyRitelWeb = document.getElementById('tabelRitelWeb');
-            let tbodyKonsumerPdf = document.getElementById('tabelKonsumerPdf');
-            let tbodyRitelPdf = document.getElementById('tabelRitelPdf');
-            
-            tbodyKonsumerWeb.innerHTML = '';
-            tbodyRitelWeb.innerHTML = '';
-            tbodyKonsumerPdf.innerHTML = '';
-            tbodyRitelPdf.innerHTML = '';
+        function normalizePhoneFromRow(row) {
+            const keys = Object.keys(row || {});
+            const exactAliases = [
+                'no hp / wa', 'no hp/wa', 'no hp', 'nomor hp', 'nomor handphone',
+                'no handphone', 'no. hp', 'no wa', 'nomor wa', 'whatsapp', 'wa',
+                'telepon', 'no telepon', 'nomor telepon', 'no telp', 'telp', 'phone', 'mobile'
+            ];
 
-            let dataKonsumer = databaseLaporan.filter(item => item.divisi === 'Konsumer');
-            let dataRitel = databaseLaporan.filter(item => item.divisi === 'Ritel');
-
-            // --- Render Konsumer ---
-            if (dataKonsumer.length === 0) {
-                tbodyKonsumerWeb.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Belum ada data untuk Divisi Konsumer.</td></tr>`;
-                tbodyKonsumerPdf.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Belum ada data rekapitulasi.</td></tr>`;
-            } else {
-                let sumK = hitungTotal(dataKonsumer);
-                let groupedK = groupDataByKantorBaku(dataKonsumer);
-                let noCounter = 1;
-
-                for (let kantor in groupedK) {
-                    let items = groupedK[kantor];
-                    items.forEach((item, index) => {
-                        tbodyKonsumerWeb.innerHTML += buatBarisWeb(item, noCounter, kantor, index === 0, items.length);
-                        tbodyKonsumerPdf.innerHTML += buatBarisPdf(item, noCounter, kantor, index === 0, items.length);
-                        noCounter++;
-                    });
-                }
-
-                // Baris Total Web
-                tbodyKonsumerWeb.innerHTML += `
-                    <tr class="table-secondary fw-bold">
-                        <td colspan="3" class="text-end">TOTAL KONSUMER:</td>
-                        <td class="text-center">${formatRibuan(sumK.noaBaru)}</td>
-                        <td class="text-end">${formatRibuan(sumK.osBaru)}</td>
-                        <td class="text-center">${formatRibuan(sumK.noaMengulang)}</td>
-                        <td class="text-end">${formatRibuan(sumK.osMengulang)}</td>
-                        <td class="text-center">${formatRibuan(sumK.noaLunas)}</td>
-                        <td class="text-end">${formatRibuan(sumK.osLunas)}</td>
-                        <td class="text-center text-success">${formatRibuan(sumK.totalNoa)}</td>
-                        <td class="text-end text-success">${formatRibuan(sumK.netOs)}</td>
-                        <td></td>
-                    </tr>`;
-                // Baris Total PDF
-                tbodyKonsumerPdf.innerHTML += `
-                    <tr style="background-color: #edf2f7; font-weight: bold;">
-                        <td colspan="3" style="text-align: right;">TOTAL KONSUMER:</td>
-                        <td style="text-align: center;">${formatRibuan(sumK.noaBaru)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumK.osBaru)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumK.noaMengulang)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumK.osMengulang)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumK.noaLunas)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumK.osLunas)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumK.totalNoa)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumK.netOs)}</td>
-                    </tr>`;
+            for (const alias of exactAliases) {
+                const aliasNorm = normalizeKey(alias);
+                const found = keys.find(k => normalizeKey(k) === aliasNorm);
+                if (found && isPhoneValue(row[found])) return formatPhoneForWA(row[found]);
             }
 
-            // --- Render Ritel ---
-            if (dataRitel.length === 0) {
-                tbodyRitelWeb.innerHTML = `<tr><td colspan="12" class="text-center text-muted">Belum ada data untuk Divisi Ritel.</td></tr>`;
-                tbodyRitelPdf.innerHTML = `<tr><td colspan="11" class="text-center text-muted">Belum ada data rekapitulasi.</td></tr>`;
-            } else {
-                let sumR = hitungTotal(dataRitel);
-                let groupedR = groupDataByKantorBaku(dataRitel);
-                let noCounter = 1;
-
-                for (let kantor in groupedR) {
-                    let items = groupedR[kantor];
-                    items.forEach((item, index) => {
-                        tbodyRitelWeb.innerHTML += buatBarisWeb(item, noCounter, kantor, index === 0, items.length);
-                        tbodyRitelPdf.innerHTML += buatBarisPdf(item, noCounter, kantor, index === 0, items.length);
-                        noCounter++;
-                    });
-                }
-
-                // Baris Total Web
-                tbodyRitelWeb.innerHTML += `
-                    <tr class="table-secondary fw-bold">
-                        <td colspan="3" class="text-end">TOTAL RITEL:</td>
-                        <td class="text-center">${formatRibuan(sumR.noaBaru)}</td>
-                        <td class="text-end">${formatRibuan(sumR.osBaru)}</td>
-                        <td class="text-center">${formatRibuan(sumR.noaMengulang)}</td>
-                        <td class="text-end">${formatRibuan(sumR.osMengulang)}</td>
-                        <td class="text-center">${formatRibuan(sumR.noaLunas)}</td>
-                        <td class="text-end">${formatRibuan(sumR.osLunas)}</td>
-                        <td class="text-center text-success">${formatRibuan(sumR.totalNoa)}</td>
-                        <td class="text-end text-success">${formatRibuan(sumR.netOs)}</td>
-                        <td></td>
-                    </tr>`;
-                // Baris Total PDF
-                tbodyRitelPdf.innerHTML += `
-                    <tr style="background-color: #edf2f7; font-weight: bold;">
-                        <td colspan="3" style="text-align: right;">TOTAL RITEL:</td>
-                        <td style="text-align: center;">${formatRibuan(sumR.noaBaru)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumR.osBaru)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumR.noaMengulang)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumR.osMengulang)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumR.noaLunas)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumR.osLunas)}</td>
-                        <td style="text-align: center;">${formatRibuan(sumR.totalNoa)}</td>
-                        <td style="text-align: right;">${formatRibuan(sumR.netOs)}</td>
-                    </tr>`;
-            }
+            const foundByColumn = keys.find(k => isPhoneColumn(normalizeKey(k)) && isPhoneValue(row[k]));
+            return foundByColumn ? formatPhoneForWA(row[foundByColumn]) : '';
         }
 
-        function hitungTotal(dataArray) {
-            return dataArray.reduce((acc, curr) => {
-                acc.noaBaru += curr.noaBaru;
-                acc.osBaru += curr.osBaru;
-                acc.noaMengulang += curr.noaMengulang;
-                acc.osMengulang += curr.osMengulang;
-                acc.noaLunas += curr.noaLunas;
-                acc.osLunas += curr.osLunas;
-                acc.totalNoa += curr.totalNoa;
-                acc.netOs += curr.netOs;
-                return acc;
-            }, { noaBaru: 0, osBaru: 0, noaMengulang: 0, osMengulang: 0, noaLunas: 0, osLunas: 0, totalNoa: 0, netOs: 0 });
-        }
+        // --- UPLOAD HANDLERS & LOCALSTORAGE WRAPPER ---
+        function handleKreditUpload(e) {
+            const file = e.target.files ? e.target.files[0] : e;
+            if (!file) return;
+            document.getElementById('fileInfoKredit').innerText = `Loaded: ${file.name}`;
+            document.getElementById('fileInfoKredit').classList.remove('hidden');
 
-        function buatBarisWeb(item, no, kantor, isFirstInGroup, groupLength) {
-            let kantorCell = isFirstInGroup ? `<td rowspan="${groupLength}" class="align-middle fw-bold bg-light">${kantor}</td>` : '';
-            return `<tr>
-                <td class="text-center">${no}</td>
-                ${kantorCell}
-                <td>${item.namaAo}</td>
-                <td class="text-center">${formatRibuan(item.noaBaru)}</td>
-                <td class="text-end">${formatRibuan(item.osBaru)}</td>
-                <td class="text-center">${formatRibuan(item.noaMengulang)}</td>
-                <td class="text-end">${formatRibuan(item.osMengulang)}</td>
-                <td class="text-center">${formatRibuan(item.noaLunas)}</td>
-                <td class="text-end">${formatRibuan(item.osLunas)}</td>
-                <td class="text-center fw-bold text-success">${formatRibuan(item.totalNoa)}</td>
-                <td class="text-end fw-bold text-success">${formatRibuan(item.netOs)}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-danger" onclick="hapusData(${item.id})">Hapus</button>
-                </td>
-            </tr>`;
-        }
-
-        function buatBarisPdf(item, no, kantor, isFirstInGroup, groupLength) {
-            let kantorCell = isFirstInGroup ? `<td rowspan="${groupLength}" style="vertical-align: middle; font-weight: bold; background-color: #f7fafc;">${kantor}</td>` : '';
-            return `<tr>
-                <td style="text-align: center;">${no}</td>
-                ${kantorCell}
-                <td>${item.namaAo}</td>
-                <td style="text-align: center;">${formatRibuan(item.noaBaru)}</td>
-                <td style="text-align: right;">${formatRibuan(item.osBaru)}</td>
-                <td style="text-align: center;">${formatRibuan(item.noaMengulang)}</td>
-                <td style="text-align: right;">${formatRibuan(item.osMengulang)}</td>
-                <td style="text-align: center;">${formatRibuan(item.noaLunas)}</td>
-                <td style="text-align: right;">${formatRibuan(item.osLunas)}</td>
-                <td style="text-align: center; font-weight: bold;">${formatRibuan(item.totalNoa)}</td>
-                <td style="text-align: right; font-weight: bold;">${formatRibuan(item.netOs)}</td>
-            </tr>`;
-        }
-
-        function hapusData(id) {
-            if (confirm('Yakin ingin menghapus data laporan ini?')) {
-                databaseLaporan = databaseLaporan.filter(item => item.id !== id);
-                localStorage.setItem('data_laporan_ao_v13', JSON.stringify(databaseLaporan));
-                tampilkanData();
-            }
-        }
-
-        function downloadPDF() {
-            let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            let tanggalHariIni = new Date().toLocaleDateString('id-ID', options);
-            document.getElementById('tanggalCetakPDF').innerText = 'Tanggal: ' + tanggalHariIni;
-
-            let element = document.getElementById('areaPdf');
-            
-            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                let imgData = canvas.toDataURL('image/png');
-                let { jsPDF } = window.jspdf;
-                let pdf = new jsPDF('l', 'mm', 'a4');
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const wb = XLSX.read(data, { type: 'array', cellDates: true });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, { raw: false });
                 
-                let imgWidth = 287; 
-                let pageHeight = 210; 
-                let imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 5;
+                kreditRawData = json.map(row => {
+                    let m = {};
+                    Object.keys(row).forEach(k => {
+                        const norm = normalizeKey(k);
+                        if (norm.includes('nopinjam') || norm.includes('norek')) m.no_pinjaman = row[k];
+                        else if (norm.includes('cif')) m.cif = row[k];
+                        else if (norm.includes('tipe') || norm.includes('jenis') || norm.includes('produk')) m.tipe_pinjaman = row[k];
+                        else if (norm.includes('bakidebet') || norm.includes('baki') || norm.includes('os')) m.baki_debet = parseNumber(row[k]);
+                        else if (norm.includes('bungaberjalan') || norm.includes('bunga')) m.bunga_berjalan = parseNumber(row[k]);
+                        else if (norm.includes('musisi') || norm.includes('musisiasuransi') || norm.includes('asuransimusisi')) m.musisi_asuransi = parseNumber(row[k]);
+                        else if (norm.includes('angsuran')) m.angsuran_eksisting = parseNumber(row[k]);
+                        else if (norm.includes('mulai') || norm.includes('realisasi') || norm.includes('tglawal')) m.tgl_mulai = parseExcelDate(row[k]);
+                        else if (norm.includes('berakhir') || norm.includes('jatuhtempo') || norm.includes('akhir')) m.tgl_berakhir = parseExcelDate(row[k]);
+                        else if (isPhoneColumn(norm)) m.no_hp = row[k];
+                    });
+                    return m;
+                });
 
-                pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                pdf.save('Laporan_Rekapitulasi_Realisasi_Kredit_Karawang.pdf');
-            });
+                persistDataset('kreditRawData', kreditRawData)
+                    .then(() => processBothData())
+                    .catch(err => {
+                        console.error(err);
+                        processBothData();
+                        alert(err.message);
+                    });
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        function exportToCSV(divisiTarget) {
-            let dataFiltered = databaseLaporan.filter(item => item.divisi === divisiTarget);
-            if (dataFiltered.length === 0) {
-                alert('Tidak ada data untuk diexport pada divisi ' + divisiTarget + '!');
+        function handlePenghasilanUpload(e) {
+            const file = e.target.files ? e.target.files[0] : e;
+            if (!file) return;
+            document.getElementById('fileInfoPenghasilan').innerText = `Loaded: ${file.name}`;
+            document.getElementById('fileInfoPenghasilan').classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const wb = XLSX.read(data, { type: 'array', cellDates: true });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, { raw: false });
+
+                penghasilanRawData = json.map(row => {
+                    let m = {};
+                    let detectedStatus = null;
+
+                    Object.keys(row).forEach(k => {
+                        const norm = normalizeKey(k);
+                        if (norm.includes('cif')) m.cif = row[k];
+                        else if (isAoColumn(norm)) m.kode_ao = row[k];
+                        else if (norm.includes('nama')) m.nama = row[k];
+                        else if (norm.includes('dinas') || norm.includes('instansi') || norm.includes('skpd') || norm.includes('unit')) m.dinas = row[k];
+                        else if (isPhoneColumn(norm)) m.no_hp = row[k];
+                        else if (norm.includes('gaji') || norm.includes('thp') || norm.includes('pokok')) m.gaji = parseNumber(row[k]);
+                        else if (norm.includes('sertifikasi')) m.sertifikasi = parseNumber(row[k]);
+                        else if (norm.includes('tpp') || norm.includes('tukin')) m.tpp = parseNumber(row[k]);
+                        else if (norm === 'bup') m.bup = parseInt(row[k]) || 60;
+                        else if (norm.includes('lahir')) m.tgl_lahir = parseExcelDate(row[k]);
+
+                        if (isStatusColumn(norm)) {
+                            const parsed = parseStatusPegawai(row[k]);
+                            if (parsed) detectedStatus = parsed;
+                        }
+                    });
+
+                    m.status_pegawai = detectedStatus || parseStatusPegawai(row['Status Pegawai'] || row['Status'] || row['Jenis Pegawai']) || 'PNS';
+
+                    // Fallback khusus nomor HP: cari alias kolom yang umum dan normalisasi ke format WA.
+                    const detectedPhone = normalizePhoneFromRow(row);
+                    if (detectedPhone) m.no_hp = detectedPhone;
+                    else if (m.no_hp) m.no_hp = formatPhoneForWA(m.no_hp);
+
+                    return m;
+                });
+
+                persistDataset('penghasilanRawData', penghasilanRawData)
+                    .then(() => processBothData())
+                    .catch(err => {
+                        console.error(err);
+                        processBothData();
+                        alert(err.message);
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Setup Drag & Drop Upload Panel Admin
+        ['dropZoneKredit', 'dropZonePenghasilan'].forEach(id => {
+            const dropZone = document.getElementById(id);
+            if (!dropZone) return;
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-indigo-500', 'bg-indigo-100/50');
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-indigo-500', 'bg-indigo-100/50');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-indigo-500', 'bg-indigo-100/50');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    if (id === 'dropZoneKredit') handleKreditUpload(e.dataTransfer.files[0]);
+                    else if (id === 'dropZonePenghasilan') handlePenghasilanUpload(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        // Dynamic Interest Rate Lookup dari Configuration State
+        function getInterestRate(tipePinjaman, jenisPenawaran) {
+            const tipe = (tipePinjaman || '').toString().trim().toUpperCase();
+            const jenis = (jenisPenawaran || '').toString().trim().toUpperCase();
+
+            if (productParams[tipe]) {
+                return (jenis === 'MENGULANG') ? productParams[tipe].rateMengulang : productParams[tipe].rateTopUp;
+            }
+            return 0.13;
+        }
+
+        // Helper Rules Produk
+        function getProdRule(tipeProd) {
+            const key = (tipeProd || '').toString().trim().toUpperCase();
+            if (productParams[key]) {
+                return productParams[key];
+            }
+            return { name: key, sumber: 'GAJI', rpcPercent: 0.90, maxTenorProduct: 300, jenisPegawai: 'PNS', rateTopUp: 0.13, rateMengulang: 0.13 };
+        }
+
+        // Formula Simulasi Plafon Kredit (Anuitas)
+        function calculatePlafonFromAngsuran(angsuran, tenorBulan, tipePinjaman, jenisPenawaran) {
+            if (angsuran <= 0 || tenorBulan <= 0) return 0;
+            const rate = getInterestRate(tipePinjaman, jenisPenawaran);
+            const i = rate / 12;
+            let rawPlafon = 0;
+            if (i === 0) {
+                rawPlafon = angsuran * tenorBulan;
+            } else {
+                const pow = Math.pow(1 + i, tenorBulan);
+                rawPlafon = angsuran * (pow - 1) / (i * pow);
+            }
+            return Math.floor(rawPlafon / 1000000) * 1000000;
+        }
+
+        // Formula Simulasi Angsuran (Anuitas)
+        function calculateInstallmentFromPlafon(plafon, tenorBulan, tipePinjaman, jenisPenawaran) {
+            if (plafon <= 0 || tenorBulan <= 0) return 0;
+            const rate = getInterestRate(tipePinjaman, jenisPenawaran);
+            const i = rate / 12;
+            if (i === 0) {
+                return plafon / tenorBulan;
+            }
+            const pow = Math.pow(1 + i, tenorBulan);
+            return plafon * (i * pow) / (pow - 1);
+        }
+
+        // Batas Tenor Pegawai
+        function getDebtorTenorRules(statusPegawai, tglLahir, bupDefault = 60, productMaxTenor = 300) {
+            const isPppk = isPppkDebtor(statusPegawai);
+            const today = new Date();
+            
+            let sisaBulanBup = productMaxTenor;
+            let usiaTahun = 0;
+
+            if (tglLahir && (tglLahir instanceof Date) && !isNaN(tglLahir.getTime())) {
+                usiaTahun = today.getFullYear() - tglLahir.getFullYear();
+                const bupYear = tglLahir.getFullYear() + bupDefault;
+                const bupDate = new Date(tglLahir);
+                bupDate.setFullYear(bupYear);
+                sisaBulanBup = Math.max(0, (bupDate.getFullYear() - today.getFullYear()) * 12 + (bupDate.getMonth() - today.getMonth()));
+            }
+
+            const maxTenorAllowed = isPppk ? Math.min(120, productMaxTenor) : productMaxTenor;
+            const tenorEfektif = Math.max(1, Math.min(sisaBulanBup, maxTenorAllowed));
+
+            return {
+                isPppk,
+                usiaTahun,
+                maxTenorRule: maxTenorAllowed,
+                tenorEfektif
+            };
+        }
+
+        // PERHITUNGAN BIAYA DINAMIS & NET PENCAIRAN BERSIH (Anuitas & Parameter Biaya Admin)
+        function calculateCreditFees(plafonGross, tenorBulan, tipePinjaman, statusPegawai, usiaTahun, bakiDebet = 0, angsuranBaru = 0, bungaBerjalan = 0, musisiAsuransi = 0) {
+            if (plafonGross <= 0 || tenorBulan <= 0) {
+                return {
+                    tarifProvisi: 0,
+                    biayaProvisi: 0,
+                    biayaAdmin: 0,
+                    biayaAsuransi: 0,
+                    tarifAsuransi: 0,
+                    jangkaWaktuTahun: 0,
+                    multiplierTabWajib: 0,
+                    tabunganWajib: 0,
+                    bungaBerjalan: 0,
+                    pelunasanBakiDebet: 0,
+                    biayaMusisiAsuransi: 0,
+                    totalPotongan: 0,
+                    netPencairan: 0
+                };
+            }
+
+            // 1. Biaya Provisi
+            const pLow = (feeParams.provisiLow || 0.2) / 100;
+            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const biayaProvisi = Math.round(plafonGross * tarifProvisi);
+
+            // 2. Biaya Administrasi
+            let biayaAdmin = feeParams.adminTier1 || 200000;
+            if (plafonGross > 350000000) {
+                biayaAdmin = feeParams.adminTier3 || 600000;
+            } else if (plafonGross > 100000000) {
+                biayaAdmin = feeParams.adminTier2 || 350000;
+            }
+
+            // 3. Biaya Asuransi
+            const ratePerTahun = getInterestRate(tipePinjaman, 'MENGULANG');
+            const bungaBulanPertama = (plafonGross * ratePerTahun) / 12;
+            const jangkaWaktuTahun = Math.ceil(tenorBulan / 12);
+
+            let tarifAsuransiPct = feeParams.asrUnder40 || 0.500;
+            if (usiaTahun >= 55) {
+                tarifAsuransiPct = feeParams.asr55Up || 2.033;
+            } else if (usiaTahun >= 50) {
+                tarifAsuransiPct = feeParams.asr50To54 || 1.525;
+            } else if (usiaTahun >= 40) {
+                tarifAsuransiPct = feeParams.asr40To49 || 0.700;
+            }
+            const tarifAsuransi = tarifAsuransiPct / 100;
+
+            const biayaAsuransi = Math.ceil((plafonGross + bungaBulanPertama) * jangkaWaktuTahun * tarifAsuransi);
+
+            // 4. Biaya Tabungan Wajib
+            const tipe = (tipePinjaman || '').toUpperCase();
+            let multiplierTabWajib = feeParams.tabWajibOthers || 3;
+            if (tipe === 'G6B' || tipe === 'G6K' || tipe === 'G6L') {
+                multiplierTabWajib = feeParams.tabWajibGajiPns || 1;
+            }
+            const tabunganWajib = Math.round(angsuranBaru * multiplierTabWajib);
+
+            // 5. Net Pencairan Bersih
+            const baki = bakiDebet || 0;
+            const bungaJln = bungaBerjalan || 0;
+            const musisiAsr = musisiAsuransi || 0;
+
+            const totalPotongan = biayaProvisi + biayaAdmin + biayaAsuransi + tabunganWajib + baki + bungaJln + musisiAsr;
+            const netPencairan = Math.max(0, plafonGross - totalPotongan);
+
+            return {
+                tarifProvisi,
+                biayaProvisi,
+                biayaAdmin,
+                biayaAsuransi,
+                tarifAsuransi,
+                jangkaWaktuTahun,
+                multiplierTabWajib,
+                tabunganWajib,
+                bungaBerjalan: bungaJln,
+                pelunasanBakiDebet: baki,
+                biayaMusisiAsuransi: musisiAsr,
+                totalPotongan,
+                netPencairan
+            };
+        }
+
+        // --- CORE PROCESSOR BOTH DATA ---
+        function processBothData() {
+            // Update Banner Status Admin & Notification AO
+            const statusBadge = document.getElementById('adminDataStatusBadge');
+            const notifText = document.getElementById('aoDataNotificationText');
+
+            if (kreditRawData.length === 0 && penghasilanRawData.length === 0) {
+                statusBadge.innerText = 'Status Data: Belum Diupload';
+                statusBadge.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200';
+                notifText.innerText = 'Belum ada data kredit yang diupload. Silakan buka Panel Admin untuk melakukan upload file excel.';
+                document.getElementById('dashboardSection').classList.add('hidden');
                 return;
             }
-            let csvContent = "data:text/csv;charset=utf-8,Divisi,Kantor,Nama AO,NoA Baru,OS Baru,NoA Mengulang,OS Mengulang,NoA Lunas,Nominal Lunas,Total NoA,Net OS\r\n";
-            dataFiltered.forEach(row => {
-                csvContent += `${row.divisi},"${row.namaKantor}","${row.namaAo}",${row.noaBaru},${row.osBaru},${row.noaMengulang},${row.osMengulang},${row.noaLunas},${row.osLunas},${row.totalNoa},${row.netOs}\r\n`;
+
+            statusBadge.innerText = `Data Aktif: ${kreditRawData.length} Kredit, ${penghasilanRawData.length} Pegawai`;
+            statusBadge.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300';
+            notifText.innerHTML = `Data aktif tersimpan di Browser (LocalStorage): <b>${kreditRawData.length} Record Kredit</b> & <b>${penghasilanRawData.length} Record Penghasilan</b>.`;
+
+            cifDatabase = {};
+            const today = new Date();
+
+            penghasilanRawData.forEach(p => {
+                const cifKey = normalizeCif(p.cif || 'UNKNOWN');
+                if (!cifKey) return;
+                
+                const parsedStatus = parseStatusPegawai(p.status_pegawai) || (isPppkDebtor(p.status_pegawai) ? 'PPPK' : 'PNS');
+
+                const incomingPhone = formatPhoneForWA(p.no_hp);
+                const existingDebtor = cifDatabase[cifKey];
+
+                if (!existingDebtor) {
+                    cifDatabase[cifKey] = {
+                        cif: cifKey,
+                        kode_ao: (p.kode_ao || '-').toString().trim(),
+                        nama: p.nama || 'Tanpa Nama',
+                        dinas: p.dinas || 'Dinas General',
+                        no_hp: incomingPhone,
+                        income: {
+                            'GAJI': p.gaji || 0,
+                            'TPP': p.tpp || 0,
+                            'SERTIFIKASI': p.sertifikasi || 0
+                        },
+                        bup: p.bup || 60,
+                        tgl_lahir: p.tgl_lahir ? new Date(p.tgl_lahir) : null,
+                        status_pegawai: parsedStatus,
+                        facilities: []
+                    };
+                } else {
+                    // Jangan timpa HP/nama/data lama dengan nilai kosong dari baris duplikat CIF.
+                    if (incomingPhone) existingDebtor.no_hp = incomingPhone;
+                    if (p.kode_ao) existingDebtor.kode_ao = p.kode_ao.toString().trim();
+                    if (p.nama) existingDebtor.nama = p.nama;
+                    if (p.dinas) existingDebtor.dinas = p.dinas;
+                    if (p.gaji !== undefined) existingDebtor.income.GAJI = p.gaji || 0;
+                    if (p.tpp !== undefined) existingDebtor.income.TPP = p.tpp || 0;
+                    if (p.sertifikasi !== undefined) existingDebtor.income.SERTIFIKASI = p.sertifikasi || 0;
+                    if (p.bup) existingDebtor.bup = p.bup;
+                    if (p.tgl_lahir) existingDebtor.tgl_lahir = new Date(p.tgl_lahir);
+                    existingDebtor.status_pegawai = parsedStatus || existingDebtor.status_pegawai;
+                }
             });
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `laporan_realisasi_${divisiTarget.toLowerCase()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+
+            kreditRawData.forEach(k => {
+                const cifKey = normalizeCif(k.cif || 'UNKNOWN');
+                if (!cifKey) return;
+
+                const tipeProd = (k.tipe_pinjaman || 'G6B').toString().trim().toUpperCase();
+                const prodInfo = getProdRule(tipeProd);
+
+                const tMulai = k.tgl_mulai ? new Date(k.tgl_mulai) : null;
+                const tAkhir = k.tgl_berakhir ? new Date(k.tgl_berakhir) : null;
+
+                if (!cifDatabase[cifKey]) {
+                    cifDatabase[cifKey] = {
+                        cif: cifKey,
+                        kode_ao: '-',
+                        nama: 'Debitur Existing',
+                        dinas: 'Dinas General',
+                        no_hp: formatPhoneForWA(k.no_hp),
+                        income: { 'GAJI': 0, 'TPP': 0, 'SERTIFIKASI': 0 },
+                        bup: 60,
+                        tgl_lahir: null,
+                        status_pegawai: prodInfo.jenisPegawai || 'PNS',
+                        facilities: []
+                    };
+                } else if (!cifDatabase[cifKey].no_hp && k.no_hp) {
+                    cifDatabase[cifKey].no_hp = formatPhoneForWA(k.no_hp);
+                }
+
+                if (!cifDatabase[cifKey].status_pegawai) {
+                    cifDatabase[cifKey].status_pegawai = prodInfo.jenisPegawai || 'PNS';
+                }
+
+                let totalTenor = null;
+                let sisaBulanFasilitas = null;
+                let tenorBerjalan = null;
+                let pctBerjalan = 0;
+                let isEligibleTenor = false;
+
+                if (tMulai && tAkhir && !isNaN(tMulai.getTime()) && !isNaN(tAkhir.getTime())) {
+                    totalTenor = (tAkhir.getFullYear() - tMulai.getFullYear()) * 12 + (tAkhir.getMonth() - tMulai.getMonth());
+                    sisaBulanFasilitas = Math.max(0, (tAkhir.getFullYear() - today.getFullYear()) * 12 + (tAkhir.getMonth() - today.getMonth()));
+                    tenorBerjalan = Math.max(0, totalTenor - sisaBulanFasilitas);
+                    
+                    if (totalTenor > 0) {
+                        pctBerjalan = (tenorBerjalan / totalTenor) * 100;
+                        isEligibleTenor = pctBerjalan >= 50.0;
+                    }
+                } else if (tAkhir && !isNaN(tAkhir.getTime())) {
+                    sisaBulanFasilitas = Math.max(0, (tAkhir.getFullYear() - today.getFullYear()) * 12 + (tAkhir.getMonth() - today.getMonth()));
+                    isEligibleTenor = true; 
+                }
+
+                cifDatabase[cifKey].facilities.push({
+                    no_pinjaman: (k.no_pinjaman || 'PK-' + Math.random().toString().substr(2, 6)).toString().trim(),
+                    tipe_pinjaman: tipeProd,
+                    sumber_penghasilan: prodInfo.sumber,
+                    baki_debet: k.baki_debet || 0,
+                    bunga_berjalan: k.bunga_berjalan || 0,
+                    musisi_asuransi: k.musisi_asuransi || 0,
+                    angsuran_eksisting: k.angsuran_eksisting || 0,
+                    tgl_mulai: tMulai,
+                    tgl_berakhir: tAkhir,
+                    totalTenor,
+                    sisaBulanFasilitas,
+                    tenorBerjalan,
+                    pctBerjalan,
+                    isEligibleTenor,
+                    prodInfo: prodInfo
+                });
+            });
+
+            loanDatabase = [];
+
+            Object.values(cifDatabase).forEach(deb => {
+                const isPppk = isPppkDebtor(deb.status_pegawai);
+                deb.status_pegawai = isPppk ? 'PPPK' : 'PNS';
+
+                const countFasilitas = deb.facilities.length;
+
+                const totalAngsuranPerSumber = {};
+                deb.facilities.forEach(f => {
+                    const src = f.sumber_penghasilan;
+                    totalAngsuranPerSumber[src] = (totalAngsuranPerSumber[src] || 0) + (f.angsuran_eksisting || 0);
+                });
+
+                deb.tenorRules = getDebtorTenorRules(deb.status_pegawai, deb.tgl_lahir, deb.bup, isPppk ? 120 : 300);
+
+                if (countFasilitas === 0) {
+                    const maxTenorNew = isPppk ? 120 : 300;
+                    const rpcGajiPct = 0.90;
+                    const rpcTppPct = 0.60;
+                    
+                    const maxRpcGaji = (deb.income['GAJI'] || 0) * rpcGajiPct;
+                    const maxRpcTpp = (deb.income['TPP'] || 0) * rpcTppPct;
+                    const totalRpcNew = maxRpcGaji + maxRpcTpp;
+                    
+                    const tenorRulesNew = getDebtorTenorRules(deb.status_pegawai, deb.tgl_lahir, deb.bup, maxTenorNew);
+                    const tipeProdukNew = isPppk ? 'J9K' : 'G6B';
+                    
+                    const initialTenor = tenorRulesNew.tenorEfektif;
+                    const grossNew = calculatePlafonFromAngsuran(totalRpcNew, initialTenor, tipeProdukNew, 'NEW');
+                    const angsuranNew = calculateInstallmentFromPlafon(grossNew, initialTenor, tipeProdukNew, 'NEW');
+
+                    const feesNew = calculateCreditFees(
+                        grossNew, initialTenor, tipeProdukNew, deb.status_pegawai, tenorRulesNew.usiaTahun, 0, angsuranNew, 0, 0
+                    );
+
+                    loanDatabase.push({
+                        loan_id: deb.cif + '_NEW',
+                        no_pinjaman: 'NEW (Tanpa Pinjaman)',
+                        tipe_pinjaman: tipeProdukNew,
+                        sumber_penghasilan: 'GAJI',
+                        cif: deb.cif,
+                        nama: deb.nama,
+                        dinas: deb.dinas,
+                        kode_ao: deb.kode_ao,
+                        no_hp: deb.no_hp,
+                        baki_debet: 0,
+                        bunga_berjalan: 0,
+                        musisi_asuransi: 0,
+                        angsuran_eksisting: 0,
+                        maxAngsuranTopUp: totalRpcNew,
+                        selectedTenor: initialTenor,
+                        maxAllowedTenor: initialTenor,
+                        potensiPlafonTopUp: feesNew.netPencairan,
+                        plafonGrossTopUp: grossNew,
+                        pctBerjalan: 0,
+                        isEligibleMengulang: false,
+                        potensiNew: feesNew.netPencairan,
+                        plafonGrossNew: grossNew,
+                        plafonGrossMengulang: 0,
+                        potensiMengulang: 0,
+                        prodRule: getProdRule(tipeProdukNew),
+                        cifRef: deb
+                    });
+                } else {
+                    deb.facilities.forEach(f => {
+                        const prodRule = f.prodInfo;
+                        const nominalIncome = deb.income[f.sumber_penghasilan] || 0;
+                        const rpcPercent = prodRule.rpcPercent;
+                        
+                        const maxRpcSource = nominalIncome * rpcPercent;
+                        const totalAngsuranSource = totalAngsuranPerSumber[f.sumber_penghasilan] || 0;
+                        const maxAngsuranTopUp = Math.max(0, maxRpcSource - totalAngsuranSource);
+
+                        const facilityTenorRules = getDebtorTenorRules(deb.status_pegawai, deb.tgl_lahir, deb.bup, prodRule.maxTenorProduct);
+                        const initialTenor = facilityTenorRules.tenorEfektif;
+
+                        const grossTopUp = calculatePlafonFromAngsuran(maxAngsuranTopUp, initialTenor, f.tipe_pinjaman, 'TOPUP');
+                        const angsuranTopUpBaru = calculateInstallmentFromPlafon(grossTopUp, initialTenor, f.tipe_pinjaman, 'TOPUP');
+                        
+                        // Nett Top-Up
+                        const feesTopUp = calculateCreditFees(
+                            grossTopUp, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0
+                        );
+
+                        let totalPlafonRenewal = 0;
+                        let potensiMengulangNet = 0;
+                        let isEligibleMengulang = false;
+
+                        if (f.isEligibleTenor && nominalIncome > 0) {
+                            isEligibleMengulang = true;
+                            const maxAngsuranRenewal = f.angsuran_eksisting + maxAngsuranTopUp;
+                            totalPlafonRenewal = calculatePlafonFromAngsuran(maxAngsuranRenewal, initialTenor, f.tipe_pinjaman, 'MENGULANG');
+                            
+                            const angsuranMengulangBaru = calculateInstallmentFromPlafon(totalPlafonRenewal, initialTenor, f.tipe_pinjaman, 'MENGULANG');
+                            
+                            // Potensi Mengulang Net
+                            const feesMengulang = calculateCreditFees(
+                                totalPlafonRenewal, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, f.baki_debet, angsuranMengulangBaru, f.bunga_berjalan, f.musisi_asuransi
+                            );
+
+                            potensiMengulangNet = feesMengulang.netPencairan;
+                        }
+
+                        loanDatabase.push({
+                            loan_id: f.no_pinjaman,
+                            no_pinjaman: f.no_pinjaman,
+                            tipe_pinjaman: f.tipe_pinjaman,
+                            sumber_penghasilan: f.sumber_penghasilan,
+                            cif: deb.cif,
+                            nama: deb.nama,
+                            dinas: deb.dinas,
+                            kode_ao: deb.kode_ao,
+                            no_hp: deb.no_hp,
+                            baki_debet: f.baki_debet,
+                            bunga_berjalan: f.bunga_berjalan,
+                            musisi_asuransi: f.musisi_asuransi || 0,
+                            angsuran_eksisting: f.angsuran_eksisting,
+                            maxAngsuranTopUp: maxAngsuranTopUp,
+                            selectedTenor: initialTenor,
+                            maxAllowedTenor: initialTenor,
+                            potensiPlafonTopUp: feesTopUp.netPencairan,
+                            plafonGrossTopUp: grossTopUp,
+                            pctBerjalan: f.pctBerjalan,
+                            isEligibleMengulang: isEligibleMengulang,
+                            potensiNew: 0,
+                            plafonGrossMengulang: totalPlafonRenewal,
+                            potensiMengulang: potensiMengulangNet,
+                            prodRule: prodRule,
+                            facilityTenorRules: facilityTenorRules,
+                            cifRef: deb,
+                            facilityRef: f
+                        });
+                    });
+                }
+            });
+
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            updateDropdowns();
+            renderDashboard();
         }
+
+        // --- ADMIN PARAMETER MANAGEMENT & RENDERING ---
+        function renderAdminProductParamTable() {
+            const tbody = document.getElementById('productParamTableBody');
+            tbody.innerHTML = '';
+
+            Object.keys(productParams).forEach(key => {
+                const item = productParams[key];
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold font-mono text-indigo-900">${key}</td>
+                    <td class="p-2.5 font-semibold text-slate-700">${item.sumber}</td>
+                    <td class="p-2.5 text-center font-mono">${Math.round(item.rpcPercent * 100)}%</td>
+                    <td class="p-2.5 text-center">
+                        <span class="${item.jenisPegawai === 'PPPK' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'} text-[10px] font-bold px-2 py-0.5 rounded">
+                            ${item.jenisPegawai}
+                        </span>
+                    </td>
+                    <td class="p-2 text-center">
+                        <input type="number" data-prod="${key}" data-field="maxTenorProduct" value="${item.maxTenorProduct}" min="12" max="360"
+                            class="w-20 p-1 border border-slate-300 rounded text-center font-mono font-bold text-xs">
+                    </td>
+                    <td class="p-2 text-center">
+                        <input type="number" step="0.1" data-prod="${key}" data-field="rateTopUp" value="${(item.rateTopUp * 100).toFixed(1)}"
+                            class="w-20 p-1 border border-slate-300 rounded text-center font-mono font-bold text-xs bg-amber-50 text-amber-900">
+                    </td>
+                    <td class="p-2 text-center">
+                        <input type="number" step="0.1" data-prod="${key}" data-field="rateMengulang" value="${(item.rateMengulang * 100).toFixed(1)}"
+                            class="w-20 p-1 border border-slate-300 rounded text-center font-mono font-bold text-xs bg-emerald-50 text-emerald-900">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateAdminFeeParamsForm() {
+            document.getElementById('cfgProvisiLow').value = feeParams.provisiLow;
+            document.getElementById('cfgProvisiHigh').value = feeParams.provisiHigh;
+            document.getElementById('cfgAdminTier1').value = feeParams.adminTier1;
+            document.getElementById('cfgAdminTier2').value = feeParams.adminTier2;
+            document.getElementById('cfgAdminTier3').value = feeParams.adminTier3;
+            document.getElementById('cfgAsrUnder40').value = feeParams.asrUnder40;
+            document.getElementById('cfgAsr40To49').value = feeParams.asr40To49;
+            document.getElementById('cfgAsr50To54').value = feeParams.asr50To54;
+            document.getElementById('cfgAsr55Up').value = feeParams.asr55Up;
+            document.getElementById('cfgTabWajibGajiPns').value = feeParams.tabWajibGajiPns;
+            document.getElementById('cfgTabWajibOthers').value = feeParams.tabWajibOthers;
+        }
+
+        function saveProductParams() {
+            const inputs = document.querySelectorAll('#productParamTableBody input[data-prod]');
+            inputs.forEach(inp => {
+                const key = inp.getAttribute('data-prod');
+                const field = inp.getAttribute('data-field');
+                const val = parseFloat(inp.value) || 0;
+
+                if (productParams[key]) {
+                    if (field === 'maxTenorProduct') {
+                        productParams[key].maxTenorProduct = Math.round(val);
+                    } else if (field === 'rateTopUp') {
+                        productParams[key].rateTopUp = val / 100;
+                    } else if (field === 'rateMengulang') {
+                        productParams[key].rateMengulang = val / 100;
+                    }
+                }
+            });
+
+            localStorage.setItem('productParams_v3', JSON.stringify(productParams));
+            alert('Parameter Produk & Suku Bunga berhasil disimpan!');
+            processBothData();
+        }
+
+        function saveFeeParams() {
+            feeParams = {
+                provisiLow: parseFloat(document.getElementById('cfgProvisiLow').value) || 0.2,
+                provisiHigh: parseFloat(document.getElementById('cfgProvisiHigh').value) || 1.5,
+                adminTier1: parseFloat(document.getElementById('cfgAdminTier1').value) || 200000,
+                adminTier2: parseFloat(document.getElementById('cfgAdminTier2').value) || 350000,
+                adminTier3: parseFloat(document.getElementById('cfgAdminTier3').value) || 600000,
+                asrUnder40: parseFloat(document.getElementById('cfgAsrUnder40').value) || 0.500,
+                asr40To49: parseFloat(document.getElementById('cfgAsr40To49').value) || 0.700,
+                asr50To54: parseFloat(document.getElementById('cfgAsr50To54').value) || 1.525,
+                asr55Up: parseFloat(document.getElementById('cfgAsr55Up').value) || 2.033,
+                tabWajibGajiPns: parseInt(document.getElementById('cfgTabWajibGajiPns').value) || 1,
+                tabWajibOthers: parseInt(document.getElementById('cfgTabWajibOthers').value) || 3
+            };
+
+            localStorage.setItem('feeParams_v3', JSON.stringify(feeParams));
+            alert('Parameter Tarif & Biaya Kredit berhasil disimpan!');
+            processBothData();
+        }
+
+        function resetProductParamsToDefault() {
+            if (confirm('Reset seluruh parameter produk ke pengaturan default?')) {
+                productParams = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_MASTER));
+                localStorage.setItem('productParams_v3', JSON.stringify(productParams));
+                renderAdminProductParamTable();
+                processBothData();
+            }
+        }
+
+        function resetFeeParamsToDefault() {
+            if (confirm('Reset seluruh parameter biaya ke pengaturan default?')) {
+                feeParams = JSON.parse(JSON.stringify(DEFAULT_FEE_PARAMS));
+                localStorage.setItem('feeParams_v3', JSON.stringify(feeParams));
+                populateAdminFeeParamsForm();
+                processBothData();
+            }
+        }
+
+        function resetAllDataAndParams() {
+            if (confirm('APAKAH ANDA YAKIN? Seluruh data kredit, data penghasilan, dan penyesuaian parameter di browser akan dihapus secara permanen.')) {
+                try { localStorage.removeItem('kreditRawData_v3'); } catch(e) {}
+                try { localStorage.removeItem('penghasilanRawData_v3'); } catch(e) {}
+                try { localStorage.removeItem('productParams_v3'); } catch(e) {}
+                try { localStorage.removeItem('feeParams_v3'); } catch(e) {}
+                try { localStorage.removeItem(getStorageKey('kreditRawData')); } catch(e) {}
+                try { localStorage.removeItem(getStorageKey('penghasilanRawData')); } catch(e) {}
+                openAppDatabase().then(db => new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORAGE_STORE_NAME, 'readwrite');
+                    tx.objectStore(STORAGE_STORE_NAME).clear();
+                    tx.oncomplete = () => { db.close(); resolve(); };
+                    tx.onerror = () => { db.close(); reject(tx.error); };
+                })).catch(() => {});
+
+                kreditRawData = [];
+                penghasilanRawData = [];
+                productParams = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_MASTER));
+                feeParams = JSON.parse(JSON.stringify(DEFAULT_FEE_PARAMS));
+
+                document.getElementById('fileInfoKredit').classList.add('hidden');
+                document.getElementById('fileInfoPenghasilan').classList.add('hidden');
+
+                renderAdminProductParamTable();
+                populateAdminFeeParamsForm();
+                processBothData();
+                alert('Semua data dan parameter berhasil di-reset!');
+            }
+        }
+
+        // --- DASHBOARD AO RENDERING & FILTERS ---
+        function updateDropdowns() {
+            const produkSelect = document.getElementById('filterProduk');
+            const produkArr = [...new Set(loanDatabase.map(l => l.tipe_pinjaman).filter(p => p))].sort();
+            produkSelect.innerHTML = '<option value="ALL">Semua Produk</option>';
+            produkArr.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p; opt.textContent = `Produk: ${p}`;
+                produkSelect.appendChild(opt);
+            });
+
+            const sumberSelect = document.getElementById('filterSumber');
+            const sumberArr = [...new Set(loanDatabase.map(l => l.sumber_penghasilan).filter(s => s))].sort();
+            sumberSelect.innerHTML = '<option value="ALL">Semua Sumber Penghasilan</option>';
+            sumberArr.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.textContent = `Sumber: ${s}`;
+                sumberSelect.appendChild(opt);
+            });
+
+            const aoSelect = document.getElementById('filterAO');
+            const aoArr = [...new Set(loanDatabase.map(l => l.kode_ao).filter(a => a && a !== '-'))].sort();
+            aoSelect.innerHTML = '<option value="ALL">Semua Kode AO</option>';
+            aoArr.forEach(ao => {
+                const opt = document.createElement('option');
+                opt.value = ao; opt.textContent = `AO: ${ao}`;
+                aoSelect.appendChild(opt);
+            });
+        }
+
+        function formatRupiahShort(val) {
+            if (val >= 1000000000) return 'Rp ' + (val / 1000000000).toFixed(2) + ' M';
+            if (val >= 1000000) return 'Rp ' + (val / 1000000).toFixed(1) + ' Jt';
+            return 'Rp ' + Math.round(val).toLocaleString('id-ID');
+        }
+
+        function renderDashboard() {
+            updateCardSummaries();
+            filterData();
+        }
+
+        function updateCardSummaries() {
+            const totalLoans = loanDatabase.length;
+            const totalNew = loanDatabase.reduce((acc, l) => acc + l.potensiNew, 0);
+            const totalMengulang = loanDatabase.reduce((acc, l) => acc + l.potensiMengulang, 0);
+            const totalTopUpAngsuran = loanDatabase.reduce((acc, l) => acc + l.maxAngsuranTopUp, 0);
+            const totalTopUpPlafon = loanDatabase.reduce((acc, l) => acc + l.potensiPlafonTopUp, 0);
+
+            document.getElementById('cardTotalLoans').innerText = totalLoans.toLocaleString('id-ID');
+            document.getElementById('cardTotalNew').innerText = formatRupiahShort(totalNew);
+            document.getElementById('cardTotalMengulang').innerText = formatRupiahShort(totalMengulang);
+            document.getElementById('cardTotalTopUpAngsuran').innerText = formatRupiahShort(totalTopUpAngsuran) + ' / bln';
+            document.getElementById('cardTotalTopUpPlafon').innerText = 'Net Top-Up: ' + formatRupiahShort(totalTopUpPlafon);
+        }
+
+        function updateLoanTenor(loanId, newTenorVal) {
+            const item = loanDatabase.find(l => l.loan_id === loanId);
+            if (!item) return;
+
+            let val = parseInt(newTenorVal);
+            if (isNaN(val) || val < 1) val = 1;
+            const maxLimit = Math.max(item.maxAllowedTenor, 300);
+            if (val > maxLimit) val = maxLimit;
+
+            item.selectedTenor = val;
+
+            const grossTopUp = calculatePlafonFromAngsuran(item.maxAngsuranTopUp, item.selectedTenor, item.tipe_pinjaman, 'TOPUP');
+            item.plafonGrossTopUp = grossTopUp;
+            const angsuranTopUpBaru = calculateInstallmentFromPlafon(grossTopUp, item.selectedTenor, item.tipe_pinjaman, 'TOPUP');
+            
+            const feesTopUp = calculateCreditFees(
+                grossTopUp, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0
+            );
+            item.potensiPlafonTopUp = feesTopUp.netPencairan;
+
+            if (item.isEligibleMengulang) {
+                const maxAngsuranRenewal = item.angsuran_eksisting + item.maxAngsuranTopUp;
+                const totalPlafonRenewal = calculatePlafonFromAngsuran(maxAngsuranRenewal, item.selectedTenor, item.tipe_pinjaman, 'MENGULANG');
+                item.plafonGrossMengulang = totalPlafonRenewal;
+
+                const angsuranMengulangBaru = calculateInstallmentFromPlafon(totalPlafonRenewal, item.selectedTenor, item.tipe_pinjaman, 'MENGULANG');
+
+                const feesMengulang = calculateCreditFees(
+                    totalPlafonRenewal, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, item.baki_debet, angsuranMengulangBaru, item.bunga_berjalan, item.musisi_asuransi
+                );
+                item.potensiMengulang = feesMengulang.netPencairan;
+            } else if (item.cifRef.facilities.length === 0) {
+                const grossNew = calculatePlafonFromAngsuran(item.maxAngsuranTopUp, item.selectedTenor, item.tipe_pinjaman, 'NEW');
+                item.plafonGrossNew = grossNew;
+                const angsuranNew = calculateInstallmentFromPlafon(grossNew, item.selectedTenor, item.tipe_pinjaman, 'NEW');
+
+                const feesNew = calculateCreditFees(
+                    grossNew, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranNew, 0, 0
+                );
+                item.potensiNew = feesNew.netPencairan;
+            }
+
+            const row = document.querySelector(`tr[data-loan-id="${loanId}"]`);
+            if (row) {
+                const numInput = row.querySelector('.tenor-num-input');
+                const rangeInput = row.querySelector('.tenor-range-input');
+                if (numInput && document.activeElement !== numInput) numInput.value = val;
+                if (rangeInput) rangeInput.value = val;
+
+                const cellPlafonBtn = row.querySelector('.cell-plafon-topup span');
+                if (cellPlafonBtn) cellPlafonBtn.innerText = 'Rp ' + Math.round(item.potensiPlafonTopUp).toLocaleString('id-ID');
+
+                const cellMengulangGross = row.querySelector('.cell-plafon-mengulang-gross');
+                if (cellMengulangGross) cellMengulangGross.innerText = 'Rp ' + Math.round(item.plafonGrossMengulang || 0).toLocaleString('id-ID');
+
+                const cellMengulangBtn = row.querySelector('.cell-potensi-mengulang span');
+                if (cellMengulangBtn) cellMengulangBtn.innerText = 'Rp ' + Math.round(item.potensiMengulang).toLocaleString('id-ID');
+            }
+
+            updateCardSummaries();
+
+            if (selectedLoanId === loanId && !document.getElementById('debtorModal').classList.contains('hidden')) {
+                document.getElementById('modalTenorInput').value = val;
+                document.getElementById('modalTenorRange').value = val;
+                updateWaPreview();
+            }
+        }
+
+
+        // ===== Modern Potensi NET Sorting =====
+        function getNetPotentialValue(item) {
+            return Math.max(
+                Number(item.potensiNew || 0),
+                Number(item.potensiPlafonTopUp || 0),
+                Number(item.potensiMengulang || 0)
+            );
+        }
+        function sortLoanData(data) {
+            const mode = document.getElementById('sortPotensi')?.value || 'NET_DESC';
+            const arr = [...data];
+            if (mode === 'ORIGINAL') {
+                return arr.sort((a,b)=>(a._originalIndex??0)-(b._originalIndex??0));
+            }
+            return arr.sort((a,b)=>{
+                const A=getNetPotentialValue(a), B=getNetPotentialValue(b);
+                const d=mode==='NET_ASC'?A-B:B-A;
+                if(d) return d;
+                return String(a.nama||'').localeCompare(String(b.nama||''),'id');
+            });
+        }
+
+        function filterData() {
+            const produk = document.getElementById('filterProduk').value;
+            const sumber = document.getElementById('filterSumber').value;
+            const jenisPegawai = document.getElementById('filterJenisPegawai').value;
+            const ao = document.getElementById('filterAO').value;
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = loanDatabase.filter(l => {
+                let mProduk = (produk === 'ALL') || (l.tipe_pinjaman === produk);
+                let mSumber = (sumber === 'ALL') || (l.sumber_penghasilan === sumber);
+                let mAO = (ao === 'ALL') || (l.kode_ao === ao);
+                
+                const isPppkDeb = isPppkDebtor(l.cifRef.status_pegawai) || l.prodRule.jenisPegawai === 'PPPK';
+                let mPegawai = true;
+                if (jenisPegawai === 'PPPK') mPegawai = isPppkDeb;
+                else if (jenisPegawai === 'PNS') mPegawai = !isPppkDeb;
+
+                let mStatus = true;
+                if (status === 'NEW') mStatus = (l.cifRef.facilities.length === 0);
+                else if (status === 'ELIGIBLE_MENGULANG') mStatus = (l.isEligibleMengulang);
+                else if (status === 'HAS_TOPUP') mStatus = (l.maxAngsuranTopUp > 0);
+
+                let mSearch = true;
+                if (search) {
+                    mSearch = (l.no_pinjaman || '').toLowerCase().includes(search) ||
+                              (l.cif || '').toLowerCase().includes(search) ||
+                              (l.nama || '').toLowerCase().includes(search) ||
+                              (l.tipe_pinjaman || '').toLowerCase().includes(search) ||
+                              (l.sumber_penghasilan || '').toLowerCase().includes(search) ||
+                              (l.dinas || '').toLowerCase().includes(search) ||
+                              (l.kode_ao || '').toLowerCase().includes(search) ||
+                              (l.no_hp || '').toLowerCase().includes(search);
+                }
+
+                return mProduk && mSumber && mPegawai && mAO && mStatus && mSearch;
+            });
+
+            renderTable(sortLoanData(filtered));
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('loanTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="p-6 text-center text-slate-400">Tidak ada data pinjaman sesuai filter.</td></tr>`;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-loan-id', item.loan_id);
+                tr.className = "hover:bg-indigo-50/40 transition border-b border-slate-100";
+
+                let pctBadge = '<span class="text-slate-400">-</span>';
+                if (item.cifRef.facilities.length > 0) {
+                    if (item.isEligibleMengulang) {
+                        pctBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-solid fa-circle-check mr-1"></i>${item.pctBerjalan.toFixed(0)}% (≥50%)</span>`;
+                    } else {
+                        pctBadge = `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px]"><i class="fa-solid fa-hourglass-half mr-1"></i>${item.pctBerjalan.toFixed(0)}% (&lt;50%)</span>`;
+                    }
+                }
+
+                const isPppk = isPppkDebtor(item.cifRef.status_pegawai) || item.prodRule.jenisPegawai === 'PPPK';
+                const statusPegawaiBadge = isPppk 
+                    ? `<span class="bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded text-[9px]">PPPK</span>`
+                    : `<span class="bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded text-[9px]">PNS</span>`;
+
+                const noHpDisplay = item.no_hp ? `<span class="text-emerald-700 font-mono font-medium"><i class="fa-brands fa-whatsapp mr-0.5"></i>+${item.no_hp}</span>` : `<span class="text-slate-400 italic">No HP tidak ada</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-semibold text-slate-500 text-center">${index + 1}</td>
+                    <td class="p-2.5 font-mono font-bold text-indigo-800">${item.no_pinjaman}</td>
+                    <td class="p-2.5">
+                        <button onclick="openDebtorModal('${item.loan_id}')" class="font-bold text-slate-800 hover:text-indigo-700 text-left hover:underline flex items-center gap-1.5">
+                            ${item.nama} ${statusPegawaiBadge}
+                        </button>
+                        <div class="font-mono text-[10px] text-slate-400">CIF: ${item.cif} | ${item.dinas}</div>
+                        <div class="mt-0.5 text-[10px]">${noHpDisplay}</div>
+                    </td>
+                    <td class="p-2.5 text-center">
+                        <span class="font-bold text-slate-800 block">${item.tipe_pinjaman}</span>
+                        <span class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">${item.sumber_penghasilan} (${Math.round(item.prodRule.rpcPercent * 100)}%)</span>
+                    </td>
+                    <td class="p-2.5 text-center">${pctBadge}</td>
+                    <td class="p-2.5 text-right font-mono text-slate-600">Rp ${Math.round(item.angsuran_eksisting).toLocaleString('id-ID')}</td>
+                    <td class="p-2.5 text-right font-mono font-bold text-amber-800 bg-amber-50">Rp ${Math.round(item.maxAngsuranTopUp).toLocaleString('id-ID')}</td>
+                    
+                    <td class="p-2 text-center bg-amber-100/60 border-x border-amber-200">
+                        <div class="flex flex-col items-center gap-1 py-0.5">
+                            <div class="flex items-center gap-1">
+                                <input type="number" 
+                                       value="${item.selectedTenor}" 
+                                       min="1" 
+                                       max="${item.maxAllowedTenor}"
+                                       oninput="updateLoanTenor('${item.loan_id}', this.value)"
+                                       class="tenor-num-input w-14 text-center font-mono font-bold text-amber-900 border border-amber-400 rounded px-1 py-0.5 text-xs bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none shadow-sm">
+                                <span class="text-[10px] text-amber-900 font-bold">Bln</span>
+                            </div>
+                            <input type="range" 
+                                   value="${item.selectedTenor}" 
+                                   min="1" 
+                                   max="${item.maxAllowedTenor}"
+                                   oninput="updateLoanTenor('${item.loan_id}', this.value)"
+                                   class="tenor-range-input w-20 h-1.5 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-600">
+                            <span class="text-[9px] text-slate-500">Max: ${item.maxAllowedTenor} Bln</span>
+                        </div>
+                    </td>
+
+                    <td class="p-2.5 text-right font-mono font-bold text-amber-900 bg-amber-100/30 cell-plafon-topup">
+                        <button onclick="openCreditDetailModal('${item.loan_id}', 'TOPUP')" class="w-full text-right hover:text-amber-950 hover:underline flex items-center justify-end gap-1 cursor-pointer group" title="Klik untuk rincian biaya dinamis & net pencairan Top-Up">
+                            <span>Rp ${Math.round(item.potensiPlafonTopUp).toLocaleString('id-ID')}</span>
+                            <i class="fa-solid fa-circle-info text-[10px] text-amber-600 group-hover:scale-125 transition"></i>
+                        </button>
+                    </td>
+                    <td class="p-2.5 text-right font-mono font-bold text-blue-800 bg-blue-50/60 cell-plafon-mengulang-gross">
+                        Rp ${Math.round(item.plafonGrossMengulang || 0).toLocaleString('id-ID')}
+                    </td>
+                    <td class="p-2.5 text-right font-mono font-bold text-emerald-700 bg-emerald-50/60 cell-potensi-mengulang">
+                        <button onclick="openCreditDetailModal('${item.loan_id}', 'MENGULANG')" class="w-full text-right hover:text-emerald-900 hover:underline flex items-center justify-end gap-1 cursor-pointer group" title="Klik untuk rincian biaya dinamis & net pencairan Mengulang">
+                            <span>Rp ${Math.round(item.potensiMengulang).toLocaleString('id-ID')}</span>
+                            <i class="fa-solid fa-circle-info text-[10px] text-emerald-600 group-hover:scale-125 transition"></i>
+                        </button>
+                    </td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="openDebtorModal('${item.loan_id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-2.5 py-1 rounded-md transition shadow flex items-center gap-1 mx-auto">
+                            <i class="fa-brands fa-whatsapp"></i> WA Penawaran
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- MODALS (RINCIAN BIAYA & DEBITUR WA) ---
+        function openCreditDetailModal(loanId, mode = 'MENGULANG') {
+            const item = loanDatabase.find(l => l.loan_id === loanId);
+            if (!item) return;
+
+            const isMengulang = (mode === 'MENGULANG');
+            const isTopUp = (mode === 'TOPUP');
+
+            let plafonGross = isMengulang ? item.plafonGrossMengulang : item.plafonGrossTopUp;
+            if (!plafonGross || plafonGross <= 0) plafonGross = item.plafonGrossTopUp;
+
+            const ratePct = getInterestRate(item.tipe_pinjaman, mode);
+            const tenor = item.selectedTenor;
+            const angsuranBaru = calculateInstallmentFromPlafon(plafonGross, tenor, item.tipe_pinjaman, mode);
+
+            const bakiDebet = isMengulang ? item.baki_debet : 0;
+            const bungaBerjalan = isMengulang ? item.bunga_berjalan : 0;
+            const musisiAsuransi = isMengulang ? item.musisi_asuransi : 0;
+
+            const fees = calculateCreditFees(
+                plafonGross,
+                tenor,
+                item.tipe_pinjaman,
+                item.cifRef.status_pegawai,
+                item.cifRef.tenorRules.usiaTahun,
+                bakiDebet,
+                angsuranBaru,
+                bungaBerjalan,
+                musisiAsuransi
+            );
+
+            const headerEl = document.getElementById('modalDetailHeader');
+            const titleEl = document.getElementById('modalDetailTitle');
+            const boxNetEl = document.getElementById('boxNetPencairan');
+            
+            if (isTopUp) {
+                headerEl.className = "bg-amber-800 text-white p-4 flex justify-between items-center transition-colors";
+                titleEl.innerText = "Simulasi Rincian Biaya Dinamis & Net Pencairan Top-Up";
+                boxNetEl.className = "flex justify-between items-center pt-3 bg-amber-50 p-3 rounded-lg border border-amber-300 text-amber-900 font-extrabold text-sm";
+                document.getElementById('rowPelunasanBakiDebet').classList.add('hidden');
+                document.getElementById('rowPelunasanBungaBerjalan').classList.add('hidden');
+                document.getElementById('rowBiayaMusisiAsuransi').classList.add('hidden');
+            } else {
+                headerEl.className = "bg-emerald-800 text-white p-4 flex justify-between items-center transition-colors";
+                titleEl.innerText = "Simulasi Rincian Biaya Dinamis & Net Pencairan Mengulang (Renewal)";
+                boxNetEl.className = "flex justify-between items-center pt-3 bg-emerald-50 p-3 rounded-lg border border-emerald-300 text-emerald-900 font-extrabold text-sm";
+                document.getElementById('rowPelunasanBakiDebet').classList.remove('hidden');
+                document.getElementById('rowPelunasanBungaBerjalan').classList.remove('hidden');
+                document.getElementById('rowBiayaMusisiAsuransi').classList.remove('hidden');
+            }
+
+            document.getElementById('mNoPinjamanTitle').innerText = `No. Pinjaman: ${item.no_pinjaman} | Mode: ${mode}`;
+            document.getElementById('mNamaDebitur').innerText = `${item.nama} (${item.cifRef.status_pegawai})`;
+            document.getElementById('mProduk').innerText = `${item.tipe_pinjaman} (${isTopUp ? 'Top-Up' : 'Mengulang/Renewal'})`;
+            document.getElementById('mBungaRate').innerText = `${(ratePct * 100).toFixed(1)}% p.a. (Anuitas)`;
+            document.getElementById('mTenorBulan').innerText = `${tenor} Bulan (${fees.jangkaWaktuTahun} Thn)`;
+
+            document.getElementById('mPlafonGross').innerText = 'Rp ' + Math.round(plafonGross).toLocaleString('id-ID');
+            document.getElementById('mAngsuranBaru').innerText = 'Rp ' + Math.round(angsuranBaru).toLocaleString('id-ID');
+
+            document.getElementById('lblBiayaProvisi').innerText = `• Biaya Provisi (${(fees.tarifProvisi * 100).toFixed(2)}%)`;
+            document.getElementById('mBiayaProvisi').innerText = 'Rp ' + fees.biayaProvisi.toLocaleString('id-ID');
+
+            document.getElementById('lblBiayaAdmin').innerText = `• Biaya Administrasi`;
+            document.getElementById('mBiayaAdmin').innerText = 'Rp ' + fees.biayaAdmin.toLocaleString('id-ID');
+
+            document.getElementById('lblBiayaAsuransi').innerText = `• Biaya Asuransi (Usia ${item.cifRef.tenorRules.usiaTahun || '-'} Thn, Tarif ${(fees.tarifAsuransi * 100).toFixed(3)}%)`;
+            document.getElementById('mBiayaAsuransi').innerText = 'Rp ' + fees.biayaAsuransi.toLocaleString('id-ID');
+
+            document.getElementById('lblTabunganWajib').innerText = `• Tabungan Wajib (${fees.multiplierTabWajib}x Angsuran)`;
+            document.getElementById('mTabunganWajib').innerText = 'Rp ' + fees.tabunganWajib.toLocaleString('id-ID');
+
+            document.getElementById('mPelunasanBakiDebet').innerText = 'Rp ' + Math.round(fees.pelunasanBakiDebet).toLocaleString('id-ID');
+            document.getElementById('mPelunasanBungaBerjalan').innerText = 'Rp ' + Math.round(fees.bungaBerjalan).toLocaleString('id-ID');
+            document.getElementById('mBiayaMusisiAsuransi').innerText = 'Rp ' + Math.round(fees.biayaMusisiAsuransi).toLocaleString('id-ID');
+
+            document.getElementById('mTotalPotongan').innerText = 'Rp ' + Math.round(fees.totalPotongan).toLocaleString('id-ID');
+            
+            const netEl = document.getElementById('mNetPencairan');
+            netEl.innerText = 'Rp ' + Math.round(fees.netPencairan).toLocaleString('id-ID');
+            netEl.className = isTopUp ? 'font-mono text-base text-amber-800' : 'font-mono text-base text-emerald-700';
+
+            const btnWa = document.getElementById('btnMengulangOpenWa');
+            btnWa.onclick = function() {
+                closeMengulangDetailModal();
+                openDebtorModal(loanId);
+            };
+
+            document.getElementById('mengulangDetailModal').classList.remove('hidden');
+        }
+
+        function closeMengulangDetailModal() {
+            document.getElementById('mengulangDetailModal').classList.add('hidden');
+        }
+
+        function openDebtorModal(loanId) {
+            const loanItem = loanDatabase.find(l => l.loan_id === loanId);
+            if (!loanItem) return;
+
+            selectedLoanId = loanId;
+            const deb = loanItem.cifRef;
+            
+            const isPppk = isPppkDebtor(deb.status_pegawai);
+            const statusText = isPppk ? 'PPPK' : 'PNS';
+            
+            const rules = getDebtorTenorRules(statusText, deb.tgl_lahir, deb.bup, isPppk ? 120 : 300);
+            deb.tenorRules = rules;
+
+            document.getElementById('modalNama').innerText = deb.nama;
+            document.getElementById('modalCifDinas').innerText = `CIF: ${deb.cif} | Instansi: ${deb.dinas} | Status: ${statusText} ${rules.usiaTahun ? '(' + rules.usiaTahun + ' Thn)' : ''}`;
+            document.getElementById('modalNoHpText').innerText = deb.no_hp ? `+${deb.no_hp}` : 'Nomor Tidak Tersedia';
+            
+            document.getElementById('modalGaji').innerText = 'Rp ' + Number(deb.income['GAJI'] || 0).toLocaleString('id-ID');
+            document.getElementById('modalTpp').innerText = 'Rp ' + Number(deb.income['TPP'] || 0).toLocaleString('id-ID');
+            document.getElementById('modalSertifikasi').innerText = 'Rp ' + Number(deb.income['SERTIFIKASI'] || 0).toLocaleString('id-ID');
+
+            document.getElementById('modalMaxTenorText').innerText = `${rules.tenorEfektif} Bulan (${isPppk ? 'PPPK Max 120 Bln' : 'PNS Max 300 Bln/BUP'})`;
+
+            const badge = document.getElementById('modalStatusBadge');
+            if (deb.facilities.length === 0) {
+                badge.innerText = 'Debitur Baru (Potensi NEW)';
+                badge.className = 'bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider';
+            } else {
+                badge.innerText = `${deb.facilities.length} Fasilitas Aktif`;
+                badge.className = 'bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider';
+            }
+
+            const facTable = document.getElementById('modalFacilityTable');
+            facTable.innerHTML = '';
+            if (deb.facilities.length === 0) {
+                facTable.innerHTML = `<tr><td colspan="9" class="p-3 text-center text-slate-400 italic">Belum ada fasilitas kredit aktif.</td></tr>`;
+            } else {
+                deb.facilities.forEach(f => {
+                    const tr = document.createElement('tr');
+                    tr.className = (f.no_pinjaman === loanItem.no_pinjaman) ? "bg-indigo-50/80 font-semibold" : "hover:bg-slate-50";
+
+                    let tenorBerjalanStr = '-';
+                    if (f.totalTenor !== null && f.tenorBerjalan !== null) {
+                        tenorBerjalanStr = `${f.tenorBerjalan}/${f.totalTenor} Bln (${f.pctBerjalan.toFixed(0)}%)`;
+                    }
+
+                    const prodRule = f.prodInfo;
+                    const maxRpcSource = (deb.income[f.sumber_penghasilan] || 0) * prodRule.rpcPercent;
+                    
+                    let totalAngsuranGroup = 0;
+                    deb.facilities.forEach(fac => {
+                        if (fac.sumber_penghasilan === f.sumber_penghasilan) {
+                            totalAngsuranGroup += fac.angsuran_eksisting;
+                        }
+                    });
+                    const sisaRpcFac = Math.max(0, maxRpcSource - totalAngsuranGroup);
+
+                    tr.innerHTML = `
+                        <td class="p-2 font-mono text-indigo-700">${f.no_pinjaman}</td>
+                        <td class="p-2 font-bold text-slate-800">${f.tipe_pinjaman}</td>
+                        <td class="p-2 text-center font-mono text-slate-600">${f.sumber_penghasilan} (${Math.round(prodRule.rpcPercent * 100)}%)</td>
+                        <td class="p-2 text-center font-mono font-medium">${tenorBerjalanStr}</td>
+                        <td class="p-2 text-right font-mono">Rp ${Number(f.baki_debet || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-right font-mono text-red-600">Rp ${Number(f.bunga_berjalan || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-right font-mono text-red-600">Rp ${Number(f.musisi_asuransi || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-right font-mono text-slate-600">Rp ${Number(f.angsuran_eksisting || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-800 bg-amber-50">Rp ${Number(sisaRpcFac).toLocaleString('id-ID')}</td>
+                    `;
+                    facTable.appendChild(tr);
+                });
+            }
+
+            const loanTargetSelect = document.getElementById('modalLoanTarget');
+            loanTargetSelect.innerHTML = '';
+            const labelNew = document.getElementById('labelOfferNew');
+
+            if (deb.facilities.length === 0) {
+                labelNew.classList.remove('hidden');
+                document.querySelector('input[name="offerType"][value="NEW"]').checked = true;
+                
+                const opt = document.createElement('option');
+                opt.value = 'NEW';
+                opt.textContent = `Debitur Baru - Potensi NEW (Nett Pencairan: Rp ${Math.round(loanItem.potensiNew || 0).toLocaleString('id-ID')})`;
+                loanTargetSelect.appendChild(opt);
+            } else {
+                labelNew.classList.add('hidden');
+                document.querySelector('input[name="offerType"][value="TOPUP"]').checked = true;
+
+                deb.facilities.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f.no_pinjaman;
+                    opt.textContent = `[${f.no_pinjaman}] ${f.tipe_pinjaman} (${f.sumber_penghasilan}) - Angsuran: Rp ${Math.round(f.angsuran_eksisting).toLocaleString('id-ID')}`;
+                    if (f.no_pinjaman === loanItem.no_pinjaman) opt.selected = true;
+                    loanTargetSelect.appendChild(opt);
+                });
+            }
+
+            const modalTenorInput = document.getElementById('modalTenorInput');
+            const modalTenorRange = document.getElementById('modalTenorRange');
+            modalTenorInput.max = loanItem.maxAllowedTenor;
+            modalTenorRange.max = loanItem.maxAllowedTenor;
+            modalTenorInput.value = loanItem.selectedTenor;
+            modalTenorRange.value = loanItem.selectedTenor;
+
+            onModalLoanChange();
+            document.getElementById('debtorModal').classList.remove('hidden');
+        }
+
+        function onModalLoanChange() {
+            updateWaPreview();
+        }
+
+        function onModalTenorChange(val) {
+            if (selectedLoanId) {
+                updateLoanTenor(selectedLoanId, val);
+            }
+        }
+
+        function closeDebtorModal() {
+            document.getElementById('debtorModal').classList.add('hidden');
+        }
+
+        function updateWaPreview() {
+            const loanTargetVal = document.getElementById('modalLoanTarget').value;
+            const offerType = document.querySelector('input[name="offerType"]:checked').value;
+            const nominalType = document.querySelector('input[name="nominalType"]:checked').value;
+
+            let targetItem = loanDatabase.find(l => l.no_pinjaman === loanTargetVal) || loanDatabase.find(l => l.loan_id === selectedLoanId);
+            if (!targetItem) return;
+
+            const deb = targetItem.cifRef;
+            const activeTenor = targetItem.selectedTenor;
+            const statusStr = isPppkDebtor(deb.status_pegawai) ? 'PPPK' : 'PNS';
+
+            let nominalAngsuran = 0;
+            let nominalPlafonGross = 0;
+            let nominalNetPencairan = 0;
+            let jenisPenawaranStr = '';
+            let infoDetail = '';
+
+            if (offerType === 'NEW') {
+                nominalPlafonGross = targetItem.plafonGrossNew;
+                nominalNetPencairan = targetItem.potensiNew;
+                jenisPenawaranStr = 'Pengajuan Kredit Baru';
+
+                if (nominalType === 'GROSS') {
+                    infoDetail = `Sebagai pegawai *${statusStr}*, Bapak/Ibu memiliki estimasi *Plafon Kredit Kotor (Gross) s.d. Rp ${Math.round(nominalPlafonGross).toLocaleString('id-ID')}* dengan jangka waktu s.d. *${activeTenor} bulan*.`;
+                } else {
+                    infoDetail = `Sebagai pegawai *${statusStr}*, Bapak/Ibu memiliki estimasi *Pencairan Bersih (Nett) s.d. Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}* (sudah memperhitungkan seluruh estimasi biaya) dengan jangka waktu s.d. *${activeTenor} bulan*.`;
+                }
+            } else if (offerType === 'TOPUP') {
+                nominalAngsuran = targetItem.maxAngsuranTopUp;
+                nominalPlafonGross = targetItem.plafonGrossTopUp;
+                nominalNetPencairan = targetItem.potensiPlafonTopUp;
+                jenisPenawaranStr = `Top-Up Sisa RPC (${targetItem.tipe_pinjaman})`;
+
+                if (nominalType === 'GROSS') {
+                    infoDetail = `Berdasarkan kalkulasi fasilitas kredit *${targetItem.tipe_pinjaman}* (${targetItem.sumber_penghasilan}) Bapak/Ibu masih memiliki *sisa RPC angsuran sebesar Rp ${Math.round(nominalAngsuran).toLocaleString('id-ID')}/bulan*.\n\nDengan sisa RPC tersebut, Bapak/Ibu berpotensi mendapat *Top-Up Plafon Kotor (Gross) sebesar Rp ${Math.round(nominalPlafonGross).toLocaleString('id-ID')}* dengan tenor s.d. *${activeTenor} bulan*.`;
+                } else {
+                    infoDetail = `Berdasarkan kalkulasi fasilitas kredit *${targetItem.tipe_pinjaman}* (${targetItem.sumber_penghasilan}) Bapak/Ibu, Bapak/Ibu masih memiliki *sisa RPC angsuran sebesar Rp ${Math.round(nominalAngsuran).toLocaleString('id-ID')}/bulan*.\n\nDengan sisa RPC tersebut, Bapak/Ibu berpotensi menerima *Pencairan Bersih (Nett) Top-Up sebesar Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}* (setelah dipotong biaya-biaya kredit) dengan tenor s.d. *${activeTenor} bulan*.`;
+                }
+            } else if (offerType === 'MENGULANG') {
+                nominalPlafonGross = targetItem.plafonGrossMengulang || 0;
+                nominalNetPencairan = targetItem.potensiMengulang;
+                jenisPenawaranStr = `Pembaruan Kredit (Renewal No. ${targetItem.no_pinjaman})`;
+
+                if (nominalType === 'GROSS') {
+                    infoDetail = `Pinjaman Bapak/Ibu pada nomor *${targetItem.no_pinjaman}* telah memenuhi syarat pembaruan. Bapak/Ibu berpotensi mengajukan OB dengan *Plafon Kredit Baru (Gross) sebesar Rp ${Math.round(nominalPlafonGross).toLocaleString('id-ID')}* dengan tenor s.d. *${activeTenor} bulan*.`;
+                } else {
+                    infoDetail = `Pinjaman pada nomor *${targetItem.no_pinjaman}* telah memenuhi syarat pembaruan. Bapak/Ibu berpotensi melakukan OB dengan *Estimasi Pencairan Bersih (Nett) sebesar Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}* (setelah dipotong pelunasan Pokok, bunga berjalan & biaya-biaya) dengan tenor s.d. *${activeTenor} bulan*.`;
+                }
+            }
+
+            const msg = `Assalamualaikum, Yth. Bapak/Ibu *${deb.nama}*,\n\nPerkenalkan saya Didin dari *Bank bjb*.\n\nIjin menginformasikan promo *${jenisPenawaranStr}* khusus *${statusStr}*.\n\n${infoDetail}\n\nProses cepat, Promo Bunga sampai akhir bulan ini. Apakah Bapak/Ibu berminat untuk simulasi perhitungan lengkapnya?\n\nTerima kasih.`;
+
+            document.getElementById('waPreviewText').value = msg;
+        }
+
+        function sendWaDirect() {
+            const targetItem = loanDatabase.find(l => l.loan_id === selectedLoanId);
+            if (!targetItem || !targetItem.cifRef.no_hp) {
+                alert("Nomor WhatsApp/HP debitur tidak tersedia!");
+                return;
+            }
+
+            const message = document.getElementById('waPreviewText').value;
+            const waUrl = `https://wa.me/${targetItem.cifRef.no_hp}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        // --- EXCEL TEMPLATE DOWNLOADERS ---
+        function downloadTemplateKredit() {
+            const sampleData = [
+                { "No Pinjaman": "PK-2021-001", "CIF": "CIF001", "Tipe Pinjaman": "G6B", "Tanggal Mulai": "2021-01-15", "Tanggal Berakhir": "2026-01-15", "Baki Debet": 45000000, "Bunga Berjalan": 487500, "Musisi Asuransi": 250000, "Angsuran Eksisting": 2000000, "No HP": "081234567890" },
+                { "No Pinjaman": "PK-2022-005", "CIF": "CIF002", "Tipe Pinjaman": "J9K", "Tanggal Mulai": "2022-03-10", "Tanggal Berakhir": "2027-03-10", "Baki Debet": 20000000, "Bunga Berjalan": 225000, "Musisi Asuransi": 150000, "Angsuran Eksisting": 1200000, "No HP": "085712345678" }
+            ];
+            const ws = XLSX.utils.json_to_sheet(sampleData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data_Kredit");
+            XLSX.writeFile(wb, "Template_Data_Kredit_Per_Pinjaman.xlsx");
+        }
+
+        function downloadTemplatePenghasilan() {
+            const sampleData = [
+                { "CIF": "CIF001", "Kode AO": "AO01", "Nama Debitur": "Ahmad Subagja", "Dinas / Instansi": "Dinas Pendidikan", "No HP / WA": "081234567890", "Status Pegawai": "PNS", "Gaji": 6500000, "TPP": 2500000, "Sertifikasi": 3000000, "BUP": 60, "Tanggal Lahir": "1980-05-20" },
+                { "CIF": "CIF002", "Kode AO": "AO01", "Nama Debitur": "Siti Nurhaliza", "Dinas / Instansi": "Dinas Kesehatan", "No HP / WA": "085712345678", "Status Pegawai": "PPPK", "Gaji": 4000000, "TPP": 1500000, "Sertifikasi": 0, "BUP": 60, "Tanggal Lahir": "1990-11-10" },
+                { "CIF": "CIF003", "Kode AO": "AO02", "Nama Debitur": "Budi Santoso", "Dinas / Instansi": "Dinas Perhubungan", "No HP / WA": "081298765432", "Status Pegawai": "PPPK", "Gaji": 3500000, "TPP": 1000000, "Sertifikasi": 0, "BUP": 60, "Tanggal Lahir": "1992-04-15" }
+            ];
+            const ws = XLSX.utils.json_to_sheet(sampleData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data_Penghasilan");
+            XLSX.writeFile(wb, "Template_Data_Penghasilan_AO.xlsx");
+        }
+
+        // --- INISIALISASI HALAMAN & PERSISTENSI DATA ---
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Parameter tetap menggunakan localStorage versi lama agar kompatibel.
+            const savedProd = safeLocalStorageGet('productParams_v3');
+            if (savedProd) {
+                try { productParams = JSON.parse(savedProd); } catch (e) { console.error(e); }
+            }
+
+            const savedFee = safeLocalStorageGet('feeParams_v3');
+            if (savedFee) {
+                try { feeParams = JSON.parse(savedFee); } catch (e) { console.error(e); }
+            }
+
+            renderAdminProductParamTable();
+            populateAdminFeeParamsForm();
+
+            // Load data penghasilan/kredit dari v4 localStorage, fallback IndexedDB, lalu v3 lama.
+            try {
+                const [savedKreditData, savedPenghasilanData] = await Promise.all([
+                    loadDataset('kreditRawData', 'kreditRawData_v3'),
+                    loadDataset('penghasilanRawData', 'penghasilanRawData_v3')
+                ]);
+
+                if (Array.isArray(savedKreditData)) kreditRawData = savedKreditData;
+                if (Array.isArray(savedPenghasilanData)) penghasilanRawData = savedPenghasilanData;
+            } catch (e) {
+                console.error('Gagal memuat data tersimpan:', e);
+                kreditRawData = [];
+                penghasilanRawData = [];
+            }
+
+            processBothData();
+        });
     </script>
 </body>
 </html>
