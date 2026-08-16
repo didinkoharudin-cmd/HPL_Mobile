@@ -918,7 +918,12 @@ body.app-locked > main { display:none !important; }
 }
 </style>
 
-<script id="v6-timeout-config">window.DATABASE_LOAD_TIMEOUT_MS = 180000;</script>
+<script id="v6-timeout-config">window.DATABASE_LOAD_TIMEOUT_MS = 300000;</script>
+
+<script id="v7-database-timeout-note">
+window.DATABASE_LOAD_TIMEOUT_MS = 300000;
+</script>
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -980,7 +985,7 @@ body.app-locked > main { display:none !important; }
                     Sistem Analisis Kredit & Penawaran Debitur
                 </h1>
                 <p class="text-indigo-200 text-xs mt-0.5">
-                    Kredit Konsumer Karawang
+                    Presisi Per No Pinjaman, RPC, Tenor Pegawai & Configurator WA
                 </p>
             </div>
             
@@ -3760,9 +3765,20 @@ body.app-locked > main { display:none !important; }
 
   async function callApi(action,credential){
     let lastError=null;
-    for(let attempt=1; attempt<=2; attempt++){
+
+    // getData memproses Kredit + Penghasilan + konversi/normalisasi server,
+    // sehingga jangan dibatasi 60 detik. Login tetap cepat.
+    const timeoutMs = action === 'getData'
+      ? Number(window.DATABASE_LOAD_TIMEOUT_MS || 300000)
+      : 60000;
+
+    // Jangan mengulang getData yang besar karena retry dapat membuat
+    // request kedua berjalan bersamaan/menambah beban server.
+    const maxAttempts = action === 'getData' ? 1 : 2;
+
+    for(let attempt=1; attempt<=maxAttempts; attempt++){
       const controller = ('AbortController' in window) ? new AbortController() : null;
-      const timer = controller ? setTimeout(()=>controller.abort(), 60000) : null;
+      const timer = controller ? setTimeout(()=>controller.abort(), timeoutMs) : null;
       try{
         const response=await fetch(AUTH_CONFIG.API_URL,{
           method:'POST',
@@ -3778,7 +3794,10 @@ body.app-locked > main { display:none !important; }
         return result;
       }catch(err){
         if(timer) clearTimeout(timer);
-        lastError = err && err.name === 'AbortError' ? new Error('Koneksi terlalu lama. Silakan coba lagi; pada jaringan mobile proses memerlukan waktu lebih lama.') : err;
+        lastError = err && err.name === 'AbortError' ? new Error(
+              'Proses database membutuhkan waktu lebih lama dari biasanya (batas 5 menit). ' +
+              'Sesi tetap dipertahankan. Silakan tunggu atau coba Muat Database lagi.'
+            ) : err;
         if(attempt<2) await new Promise(r=>setTimeout(r,1200));
       }
     }
@@ -3800,22 +3819,38 @@ body.app-locked > main { display:none !important; }
       kreditRawData = normalizeServerKreditData(
         Array.isArray(data.kredit) ? data.kredit : []
       );
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(70, 'Normalisasi data penghasilan...');
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(70, 'Menyelaraskan data penghasilan dengan CIF...');
       penghasilanRawData = normalizeServerPenghasilanData(
         Array.isArray(data.penghasilan) ? data.penghasilan : []
       );
 
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(78, 'Menyelaraskan Kredit ↔ Penghasilan...');
       console.info('[ANALISA KREDIT] Pemeriksaan hubungan CIF Kredit ↔ Penghasilan:', diagnoseIncomeLink());
 
       // Data dari server menjadi sumber utama sesi ini; jangan gunakan data lokal lama.
       try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
       if(typeof updateGoogleDataCounts==='function') updateGoogleDataCounts();
-      if(badge) badge.textContent='Data diterima. Menyiapkan database...';
-      requestAnimationFrame(() => processBothData());
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(82, 'Menyusun database debitur & fasilitas...');
+      if(badge) badge.textContent='Data diterima. Menyusun database...';
+      requestAnimationFrame(() => {
+        try {
+          processBothData();
+          if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(100, 'Database berhasil diselaraskan.');
+          if(badge) badge.textContent='Database berhasil diselaraskan.';
+        } catch(processError) {
+          console.error('[ANALISA KREDIT] Error saat menyusun database:', processError);
+          if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal menyusun database: ' + (processError.message || 'error'));
+          showAuthError('Data sudah diterima, tetapi proses penyelarasan di browser gagal: ' + (processError.message || 'error'));
+        }
+      });
     }catch(err){
       if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal mengambil database: ' + (err.message || 'error'));
-      console.error(err);
-      logoutGoogleUser();
+      console.error('[ANALISA KREDIT] Gagal memuat database:', err);
+
+      // Jangan logout otomatis. Timeout database bukan berarti sesi Google
+      // tidak valid. Pengguna tetap berada di aplikasi dan dapat mencoba
+      // Muat Database kembali.
+      if(badge) badge.textContent='Database belum selesai dimuat. Sesi tetap aktif.';
       showAuthError(err.message||'Data gagal dimuat.');
     }
   };
