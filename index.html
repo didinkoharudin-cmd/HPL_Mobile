@@ -361,6 +361,248 @@ body.app-locked > main { display:none !important; }
   #loanPaginationBar { position: sticky; left: 0; width: 100%; }
 }
 </style>
+
+<style id="final-ui-optimization">
+/* =========================================================
+   FINAL UI OPTIMIZATION
+========================================================= */
+
+@media (max-width: 767px) {
+  #appHeader {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    min-height: 0 !important;
+    transition: transform .22s ease, opacity .22s ease;
+    z-index: 60;
+  }
+
+  #appHeader.mobile-header-hidden {
+    transform: translateY(-105%);
+    opacity: .08;
+    pointer-events: none;
+  }
+
+  #appHeader h1,
+  #appHeader .page-title,
+  #appHeader .app-title {
+    font-size: 14px !important;
+    line-height: 1.15 !important;
+  }
+
+  #appHeader .text-2xl,
+  #appHeader .text-xl {
+    font-size: 15px !important;
+  }
+
+  #appHeader .text-sm,
+  #appHeader .text-xs {
+    font-size: 9px !important;
+  }
+
+  #appHeader .px-4,
+  #appHeader .px-5,
+  #appHeader .px-6 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  #appHeader .py-3,
+  #appHeader .py-4,
+  #appHeader .py-5 {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+
+  #appHeader .gap-4,
+  #appHeader .gap-5,
+  #appHeader .gap-6 {
+    gap: 7px !important;
+  }
+
+  #appHeader button {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+  }
+
+  #appHeader nav {
+    gap: 4px !important;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  main {
+    padding-top: 7px !important;
+  }
+
+  /* Compact page title / toolbar areas */
+  .mobile-compact-toolbar,
+  .mobile-compact-title {
+    margin-bottom: 7px !important;
+    padding: 7px !important;
+  }
+
+  /* Detail modal: portrait-first */
+  .detail-modal,
+  .debtor-detail-modal {
+    max-height: 92dvh !important;
+    height: auto !important;
+    margin: 4px !important;
+    border-radius: 12px !important;
+  }
+
+  .detail-modal .modal-header,
+  .debtor-detail-modal .modal-header {
+    padding: 8px 10px !important;
+  }
+
+  .detail-modal .modal-body,
+  .debtor-detail-modal .modal-body {
+    padding: 8px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 900px) {
+  #appHeader {
+    min-height: 0 !important;
+  }
+
+  .detail-modal,
+  .debtor-detail-modal {
+    max-height: 94dvh !important;
+  }
+}
+
+/* Desktop filters: compact and proportional */
+@media (min-width: 768px) {
+  #filterSection input,
+  #filterSection select,
+  #filterSection button,
+  .desktop-filter input,
+  .desktop-filter select,
+  .desktop-filter button {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  #filterSection {
+    gap: 6px !important;
+  }
+}
+
+/* =========================================================
+   INTERACTIVE ADMIN
+========================================================= */
+
+.admin-interactive {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-interactive-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.admin-interactive-toolbar select,
+.admin-interactive-toolbar input {
+  height: 32px;
+  padding: 5px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  font-size: 11px;
+  outline: none;
+}
+
+.admin-interactive-toolbar select:focus,
+.admin-interactive-toolbar input:focus {
+  border-color: #6366f1;
+}
+
+.admin-drill-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.admin-drill-table th {
+  padding: 8px 9px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.admin-drill-table td {
+  padding: 8px 9px;
+  border-bottom: 1px solid #f1f5f9;
+  white-space: nowrap;
+}
+
+.admin-drill-table tr[data-ao] {
+  cursor: pointer;
+}
+
+.admin-drill-table tr[data-ao]:hover {
+  background: #eef2ff;
+}
+
+.admin-drill-table tr.is-selected {
+  background: #e0e7ff;
+}
+
+.admin-chart {
+  width: 100%;
+  height: 220px;
+  display: block;
+}
+
+.admin-drill-detail {
+  max-height: 420px;
+  overflow: auto;
+}
+
+.admin-active-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .admin-interactive-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-interactive-toolbar input {
+    grid-column: 1 / -1;
+  }
+
+  .admin-chart {
+    height: 190px;
+  }
+
+  .admin-drill-detail {
+    max-height: 330px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -3193,5 +3435,581 @@ function bind(zoneId,inputId){
 function init(){bind('dropZoneKredit','excelKreditInput');bind('dropZonePenghasilan','excelPenghasilanInput');}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script>
+<script id="final-ui-js">
+/* =========================================================
+   MOBILE HEADER AUTO-HIDE
+========================================================= */
+(function () {
+  let lastY = 0;
+  let ticking = false;
+
+  function updateHeader() {
+    const header = document.getElementById('appHeader');
+    if (!header || window.innerWidth > 767) return;
+
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+
+    if (y < 18) {
+      header.classList.remove('mobile-header-hidden');
+    } else if (y > lastY + 4) {
+      header.classList.add('mobile-header-hidden');
+    } else if (y < lastY - 4) {
+      header.classList.remove('mobile-header-hidden');
+    }
+
+    lastY = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 767) {
+      const header = document.getElementById('appHeader');
+      if (header) header.classList.remove('mobile-header-hidden');
+    }
+  });
+})();
+
+/* =========================================================
+   INTERACTIVE ADMIN DASHBOARD
+========================================================= */
+
+function adminGetLoanValue(loan, keys) {
+  for (const key of keys) {
+    if (loan && loan[key] !== undefined && loan[key] !== null && loan[key] !== '') {
+      return loan[key];
+    }
+  }
+  return '';
+}
+
+function adminLoanStatus(loan) {
+  const raw = String(
+    adminGetLoanValue(loan, [
+      'status',
+      'STATUS',
+      'jenis',
+      'JENIS',
+      'kategori',
+      'KATEGORI'
+    ])
+  ).trim().toUpperCase();
+
+  if (raw.includes('TOP')) return 'TOP-UP';
+  if (raw.includes('MENGULANG')) return 'MENGULANG';
+  if (raw.includes('NEW')) return 'NEW';
+
+  const topup = Number(loan?.potensiPlafonTopUp || 0);
+  const ulang = Number(loan?.potensiMengulang || 0);
+  const baru = Number(loan?.potensiNew || 0);
+
+  if (topup > 0) return 'TOP-UP';
+  if (ulang > 0) return 'MENGULANG';
+  if (baru > 0) return 'NEW';
+
+  return '-';
+}
+
+function adminLoanAO(loan) {
+  return String(
+    adminGetLoanValue(loan, [
+      'kode_ao',
+      'KODE_AO'
+    ]) ||
+    loan?.cifRef?.kode_ao ||
+    ''
+  ).trim().toUpperCase();
+}
+
+function adminLoanCIF(loan) {
+  return String(
+    adminGetLoanValue(loan, [
+      'cif',
+      'CIF',
+      'CIFNO'
+    ]) ||
+    loan?.cifRef?.cif ||
+    ''
+  ).trim();
+}
+
+function adminLoanName(loan) {
+  return String(
+    adminGetLoanValue(loan, [
+      'nama',
+      'NAMA',
+      'nama_debitur',
+      'NAMA_DEBITUR'
+    ]) ||
+    loan?.cifRef?.nama ||
+    ''
+  ).trim();
+}
+
+function adminLoanProduct(loan) {
+  return String(
+    adminGetLoanValue(loan, [
+      'produk',
+      'PRODUK',
+      'product',
+      'PRODUCT',
+      'nama_produk',
+      'NAMA_PRODUK'
+    ])
+  ).trim();
+}
+
+function adminLoanPinjaman(loan) {
+  return String(
+    adminGetLoanValue(loan, [
+      'no_pinjaman',
+      'NO_PINJAMAN',
+      'loan_number',
+      'LOAN_NUMBER',
+      'noPinjaman'
+    ])
+  ).trim();
+}
+
+function adminLoanDate(loan) {
+  const value = adminGetLoanValue(loan, [
+    'tanggal',
+    'TANGGAL',
+    'tgl',
+    'TGL',
+    'tanggal_realisasi',
+    'TANGGAL_REALISASI'
+  ]);
+
+  if (!value) return '';
+
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return String(value);
+
+  return d.toISOString().slice(0, 10);
+}
+
+function adminCurrency(value) {
+  const n = Number(value || 0);
+  if (!isFinite(n)) return 'Rp 0';
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function adminEsc(value) {
+  if (typeof esc === 'function') return esc(String(value ?? ''));
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function adminGetAllLoans() {
+  return Array.isArray(window.loanDatabase)
+    ? window.loanDatabase
+    : (typeof loanDatabase !== 'undefined' && Array.isArray(loanDatabase)
+        ? loanDatabase
+        : []);
+}
+
+function adminGetFilteredLoans() {
+  const loans = adminGetAllLoans();
+
+  const q = String(
+    document.getElementById('adminInteractiveSearch')?.value || ''
+  ).trim().toUpperCase();
+
+  const ao = String(
+    document.getElementById('adminInteractiveAO')?.value || ''
+  ).trim().toUpperCase();
+
+  const status = String(
+    document.getElementById('adminInteractiveStatus')?.value || ''
+  ).trim().toUpperCase();
+
+  const product = String(
+    document.getElementById('adminInteractiveProduct')?.value || ''
+  ).trim().toUpperCase();
+
+  return loans.filter(function (loan) {
+    const lao = adminLoanAO(loan);
+    const lname = adminLoanName(loan).toUpperCase();
+    const lcif = adminLoanCIF(loan).toUpperCase();
+    const lpin = adminLoanPinjaman(loan).toUpperCase();
+    const lproduct = adminLoanProduct(loan).toUpperCase();
+    const lstatus = adminLoanStatus(loan);
+
+    if (ao && lao !== ao) return false;
+    if (status && lstatus !== status) return false;
+    if (product && lproduct !== product) return false;
+
+    if (q) {
+      const haystack = [
+        lao, lname, lcif, lpin, lproduct, lstatus
+      ].join(' ');
+
+      if (!haystack.includes(q)) return false;
+    }
+
+    return true;
+  });
+}
+
+function populateInteractiveAdminFilters() {
+  const loans = adminGetAllLoans();
+
+  const aoSelect = document.getElementById('adminInteractiveAO');
+  const productSelect = document.getElementById('adminInteractiveProduct');
+
+  if (!aoSelect || !productSelect) return;
+
+  const currentAO = aoSelect.value;
+  const currentProduct = productSelect.value;
+
+  const aos = [...new Set(
+    loans.map(adminLoanAO).filter(Boolean)
+  )].sort();
+
+  const products = [...new Set(
+    loans.map(adminLoanProduct).filter(Boolean)
+  )].sort();
+
+  aoSelect.innerHTML =
+    '<option value="">Semua AO</option>' +
+    aos.map(function (ao) {
+      return `<option value="${adminEsc(ao)}">${adminEsc(ao)}</option>`;
+    }).join('');
+
+  productSelect.innerHTML =
+    '<option value="">Semua Produk</option>' +
+    products.map(function (p) {
+      return `<option value="${adminEsc(p)}">${adminEsc(p)}</option>`;
+    }).join('');
+
+  aoSelect.value = aos.includes(currentAO) ? currentAO : '';
+  productSelect.value = products.includes(currentProduct) ? currentProduct : '';
+}
+
+function renderInteractiveAdmin() {
+  const section = document.getElementById('adminInteractiveDashboard');
+  if (!section) return;
+
+  populateInteractiveAdminFilters();
+
+  const loans = adminGetFilteredLoans();
+
+  const grouped = {};
+
+  loans.forEach(function (loan) {
+    const ao = adminLoanAO(loan) || '-';
+
+    if (!grouped[ao]) {
+      grouped[ao] = {
+        ao,
+        debitur: new Set(),
+        fasilitas: 0,
+        new: 0,
+        mengulang: 0,
+        topup: 0
+      };
+    }
+
+    const item = grouped[ao];
+
+    item.fasilitas++;
+
+    const cif = adminLoanCIF(loan);
+    if (cif) item.debitur.add(cif);
+
+    item.new += Number(loan?.potensiNew || 0);
+    item.mengulang += Number(loan?.potensiMengulang || 0);
+    item.topup += Number(loan?.potensiPlafonTopUp || 0);
+  });
+
+  const rows = Object.values(grouped).sort(function (a, b) {
+    return a.ao.localeCompare(b.ao, 'id');
+  });
+
+  const tbody = document.getElementById('adminInteractiveAOTbody');
+
+  if (tbody) {
+    tbody.innerHTML = rows.length
+      ? rows.map(function (r) {
+          return `
+            <tr data-ao="${adminEsc(r.ao)}"
+                onclick="selectAdminAO('${adminEsc(r.ao)}')">
+              <td class="font-bold text-indigo-700">${adminEsc(r.ao)}</td>
+              <td>${r.debitur.size.toLocaleString('id-ID')}</td>
+              <td>${r.fasilitas.toLocaleString('id-ID')}</td>
+              <td>${adminCurrency(r.new)}</td>
+              <td>${adminCurrency(r.mengulang)}</td>
+              <td>${adminCurrency(r.topup)}</td>
+            </tr>
+          `;
+        }).join('')
+      : `<tr><td colspan="6" class="text-center text-slate-400 py-6">Tidak ada data.</td></tr>`;
+  }
+
+  const summary = document.getElementById('adminInteractiveSummary');
+  if (summary) {
+    summary.textContent =
+      `${loans.length.toLocaleString('id-ID')} fasilitas terpilih • ` +
+      `${rows.length.toLocaleString('id-ID')} AO`;
+  }
+
+  renderAdminCharts(loans, rows);
+  updateAdminActiveFilter();
+}
+
+function renderAdminCharts(loans, rows) {
+  const distCanvas = document.getElementById('adminDistributionChart');
+  const compareCanvas = document.getElementById('adminComparisonChart');
+
+  if (distCanvas) {
+    const ctx = distCanvas.getContext('2d');
+    ctx.clearRect(0, 0, distCanvas.width, distCanvas.height);
+
+    const width = distCanvas.clientWidth || 500;
+    const height = 220;
+    const dpr = window.devicePixelRatio || 1;
+
+    distCanvas.width = width * dpr;
+    distCanvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const values = rows.slice(0, 12);
+    const max = Math.max(1, ...values.map(x => x.fasilitas));
+
+    drawAdminBarChart(
+      ctx,
+      width,
+      height,
+      values.map(x => x.ao),
+      values.map(x => x.fasilitas),
+      max,
+      'Fasilitas'
+    );
+  }
+
+  if (compareCanvas) {
+    const ctx = compareCanvas.getContext('2d');
+    ctx.clearRect(0, 0, compareCanvas.width, compareCanvas.height);
+
+    const width = compareCanvas.clientWidth || 500;
+    const height = 220;
+    const dpr = window.devicePixelRatio || 1;
+
+    compareCanvas.width = width * dpr;
+    compareCanvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const totals = [
+      loans.reduce((s, x) => s + Number(x?.potensiNew || 0), 0),
+      loans.reduce((s, x) => s + Number(x?.potensiPlafonTopUp || 0), 0),
+      loans.reduce((s, x) => s + Number(x?.potensiMengulang || 0), 0)
+    ];
+
+    drawAdminBarChart(
+      ctx,
+      width,
+      height,
+      ['NEW', 'TOP-UP', 'MENGULANG'],
+      totals,
+      Math.max(1, ...totals),
+      'Nilai'
+    );
+  }
+}
+
+function drawAdminBarChart(ctx, width, height, labels, values, max, unit) {
+  const left = 58;
+  const right = 12;
+  const top = 20;
+  const bottom = 42;
+
+  const plotW = Math.max(10, width - left - right);
+  const plotH = Math.max(10, height - top - bottom);
+
+  ctx.font = '10px Arial';
+  ctx.textBaseline = 'middle';
+
+  const count = Math.max(1, values.length);
+  const gap = 8;
+  const barW = Math.max(8, (plotW - gap * (count - 1)) / count);
+
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.fillStyle = '#64748b';
+
+  for (let i = 0; i <= 4; i++) {
+    const y = top + plotH - (plotH * i / 4);
+
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(left + plotW, y);
+    ctx.stroke();
+
+    const v = max * i / 4;
+    ctx.fillText(
+      v >= 1000000
+        ? (v / 1000000).toFixed(1) + 'M'
+        : v >= 1000
+          ? (v / 1000).toFixed(0) + 'K'
+          : Math.round(v).toString(),
+      5,
+      y
+    );
+  }
+
+  values.forEach(function (value, i) {
+    const x = left + i * (barW + gap);
+    const h = (Number(value || 0) / max) * plotH;
+    const y = top + plotH - h;
+
+    ctx.fillStyle = '#4f46e5';
+    ctx.fillRect(x, y, barW, h);
+
+    ctx.fillStyle = '#334155';
+    ctx.textAlign = 'center';
+
+    const label =
+      String(labels[i] || '').length > 9
+        ? String(labels[i]).slice(0, 8) + '…'
+        : String(labels[i] || '');
+
+    ctx.fillText(label, x + barW / 2, height - 17);
+
+    if (barW > 24) {
+      ctx.fillText(
+        value >= 1000000
+          ? (value / 1000000).toFixed(1) + 'M'
+          : value >= 1000
+            ? (value / 1000).toFixed(0) + 'K'
+            : Math.round(value).toString(),
+        x + barW / 2,
+        Math.max(10, y - 8)
+      );
+    }
+  });
+
+  ctx.textAlign = 'left';
+}
+
+function selectAdminAO(ao) {
+  const select = document.getElementById('adminInteractiveAO');
+  if (select) select.value = ao;
+
+  const panel = document.getElementById('adminAODetailPanel');
+  const title = document.getElementById('adminAOSelectedTitle');
+  const subtitle = document.getElementById('adminAOSelectedSubtitle');
+  const tbody = document.getElementById('adminAOSelectedTbody');
+
+  const loans = adminGetFilteredLoans().filter(function (loan) {
+    return adminLoanAO(loan) === String(ao).toUpperCase();
+  });
+
+  if (!panel || !tbody) return;
+
+  panel.style.display = '';
+
+  if (title) title.textContent = 'Detail AO ' + ao;
+
+  if (subtitle) {
+    subtitle.textContent =
+      `${loans.length.toLocaleString('id-ID')} fasilitas`;
+  }
+
+  tbody.innerHTML = loans.length
+    ? loans.map(function (loan) {
+        return `
+          <tr>
+            <td>${adminEsc(adminLoanCIF(loan))}</td>
+            <td class="font-semibold">${adminEsc(adminLoanName(loan))}</td>
+            <td>${adminEsc(adminLoanPinjaman(loan))}</td>
+            <td>${adminEsc(adminLoanProduct(loan))}</td>
+            <td>${adminEsc(adminLoanStatus(loan))}</td>
+            <td>${adminEsc(adminGetLoanValue(loan, ['rpc','RPC']))}</td>
+            <td>${adminCurrency(adminGetLoanValue(loan, ['angsuran','ANGSURAN','installment']))}</td>
+            <td>${adminCurrency(loan?.potensiMengulang || 0)}</td>
+            <td>${adminCurrency(loan?.potensiPlafonTopUp || 0)}</td>
+          </tr>
+        `;
+      }).join('')
+    : `<tr><td colspan="9" class="text-center text-slate-400 py-6">Tidak ada fasilitas.</td></tr>`;
+
+  panel.scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest'
+  });
+
+  renderInteractiveAdmin();
+}
+
+function clearAdminAOSelection() {
+  const panel = document.getElementById('adminAODetailPanel');
+  if (panel) panel.style.display = 'none';
+
+  const select = document.getElementById('adminInteractiveAO');
+  if (select) select.value = '';
+
+  renderInteractiveAdmin();
+}
+
+function updateAdminActiveFilter() {
+  const badge = document.getElementById('adminActiveFilter');
+  if (!badge) return;
+
+  const ao = document.getElementById('adminInteractiveAO')?.value || '';
+  const status = document.getElementById('adminInteractiveStatus')?.value || '';
+  const product = document.getElementById('adminInteractiveProduct')?.value || '';
+  const search = document.getElementById('adminInteractiveSearch')?.value || '';
+
+  const parts = [];
+  if (ao) parts.push('AO: ' + ao);
+  if (status) parts.push(status);
+  if (product) parts.push(product);
+  if (search) parts.push('Cari: ' + search);
+
+  if (parts.length) {
+    badge.style.display = '';
+    badge.textContent = parts.join(' • ');
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* Hook into existing dashboard rendering without replacing it. */
+(function hookAdminDashboard() {
+  const original = window.renderAdminDashboard;
+
+  window.renderAdminDashboard = function () {
+    if (typeof original === 'function') {
+      original.apply(this, arguments);
+    }
+
+    setTimeout(function () {
+      renderInteractiveAdmin();
+    }, 30);
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+      if (typeof window.renderAdminDashboard === 'function') {
+        window.renderAdminDashboard();
+      } else {
+        renderInteractiveAdmin();
+      }
+    }, 200);
+  });
+})();
+</script>
+
+</body>
 </html>
