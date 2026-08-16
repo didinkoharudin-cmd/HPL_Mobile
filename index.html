@@ -1166,6 +1166,17 @@ body{background:#f5f8fc!important;padding:0!important}
 }
 @media(max-width:390px){.v12-mobile-admin-grid{grid-template-columns:1fr}.v12-mobile-admin-grid button{min-height:112px}}
 </style>
+<style id="v16-performance-admin-switch">
+@media(max-width:768px){
+  #v16AdminSwitch{display:none;align-items:center;gap:5px;box-shadow:0 4px 12px rgba(49,46,129,.10)}
+  #v16AdminSwitch.show{display:inline-flex!important}
+  #v16LoadGuard{position:fixed;inset:0;z-index:600000;background:rgba(248,250,252,.96);display:none;align-items:center;justify-content:center;padding:24px;text-align:center}
+  #v16LoadGuard.show{display:flex}
+  #v16LoadGuard .card{width:min(360px,92vw);background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(15,23,42,.16)}
+  #v16LoadGuard .spin{width:38px;height:38px;border:4px solid #e0e7ff;border-top-color:#4f46e5;border-radius:50%;animation:v16spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes v16spin{to{transform:rotate(360deg)}}
+}
+</style>
 <style id="v15-mobile-routing-fix">
 /* V15: admin mobile uses the real existing #viewAdmin as a full-screen native page.
    This avoids routing through the desktop switchView layer, which was hidden behind
@@ -1267,9 +1278,11 @@ body.v15-mobile-admin-active #viewAdmin button{
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
+<div id="v16LoadGuard" aria-live="polite"><div class="card"><div class="spin"></div><b id="v16LoadGuardTitle">Menyusun database...</b><div id="v16LoadGuardText" style="margin-top:7px;font-size:11px;color:#64748b">Mohon tunggu. Aplikasi belum akan berpindah halaman sampai proses selesai.</div><div style="height:7px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:14px"><div id="v16LoadGuardBar" style="height:100%;width:8%;background:#4f46e5;transition:width .25s"></div></div></div></div>
+
 <div id="mobileV9Home">
 <div class="v9-shell">
-<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div></div>
+<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div><button id="v16AdminSwitch" type="button" onclick="v16SwitchToAdmin()" style="display:none;border:0;border-radius:12px;background:#eef2ff;color:#3730a3;padding:8px 10px;font-size:10px;font-weight:900;white-space:nowrap"><i class="fa-solid fa-user-shield"></i> Admin</button></div>
 <div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Potensi debitur berdasarkan jenis pengajuan</p></div>
 <div class="v15-home-search">
   <i class="fa-solid fa-magnifying-glass"></i>
@@ -2856,14 +2869,16 @@ body.v15-mobile-admin-active #viewAdmin button{
                 };
             }
 
-            // 1. Biaya Provisi
-            const pLow = (feeParams.provisiLow || 0.2) / 100;
-            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
-            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
-            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-            const biayaProvisi = Math.round(
-                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
-            );
+             // 1. Biaya Provisi
+            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+
+tarifProvisi =
+    tenorBulan < 84
+        ? 0.02 / 100
+        : 0.15 / 100;
+
+biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
+
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -4372,54 +4387,78 @@ body.v15-mobile-admin-active #viewAdmin button{
   window.loadProtectedData = async function(){
     window.lastProtectedLoadOk = false;
     if(!googleCredential) throw new Error('Sesi Google tidak tersedia.');
-    if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(8, 'Menghubungi database server...');
+    const guard=document.getElementById('v16LoadGuard');
+    const guardTitle=document.getElementById('v16LoadGuardTitle');
+    const guardText=document.getElementById('v16LoadGuardText');
+    const guardBar=document.getElementById('v16LoadGuardBar');
     const badge=document.getElementById('adminDataStatusBadge');
+    const setGuard=(p,t)=>{ if(guardBar) guardBar.style.width=Math.max(5,Math.min(100,p))+'%'; if(guardText) guardText.textContent=t; };
+    if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(8,'Menghubungi database server...');
     if(badge) badge.textContent='Mengambil data sesuai hak akses...';
+    if(guard){ guard.classList.add('show'); if(guardTitle) guardTitle.textContent='Mengambil database...'; setGuard(10,'Menghubungi server dan mengambil data sesuai hak akses.'); }
     try{
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(22, 'Mengambil data kredit & penghasilan...');
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(22,'Mengambil data kredit & penghasilan...');
       const data=await callApi('getData',googleCredential);
       if(!data.success) throw new Error(data.error||'Akses data ditolak.');
-      // Normalisasi data server agar format Apps Script (header Excel asli)
-      // sama dengan format yang digunakan processor lokal.
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(55, 'Normalisasi data kredit...');
-      kreditRawData = normalizeServerKreditData(
-        Array.isArray(data.kredit) ? data.kredit : []
-      );
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(70, 'Menyelaraskan data penghasilan dengan CIF...');
-      penghasilanRawData = normalizeServerPenghasilanData(
-        Array.isArray(data.penghasilan) ? data.penghasilan : []
-      );
 
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(78, 'Menyelaraskan Kredit ↔ Penghasilan...');
-      console.info('[ANALISA KREDIT] Pemeriksaan hubungan CIF Kredit ↔ Penghasilan:', diagnoseIncomeLink());
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(55,'Normalisasi data kredit...');
+      if(guard) setGuard(38,'Data kredit diterima. Menyiapkan format yang ringan untuk browser.');
+      const serverKredit=Array.isArray(data.kredit)?data.kredit:[];
+      kreditRawData=normalizeServerKreditData(serverKredit);
+      data.kredit=null;
 
-      // Data dari server menjadi sumber utama sesi ini; jangan gunakan data lokal lama.
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(70,'Menyelaraskan data penghasilan dengan CIF...');
+      if(guard) setGuard(52,'Menyelaraskan data penghasilan dengan CIF.');
+      const serverPenghasilan=Array.isArray(data.penghasilan)?data.penghasilan:[];
+      penghasilanRawData=normalizeServerPenghasilanData(serverPenghasilan);
+      data.penghasilan=null;
+
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(78,'Menyusun database debitur & fasilitas...');
+      if(badge) badge.textContent='Data diterima. Menyusun database...';
+      if(guard) { if(guardTitle) guardTitle.textContent='Menyusun database AO...'; setGuard(68,'Proses ini dapat memerlukan waktu pada HP. Jangan tutup atau pindah halaman.'); }
+
+      // Hindari pekerjaan tambahan yang tidak diperlukan saat loading mobile AO.
+      // Diagnosis CIF hanya dijalankan di desktop/admin.
+      try{
+        const isMobile=window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+        if(!isMobile) console.info('[ANALISA KREDIT] Pemeriksaan hubungan CIF Kredit ↔ Penghasilan:', diagnoseIncomeLink());
+      }catch(e){ console.warn('diagnoseIncomeLink skipped:',e); }
+
       try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
       if(typeof updateGoogleDataCounts==='function') updateGoogleDataCounts();
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(82, 'Menyusun database debitur & fasilitas...');
-      if(badge) badge.textContent='Data diterima. Menyusun database...';
-      requestAnimationFrame(() => {
-        try {
-          processBothData();
-          if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(100, 'Database berhasil diselaraskan.');
-          if(badge) badge.textContent='Database berhasil diselaraskan.';
-          window.lastProtectedLoadOk = true;
-        } catch(processError) {
-          console.error('[ANALISA KREDIT] Error saat menyusun database:', processError);
-          if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal menyusun database: ' + (processError.message || 'error'));
-          showAuthError('Data sudah diterima, tetapi proses penyelarasan di browser gagal: ' + (processError.message || 'error'));
-        }
-      });
-    }catch(err){
-      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal mengambil database: ' + (err.message || 'error'));
-      console.error('[ANALISA KREDIT] Gagal memuat database:', err);
 
-      // Jangan logout otomatis. Timeout database bukan berarti sesi Google
-      // tidak valid. Pengguna tetap berada di aplikasi dan dapat mencoba
-      // Muat Database kembali.
+      // Tunggu sampai processBothData benar-benar selesai sebelum routing ke AO.
+      // V15 sebelumnya menjadwalkan requestAnimationFrame lalu langsung resolve; pada HP
+      // halaman AO dapat terbuka ketika database masih sedang dibangun dan menyebabkan crash.
+      await new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+          try{
+            processBothData();
+            resolve();
+          }catch(processError){ reject(processError); }
+        },60);
+      });
+
+      // Lepaskan dua array mentah setelah database terproses untuk mengurangi tekanan RAM mobile.
+      // loanDatabase/cifDatabase tetap dipertahankan sebagai sumber aplikasi.
+      kreditRawData=[];
+      penghasilanRawData=[];
+
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(100,'Database berhasil diselaraskan.');
+      if(badge) badge.textContent='Database berhasil diselaraskan.';
+      if(guard) { setGuard(100,'Database selesai. Membuka aplikasi AO...'); if(guardTitle) guardTitle.textContent='Database siap'; }
+      window.lastProtectedLoadOk=true;
+      await new Promise(r=>setTimeout(r,180));
+    }catch(err){
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0,'Gagal mengambil database: '+(err.message||'error'));
+      console.error('[ANALISA KREDIT] Gagal memuat database:',err);
       if(badge) badge.textContent='Database belum selesai dimuat. Sesi tetap aktif.';
+      if(guard){ if(guardTitle) guardTitle.textContent='Database belum selesai'; setGuard(0,err.message||'Data gagal dimuat. Sesi tetap aktif.'); setTimeout(()=>guard.classList.remove('show'),700); }
       showAuthError(err.message||'Data gagal dimuat.');
-      window.lastProtectedLoadOk = false;
+      window.lastProtectedLoadOk=false;
+    }finally{
+      // Pastikan objek response besar tidak tertahan oleh closure.
+      try{ if(typeof data!=='undefined') data=null; }catch(e){}
     }
   };
 
@@ -4436,6 +4475,7 @@ body.v15-mobile-admin-active #viewAdmin button{
     document.body.classList.remove('v12-mobile-admin-active');
     document.body.classList.remove('v15-mobile-admin-active');
     document.getElementById('v12ManualUpload')?.classList.remove('show');
+    document.getElementById('v16AdminSwitch')?.classList.remove('show');
     document.getElementById('userSessionBadge')?.classList.remove('show');
     document.getElementById('logoutBtn')?.classList.remove('show');
     const badge=document.getElementById('adminDataStatusBadge');
@@ -5596,7 +5636,20 @@ function updateIdentity(){
   document.querySelectorAll('[data-v9-access]').forEach(btn=>{
     btn.classList.toggle('v9-access-active',String(btn.dataset.v9Access||'').toUpperCase()===role);
   });
+  const adminSwitch=document.getElementById('v16AdminSwitch');
+  if(adminSwitch) adminSwitch.classList.toggle('show', role==='ADMIN' || role==='SUPERVISOR');
 }
+
+window.v16SwitchToAdmin=function(){
+  const u=getUser();
+  const r=String(u.role||'').trim().toUpperCase();
+  if(r!=='ADMIN' && r!=='SUPERVISOR') return;
+  if(typeof window.v12OpenAdmin==='function'){
+    window.v12OpenAdmin('dashboard');
+  }else if(typeof switchView==='function'){
+    switchView('ADMIN');
+  }
+};
 
 function uniqueValues(rows, keys){
   const s=new Set();
@@ -5629,7 +5682,7 @@ function populateFilters(rows){
 }
 
 function getFilteredLoans(){
-  let rows=getLoans().slice();
+  let rows=getLoans();
 
   // V14 quick product filter: NEW / TOP-UP / MENGULANG.
   // These are derived from the same potential fields used by the credit analysis.
@@ -5685,8 +5738,18 @@ function renderDebtors(){
   const list=document.getElementById('v9DebtorList');
   if(!list) return;
 
-  const rows=getFilteredLoans();
+  const allRows=getFilteredLoans();
+  const mobile=window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+  const pageSize=mobile ? 60 : allRows.length;
+  const offset=Number(window.v16DebtorOffset||0);
+  const rows=mobile ? allRows.slice(offset,offset+pageSize) : allRows;
   list.innerHTML='';
+  if(mobile && offset===0 && allRows.length>pageSize){
+    const note=document.createElement('div');
+    note.style.cssText='margin-bottom:8px;padding:8px 10px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:9px;font-weight:700';
+    note.textContent='Menampilkan 60 debitur terlebih dahulu agar aplikasi tetap ringan.';
+    list.appendChild(note);
+  }
 
   if(v9QuickOfferType){
     const quickLabel = v9QuickOfferType==='TOP-UP' ? 'TOP-UP' : v9QuickOfferType;
@@ -5741,6 +5804,14 @@ function renderDebtors(){
     tbody.appendChild(tr);
   });
   list.appendChild(table);
+  if(mobile && offset+pageSize<allRows.length){
+    const more=document.createElement('button');
+    more.type='button';
+    more.id='v16LoadMoreDebtors';
+    more.style.cssText='width:100%;margin-top:10px;border:0;border-radius:12px;padding:11px;background:#eef2ff;color:#3730a3;font-size:10px;font-weight:900';
+    more.innerHTML='<i class="fa-solid fa-list"></i> Muat 60 debitur berikutnya';
+    list.appendChild(more);
+  }
 }
 
 function getActivity(){
@@ -5896,6 +5967,7 @@ function quickOffer(type){
   type=String(type||'').toUpperCase();
   if(!allowed.includes(type)) return;
   v9QuickOfferType=type;
+  window.v16DebtorOffset=0;
 
   // Move directly to the debtor potential list.
   go('debitur');
@@ -5904,6 +5976,7 @@ function quickOffer(type){
 
 function clearQuickOffer(){
   v9QuickOfferType='';
+  window.v16DebtorOffset=0;
   renderDebtors();
 }
 
@@ -5938,6 +6011,14 @@ function bind(){
     const id=e.target.closest('[data-action-loan-id]')?.dataset.actionLoanId || row.dataset.loanId;
     const fake={dataset:{loanId:id}};
     openSelected(fake);
+  });
+
+  document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
+    if(e.target.closest('#v16LoadMoreDebtors')){
+      window.v16DebtorOffset=Number(window.v16DebtorOffset||0)+60;
+      renderDebtors();
+      return;
+    }
   });
 
   document.getElementById('v9ActivityList')?.addEventListener('click',e=>{
