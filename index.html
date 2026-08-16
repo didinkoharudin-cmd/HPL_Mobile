@@ -924,6 +924,40 @@ body.app-locked > main { display:none !important; }
 window.DATABASE_LOAD_TIMEOUT_MS = 300000;
 </script>
 
+
+<style id="modern-mobile-app-v8">
+@media (max-width:768px){
+:root{--mbg:#f5f7fb;--mcard:rgba(255,255,255,.96);--mborder:rgba(15,23,42,.08);--mtext:#172033;--mmuted:#718096;--mprimary:#2563eb}
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;background:var(--mbg)!important;-webkit-tap-highlight-color:transparent}
+body{margin:0!important;padding:0 0 82px!important;font-size:14px!important;color:var(--mtext)}
+header,.header,.topbar,.navbar,.app-header{transition:transform .25s ease,opacity .25s ease,box-shadow .25s ease}
+body.mobile-header-hidden header,body.mobile-header-hidden .header,body.mobile-header-hidden .topbar,body.mobile-header-hidden .navbar,body.mobile-header-hidden .app-header{transform:translateY(-110%);opacity:.15;pointer-events:none}
+main,.container,.content,.main-content,.dashboard,.page-content{width:100%!important;max-width:none!important;box-sizing:border-box!important}
+main,.main-content,.dashboard,.page-content{padding:12px!important}
+h1{font-size:21px!important;line-height:1.2!important;margin:8px 0 12px!important}
+h2{font-size:17px!important;margin:10px 0 8px!important}
+.card,.panel,.dashboard-card,.stat-card,.section-card,.debtor-card,.facility-card{border:1px solid var(--mborder)!important;border-radius:18px!important;box-shadow:0 8px 30px rgba(15,23,42,.07)!important;background:var(--mcard)!important;margin-bottom:12px!important}
+button,.btn,input,select{min-height:40px!important;border-radius:12px!important;font-size:13px!important}
+button{padding:8px 12px!important}
+.filters,.filter-row,.toolbar,.actions,.action-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:8px 0!important}
+.table-container,.table-responsive,.data-table-wrap,.table-wrapper{width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;border-radius:14px}
+table{min-width:680px;font-size:11px!important}th,td{padding:7px 8px!important;white-space:nowrap}
+.stats,.stat-grid,.dashboard-stats,.summary-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.stat-card{padding:12px!important;min-height:72px!important}
+#modernMobileNavV8{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:99990;height:62px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:6px;border:1px solid rgba(255,255,255,.7);border-radius:20px;background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(15,23,42,.16)}
+#modernMobileNavV8 button{border:0!important;background:transparent!important;color:#718096!important;min-height:48px!important;padding:3px!important;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;font-size:10px!important;font-weight:600}
+#modernMobileNavV8 button.active{color:var(--mprimary)!important;background:rgba(37,99,235,.09)!important}
+#modernMobileNavV8 .nav-icon{font-size:20px;line-height:20px}
+.modal,.dialog,.drawer,.detail-panel{max-width:calc(100vw - 20px)!important;border-radius:20px!important}
+.desktop-only{display:none!important}
+}
+@media (max-width:900px) and (orientation:landscape){
+#modernMobileNavV8{height:52px;bottom:6px}
+#modernMobileNavV8 button{min-height:40px!important;flex-direction:row;gap:5px;font-size:10px!important}
+body{padding-bottom:64px!important}
+}
+</style>
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -985,7 +1019,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
                     Sistem Analisis Kredit & Penawaran Debitur
                 </h1>
                 <p class="text-indigo-200 text-xs mt-0.5">
-                    Kredit Konsumer Karawang
+                    Presisi Per No Pinjaman, RPC, Tenor Pegawai & Configurator WA
                 </p>
             </div>
             
@@ -2379,7 +2413,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
                 };
             }
 
-           // 1. Biaya Provisi
+            // 1. Biaya Provisi
             jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
 
 tarifProvisi =
@@ -4767,6 +4801,27 @@ window.hideDatabaseProgressV6 = function() {
   const box = document.getElementById('databaseProgressV6');
   if (box) box.remove();
 };
+</script>
+
+
+<script id="modern-mobile-app-v8-js">
+(function(){
+'use strict';
+if(window.innerWidth>768)return;
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn,{once:true});else fn();}
+ready(function(){
+if(!document.getElementById('modernMobileNavV8')){
+const nav=document.createElement('nav');nav.id='modernMobileNavV8';nav.setAttribute('aria-label','Navigasi aplikasi mobile');
+[['⌂','Beranda'],['▣','Debitur'],['▤','Analisa'],['☰','Menu']].forEach(function(x,i){
+const b=document.createElement('button');b.type='button';b.innerHTML='<span class="nav-icon">'+x[0]+'</span><span>'+x[1]+'</span>';if(i===0)b.classList.add('active');
+b.onclick=function(){document.querySelectorAll('#modernMobileNavV8 button').forEach(y=>y.classList.remove('active'));b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});};
+nav.appendChild(b);});document.body.appendChild(nav);}
+let lastY=window.scrollY,ticking=false;
+window.addEventListener('scroll',function(){if(ticking)return;ticking=true;requestAnimationFrame(function(){const y=window.scrollY,d=y-lastY;if(Math.abs(d)>5){if(y>80&&d>0)document.body.classList.add('mobile-header-hidden');else if(d<0||y<30)document.body.classList.remove('mobile-header-hidden');}lastY=y;ticking=false;});},{passive:true});
+document.querySelectorAll('img,video,iframe').forEach(function(el){el.style.maxWidth='100%';el.style.height='auto';});
+const meta=document.querySelector('meta[name="viewport"]');if(meta)meta.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover');
+});
+})();
 </script>
 
 </body>
