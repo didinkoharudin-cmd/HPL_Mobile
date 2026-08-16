@@ -960,9 +960,10 @@ body{padding-bottom:64px!important}
 
 <style id="v9-mobile-app">
 @media(max-width:768px){
-body{background:#f5f8fc!important;padding-bottom:92px!important}
-#mobileV9Home{display:block!important}
-.v9-shell{min-height:calc(100vh - 20px);padding:14px 14px 105px}
+html,body{height:100%!important;overflow:hidden!important;overscroll-behavior:none!important}
+body{background:#f5f8fc!important;padding:0!important}
+#mobileV9Home{display:block!important;position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;overflow:hidden!important;z-index:90000!important}
+.v9-shell{height:100%!important;min-height:0!important;box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;padding:12px 12px calc(112px + env(safe-area-inset-bottom))!important}
 .v9-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .v9-user{display:flex;align-items:center;gap:10px}.v9-avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#2563eb,#4f46e5);color:#fff;font-size:19px}
 .v9-user b{display:block;font-size:14px}.v9-user span{font-size:11px;color:#64748b}.v9-exit{width:40px;height:40px;border:0;border-radius:13px;background:#fff;color:#ef4444;box-shadow:0 5px 18px rgba(15,23,42,.08)}
@@ -973,12 +974,30 @@ body{background:#f5f8fc!important;padding-bottom:92px!important}
 .v9-list{display:grid;gap:8px}.v9-debtor{border:1px solid #e5eaf1;background:#fff;border-radius:16px;padding:12px}.v9-debtor .top{display:flex;justify-content:space-between;gap:8px}.v9-debtor b{font-size:13px}.v9-chip{font-size:9px;border-radius:999px;padding:4px 7px;background:#eef2ff;color:#4338ca}.v9-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.v9-grid span{font-size:10px;color:#64748b}.v9-grid strong{display:block;color:#1e293b;font-size:11px;margin-top:2px}
 .v9-filters{display:grid;gap:9px}.v9-filters label{font-size:10px;color:#64748b;font-weight:600}.v9-filters select,.v9-filters input{width:100%;margin-top:4px;border:1px solid #dbe3ee;border-radius:11px;padding:10px;background:#f8fafc;font-size:12px}
 #v9Whatsapp{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:100001;width:66px;height:66px;border:0;border-radius:50%;background:#16a34a;color:#fff;box-shadow:0 10px 30px rgba(22,163,74,.4);display:none;font-size:28px}#v9Whatsapp.show{display:grid;place-items:center}
-#v9BottomNav{position:fixed;left:10px;right:10px;bottom:max(8px,env(safe-area-inset-bottom));height:64px;z-index:100000;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;padding:5px;border-radius:21px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(15,23,42,.16)}
-#v9BottomNav button{border:0;background:transparent;color:#64748b;height:54px;border-radius:16px;font-size:10px;font-weight:700}#v9BottomNav button i{display:block;font-size:19px;margin-bottom:3px}.v9-nav-active{color:#2563eb!important;background:#eff6ff!important}
-#v9BottomNav .wa-nav{margin-top:-28px;width:66px;height:66px;border-radius:50%;background:#16a34a;color:#fff;box-shadow:0 10px 26px rgba(22,163,74,.35);border:5px solid #f5f8fc;font-size:25px}#v9BottomNav .wa-nav i{font-size:25px;margin:0}
+#v9BottomNav{position:fixed!important;left:8px;right:8px;bottom:max(7px,env(safe-area-inset-bottom));height:66px;z-index:100001!important;display:grid;grid-template-columns:1fr 1fr 1.12fr 1fr 1fr;align-items:center;padding:4px;border-radius:21px;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(15,23,42,.18);border:1px solid rgba(226,232,240,.85)}
+#v9BottomNav button{border:0!important;background:transparent!important;color:#64748b!important;height:56px!important;min-height:56px!important;border-radius:16px!important;font-size:9px!important;font-weight:800!important;padding:3px 2px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+#v9BottomNav button i{display:block!important;font-size:18px!important;line-height:20px!important;margin:0!important}
+#v9BottomNav button.v9-nav-active{color:#2563eb!important;background:#eff6ff!important}
+#v9BottomNav .wa-nav{margin-top:-31px!important;width:70px!important;height:70px!important;border-radius:50%!important;background:#16a34a!important;color:#fff!important;box-shadow:0 10px 28px rgba(22,163,74,.38)!important;border:5px solid #f5f8fc!important;font-size:24px!important}
+#v9BottomNav .wa-nav i{font-size:27px!important;margin:0!important}
+#v9Whatsapp{display:none!important}
 #modernMobileNavV8{display:none!important}
 }
 @media(min-width:769px){#mobileV9Home,#v9BottomNav,#v9Whatsapp{display:none!important}}
+
+.v9-activity-list{display:grid;gap:8px}
+.v9-activity-item{background:#fff;border:1px solid #e5eaf1;border-radius:15px;padding:11px}
+.v9-activity-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.v9-activity-top b{font-size:12px;color:#1e293b}
+.v9-activity-meta{font-size:9px;color:#64748b;line-height:1.45;margin-top:5px}
+.v9-activity-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.v9-activity-actions button{border:0;border-radius:11px;padding:9px 8px;font-size:10px;font-weight:800}
+.v9-empty{padding:28px 12px;text-align:center;color:#94a3b8;font-size:11px}
+@media(max-width:768px){
+  #v9PageActivity .v9-panel{margin-top:0}
+  .v9-shell{scrollbar-width:none}
+  .v9-shell::-webkit-scrollbar{display:none}
+}
 </style>
 <style id="v9-mobile-fix-css">
 @media(max-width:768px){
@@ -988,6 +1007,17 @@ body{background:#f5f8fc!important;padding-bottom:92px!important}
   .v9-debtor:active{transform:scale(.985)}
 }
 </style>
+
+<style id="v10-final-mobile-fix">
+@media(max-width:768px){
+  body.app-locked #mobileV9Home{visibility:hidden;pointer-events:none}
+  body:not(.app-locked) #mobileV9Home{visibility:visible;pointer-events:auto}
+  #v9BottomNav{touch-action:manipulation}
+  #v9BottomNav button{user-select:none;-webkit-tap-highlight-color:transparent}
+  .v9-debtor,.v9-activity-item{user-select:none}
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -998,10 +1028,30 @@ body{background:#f5f8fc!important;padding-bottom:92px!important}
 <div class="v9-access"><button data-v9-access="admin"><i class="fa-solid fa-user-shield"></i>Admin</button><button data-v9-access="ao"><i class="fa-solid fa-user-tie"></i>AO</button><button data-v9-access="exit"><i class="fa-solid fa-power-off"></i>Exit</button></div>
 <section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
 <section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
-<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option>Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option>Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option>Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option>Semua AO</option></select></label><label>Pencarian<input id="v9FilterSearch" placeholder="Nama / CIF / No. Pinjaman"></label></div></div></section>
+<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option value="">Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><label>Pencarian<input id="v9FilterSearch" placeholder="Nama / CIF / No. Pinjaman"></label></div></div></section>
+<section class="v9-page" id="v9PageActivity">
+  <div class="v9-title">My Activity</div>
+  <div class="v9-panel" style="margin-top:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+      <div>
+        <h3 style="margin:0;font-size:13px">Debitur Sudah Diberi Penawaran</h3>
+        <div id="v9ActivityCount" style="font-size:10px;color:#64748b;margin-top:2px">0 debitur</div>
+      </div>
+      <button id="v9ExportActivity" style="border:0;border-radius:11px;background:#0f766e;color:#fff;padding:9px 10px;font-size:10px;font-weight:800">
+        <i class="fa-solid fa-file-excel"></i> Excel
+      </button>
+    </div>
+    <div id="v9ActivityList" class="v9-activity-list"></div>
+  </div>
+</section>
 </div></div>
-<button id="v9Whatsapp" title="Kirim WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
-<nav id="v9BottomNav"><button data-v9-page="home" class="v9-nav-active"><i class="fa-solid fa-house"></i>Home</button><button data-v9-page="debitur"><i class="fa-solid fa-users"></i>Debitur</button><button class="wa-nav" id="v9WaNav"><i class="fa-brands fa-whatsapp"></i></button><button data-v9-page="menu"><i class="fa-solid fa-sliders"></i>Menu</button></nav>
+<nav id="v9BottomNav">
+  <button data-v9-page="home" class="v9-nav-active"><i class="fa-solid fa-house"></i><span>Home</span></button>
+  <button data-v9-page="debitur"><i class="fa-solid fa-users"></i><span>Debitur</span></button>
+  <button class="wa-nav" id="v9WaNav" title="Kirim Penawaran"><i class="fa-brands fa-whatsapp"></i><span>WA</span></button>
+  <button data-v9-page="activity"><i class="fa-solid fa-clock-rotate-left"></i><span>My Activity</span></button>
+  <button data-v9-page="menu"><i class="fa-solid fa-sliders"></i><span>Menu</span></button>
+</nav>
 
 
 
@@ -3633,16 +3683,91 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
             document.getElementById('waPreviewText').value = msg;
         }
 
+        function getOfferActivityKey(item) {
+            if (!item) return '';
+            return String(item.loan_id || item.no_pinjaman || item.cifRef?.cif || '').trim();
+        }
+
+        function getOfferActivity() {
+            try {
+                const raw = localStorage.getItem('analisaKredit_offerActivity_v1');
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveOfferActivity(item, message) {
+            if (!item) return;
+
+            const deb = item.cifRef || {};
+            let offerType = '';
+            let nominalType = '';
+            try {
+                offerType = document.querySelector('input[name="offerType"]:checked')?.value || '';
+                nominalType = document.querySelector('input[name="nominalType"]:checked')?.value || '';
+            } catch (e) {}
+
+            const targetKey = getOfferActivityKey(item);
+            const activity = getOfferActivity();
+            const now = new Date();
+
+            const record = {
+                key: targetKey,
+                waktu: now.toISOString(),
+                waktuDisplay: now.toLocaleString('id-ID'),
+                loan_id: item.loan_id || '',
+                no_pinjaman: item.no_pinjaman || '',
+                cif: deb.cif || '',
+                nama: deb.nama || '',
+                kode_ao: deb.kode_ao || deb.kodeAO || '',
+                no_hp: deb.no_hp || '',
+                tipe_pinjaman: item.tipe_pinjaman || '',
+                jenis_penawaran: offerType,
+                nominal_type: nominalType,
+                tenor: item.selectedTenor || '',
+                potensi_nett: Number(
+                    offerType === 'NEW' ? item.potensiNew :
+                    offerType === 'TOPUP' ? item.potensiPlafonTopUp :
+                    item.potensiMengulang
+                ) || 0
+            };
+
+            // Satu debitur tetap satu baris. Jika dikirim lagi, datanya diperbarui
+            // dan timestamp menjadi waktu penawaran terakhir.
+            const idx = activity.findIndex(x => String(x.key) === targetKey);
+            if (idx >= 0) activity[idx] = record;
+            else activity.unshift(record);
+
+            // Batasi agar localStorage tetap ringan di mobile.
+            const trimmed = activity.slice(0, 500);
+            try {
+                localStorage.setItem('analisaKredit_offerActivity_v1', JSON.stringify(trimmed));
+            } catch (e) {
+                console.warn('Gagal menyimpan My Activity:', e);
+            }
+
+            return record;
+        }
+
         function sendWaDirect() {
             const targetItem = loanDatabase.find(l => l.loan_id === selectedLoanId);
-            if (!targetItem || !targetItem.cifRef.no_hp) {
+            if (!targetItem || !targetItem.cifRef || !targetItem.cifRef.no_hp) {
                 alert("Nomor WhatsApp/HP debitur tidak tersedia!");
                 return;
             }
 
-            const message = document.getElementById('waPreviewText').value;
+            const message = document.getElementById('waPreviewText')?.value || '';
+            saveOfferActivity(targetItem, message);
+
             const waUrl = `https://wa.me/${targetItem.cifRef.no_hp}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
+
+            // Perbarui halaman My Activity segera setelah tombol penawaran diklik.
+            try {
+                if (typeof window.renderV9Activity === 'function') window.renderV9Activity();
+            } catch (e) {}
         }
 
         // --- EXCEL TEMPLATE DOWNLOADERS ---
@@ -4871,14 +4996,11 @@ const meta=document.querySelector('meta[name="viewport"]');if(meta)meta.setAttri
 (function(){
 'use strict';
 
+const ACTIVITY_KEY = 'analisaKredit_offerActivity_v1';
+
 function getLoans(){
-  // IMPORTANT: loanDatabase/currentUser are the existing V8 core variables.
-  // They are intentionally reused so no existing database/calculation function is replaced.
-  try {
-    return Array.isArray(loanDatabase) ? loanDatabase : [];
-  } catch(e) {
-    return [];
-  }
+  try { return Array.isArray(loanDatabase) ? loanDatabase : []; }
+  catch(e) { return []; }
 }
 
 function getUser(){
@@ -4905,46 +5027,42 @@ function nett(o){
   ])) || 0;
 }
 
-function selectedAccess(){
-  const u = getUser();
-  const role = String(u.role || '').toUpperCase();
-  return ['ADMIN','SUPERVISOR'].includes(role) ? 'ADMIN' : 'AO';
+function escapeHtml(v){
+  return String(v ?? '').replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[m]));
 }
 
 function updateIdentity(){
-  const u = getUser();
-  const name = u.name || u.email || 'Pengguna';
-  const role = String(u.role || 'AO').toUpperCase();
-  const n = document.getElementById('v9UserName');
-  const r = document.getElementById('v9UserRole');
-  if(n) n.textContent = name;
-  if(r) r.textContent = (role === 'SUPERVISOR' ? 'SUPERVISOR' : role) + (u.kodeAO ? ' • '+u.kodeAO : '');
+  const u=getUser();
+  const name=u.name || u.email || 'Pengguna';
+  const role=String(u.role || 'AO').toUpperCase();
+  document.getElementById('v9UserName')?.replaceChildren(document.createTextNode(name));
+  document.getElementById('v9UserRole')?.replaceChildren(
+    document.createTextNode((role === 'SUPERVISOR' ? 'SUPERVISOR' : role) + (u.kodeAO ? ' • '+u.kodeAO : ''))
+  );
 
   document.querySelectorAll('[data-v9-access]').forEach(btn=>{
-    const a = String(btn.dataset.v9Access || '').toUpperCase();
-    if(a === role) btn.classList.add('v9-access-active');
-    else btn.classList.remove('v9-access-active');
+    btn.classList.toggle('v9-access-active',String(btn.dataset.v9Access||'').toUpperCase()===role);
   });
 }
 
 function uniqueValues(rows, keys){
-  const s = new Set();
+  const s=new Set();
   rows.forEach(o=>{
-    const v = String(val(o,keys)||'').trim();
+    const v=String(val(o,keys)||'').trim();
     if(v) s.add(v);
   });
   return [...s].sort((a,b)=>a.localeCompare(b,'id'));
 }
 
 function fillSelect(id, values, first){
-  const el = document.getElementById(id);
+  const el=document.getElementById(id);
   if(!el) return;
-  const current = el.value;
-  el.innerHTML = '';
-  const op = document.createElement('option');
-  op.value = '';
-  op.textContent = first;
-  el.appendChild(op);
+  const current=el.value;
+  el.innerHTML='';
+  const op=document.createElement('option');
+  op.value=''; op.textContent=first; el.appendChild(op);
   values.forEach(v=>{
     const x=document.createElement('option');
     x.value=v; x.textContent=v; el.appendChild(x);
@@ -4953,52 +5071,34 @@ function fillSelect(id, values, first){
 }
 
 function populateFilters(rows){
-  fillSelect('v9FilterProduk',
-    uniqueValues(rows,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']),
-    'Semua Produk'
-  );
-  fillSelect('v9FilterJenis',
-    uniqueValues(rows,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']),
-    'Semua Jenis'
-  );
-  fillSelect('v9FilterStatus',
-    uniqueValues(rows,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']),
-    'Semua Status'
-  );
-  fillSelect('v9FilterAO',
-    uniqueValues(rows,['kode_ao','KODE_AO','kodeAO','KODEAO']),
-    'Semua AO'
-  );
+  fillSelect('v9FilterProduk',uniqueValues(rows,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']),'Semua Produk');
+  fillSelect('v9FilterJenis',uniqueValues(rows,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']),'Semua Jenis');
+  fillSelect('v9FilterStatus',uniqueValues(rows,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']),'Semua Status');
+  fillSelect('v9FilterAO',uniqueValues(rows,['kode_ao','KODE_AO','kodeAO','KODEAO']),'Semua AO');
 }
 
 function getFilteredLoans(){
-  let rows = getLoans().slice();
+  let rows=getLoans().slice();
+  const p=document.getElementById('v9FilterProduk')?.value || '';
+  const j=document.getElementById('v9FilterJenis')?.value || '';
+  const s=document.getElementById('v9FilterStatus')?.value || '';
+  const a=document.getElementById('v9FilterAO')?.value || '';
+  const q=(document.getElementById('v9FilterSearch')?.value || '').trim().toLowerCase();
 
-  const p = document.getElementById('v9FilterProduk')?.value || '';
-  const j = document.getElementById('v9FilterJenis')?.value || '';
-  const s = document.getElementById('v9FilterStatus')?.value || '';
-  const a = document.getElementById('v9FilterAO')?.value || '';
-  const q = (document.getElementById('v9FilterSearch')?.value || '').trim().toLowerCase();
-
-  if(p) rows = rows.filter(o=>String(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===p);
-  if(j) rows = rows.filter(o=>String(val(o,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']))===j);
-  if(s) rows = rows.filter(o=>String(val(o,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']))===s);
-  if(a) rows = rows.filter(o=>String(val(o,['kode_ao','KODE_AO','kodeAO','KODEAO']))===a);
-
+  if(p) rows=rows.filter(o=>String(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===p);
+  if(j) rows=rows.filter(o=>String(val(o,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']))===j);
+  if(s) rows=rows.filter(o=>String(val(o,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']))===s);
+  if(a) rows=rows.filter(o=>String(val(o,['kode_ao','KODE_AO','kodeAO','KODEAO']))===a);
   if(q){
-    rows = rows.filter(o=>{
-      const text = [
-        val(o,['nama','NAMA']),
-        val(o,['cif','CIF']),
-        val(o,['no_pinjaman','NO_PINJAMAN']),
-        val(o,['kode_ao','KODE_AO']),
-        val(o,['no_hp','NO_HP']),
-        val(o,['tipe_pinjaman','TIPE_PINJAMAN'])
+    rows=rows.filter(o=>{
+      const text=[
+        val(o,['nama','NAMA']),val(o,['cif','CIF']),
+        val(o,['no_pinjaman','NO_PINJAMAN']),val(o,['kode_ao','KODE_AO']),
+        val(o,['no_hp','NO_HP']),val(o,['tipe_pinjaman','TIPE_PINJAMAN'])
       ].join(' ').toLowerCase();
       return text.includes(q);
     });
   }
-
   return rows;
 }
 
@@ -5016,39 +5116,105 @@ function renderDebtors(){
 
   const rows=getFilteredLoans();
   list.innerHTML='';
-
   if(!rows.length){
-    list.innerHTML='<div style="text-align:center;color:#94a3b8;padding:28px 10px">Tidak ada data debitur sesuai filter.</div>';
+    list.innerHTML='<div class="v9-empty">Tidak ada data debitur sesuai filter.</div>';
     return;
   }
 
-  rows.forEach((o)=>{
+  rows.forEach(o=>{
     const card=document.createElement('div');
     card.className='v9-debtor';
     card.dataset.loanId=String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']));
     card.innerHTML=
-      '<div class="top">'+
-        '<b>'+escapeHtml(val(o,['nama','NAMA'])||'Debitur')+'</b>'+
-        '<span class="v9-chip">'+escapeHtml(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN'])||'Analisa')+'</span>'+
-      '</div>'+
+      '<div class="top"><b>'+escapeHtml(val(o,['nama','NAMA'])||'Debitur')+'</b>'+
+      '<span class="v9-chip">'+escapeHtml(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN'])||'Analisa')+'</span></div>'+
       '<div class="v9-grid">'+
-        '<span>CIF<strong>'+escapeHtml(val(o,['cif','CIF'])||'-')+'</strong></span>'+
-        '<span>Kode AO<strong>'+escapeHtml(val(o,['kode_ao','KODE_AO','kodeAO'])||'-')+'</strong></span>'+
-        '<span>No. Pinjaman<strong>'+escapeHtml(val(o,['no_pinjaman','NO_PINJAMAN','loan_id'])||'-')+'</strong></span>'+
-        '<span>Potensi NETT<strong>'+money(nett(o))+'</strong></span>'+
+      '<span>CIF<strong>'+escapeHtml(val(o,['cif','CIF'])||'-')+'</strong></span>'+
+      '<span>Kode AO<strong>'+escapeHtml(val(o,['kode_ao','KODE_AO','kodeAO'])||'-')+'</strong></span>'+
+      '<span>No. Pinjaman<strong>'+escapeHtml(val(o,['no_pinjaman','NO_PINJAMAN','loan_id'])||'-')+'</strong></span>'+
+      '<span>Potensi NETT<strong>'+money(nett(o))+'</strong></span>'+
       '</div>';
     list.appendChild(card);
   });
 }
 
-function escapeHtml(v){
-  return String(v ?? '').replace(/[&<>"']/g,m=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-  }[m]));
+function getActivity(){
+  try{
+    const raw=localStorage.getItem(ACTIVITY_KEY);
+    const data=raw?JSON.parse(raw):[];
+    return Array.isArray(data)?data:[];
+  }catch(e){ return []; }
+}
+
+function renderV9Activity(){
+  const list=document.getElementById('v9ActivityList');
+  const count=document.getElementById('v9ActivityCount');
+  if(!list) return;
+
+  const data=getActivity();
+  if(count) count.textContent=data.length.toLocaleString('id-ID')+' debitur';
+
+  list.innerHTML='';
+  if(!data.length){
+    list.innerHTML='<div class="v9-empty"><i class="fa-regular fa-clock" style="font-size:24px;display:block;margin-bottom:7px"></i>Belum ada debitur yang diberi penawaran.</div>';
+    return;
+  }
+
+  data.forEach(item=>{
+    const row=document.createElement('div');
+    row.className='v9-activity-item';
+    row.innerHTML=
+      '<div class="v9-activity-top"><b>'+escapeHtml(item.nama||'Debitur')+'</b>'+
+      '<span class="v9-chip">'+escapeHtml(item.jenis_penawaran||'PENAWARAN')+'</span></div>'+
+      '<div class="v9-activity-meta">'+
+      'CIF: '+escapeHtml(item.cif||'-')+' • AO: '+escapeHtml(item.kode_ao||'-')+'<br>'+
+      'No. Pinjaman: '+escapeHtml(item.no_pinjaman||'-')+'<br>'+
+      'Diberi penawaran: '+escapeHtml(item.waktuDisplay||'-')+
+      (item.potensi_nett ? '<br>Potensi Nett: <b>'+money(item.potensi_nett)+'</b>' : '')+
+      '</div>'+
+      '<div class="v9-activity-actions">'+
+      '<button data-activity-key="'+escapeHtml(item.key)+'" class="v9-activity-open" style="background:#eef2ff;color:#3730a3"><i class="fa-solid fa-file-lines"></i> Rincian</button>'+
+      '<button data-activity-phone="'+escapeHtml(item.no_hp||'')+'" class="v9-activity-wa" style="background:#dcfce7;color:#15803d"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>'+
+      '</div>';
+    list.appendChild(row);
+  });
+}
+
+function exportActivityExcel(){
+  const data=getActivity();
+  if(!data.length){
+    alert('Belum ada data My Activity untuk di-download.');
+    return;
+  }
+  if(typeof XLSX==='undefined'){
+    alert('Library Excel belum siap. Silakan tunggu sebentar lalu coba lagi.');
+    return;
+  }
+
+  const rows=data.map((x,i)=>({
+    'No':i+1,
+    'Waktu Penawaran':x.waktuDisplay||x.waktu||'',
+    'Nama Debitur':x.nama||'',
+    'CIF':x.cif||'',
+    'Kode AO':x.kode_ao||'',
+    'No. Pinjaman':x.no_pinjaman||'',
+    'No. HP / WhatsApp':x.no_hp||'',
+    'Tipe Pinjaman':x.tipe_pinjaman||'',
+    'Jenis Penawaran':x.jenis_penawaran||'',
+    'Tipe Nominal':x.nominal_type||'',
+    'Tenor':x.tenor||'',
+    'Potensi Nett':Number(x.potensi_nett)||0
+  }));
+
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'My Activity');
+  XLSX.writeFile(wb,'My_Activity_Debitur_Sudah_Diberi_Penawaran.xlsx');
 }
 
 function go(page){
-  const target=document.getElementById('v9Page'+page.charAt(0).toUpperCase()+page.slice(1));
+  const map={home:'Home',debitur:'Debitur',activity:'Activity',menu:'Menu'};
+  const target=document.getElementById('v9Page'+map[page]);
   if(!target) return;
 
   document.querySelectorAll('.v9-page').forEach(x=>x.classList.remove('active'));
@@ -5058,14 +5224,14 @@ function go(page){
     x.classList.toggle('v9-nav-active',x.dataset.v9Page===page);
   });
 
-  const wa=document.getElementById('v9Whatsapp');
-  if(wa) wa.classList.remove('show');
+  // IMPORTANT: scroll only the V9 content container, never the document.
+  const shell=document.querySelector('#mobileV9Home .v9-shell');
+  if(shell) shell.scrollTo({top:0,left:0,behavior:'auto'});
 
   if(page==='home') renderDashboard();
-  if(page==='debitur') renderDebtors();
+  if(page==='debitur'){ populateFilters(getLoans()); renderDebtors(); }
+  if(page==='activity') renderV9Activity();
   if(page==='menu') populateFilters(getLoans());
-
-  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function openSelected(card){
@@ -5076,35 +5242,31 @@ function openSelected(card){
 
   window.v9Selected=obj;
 
-  const wa=document.getElementById('v9Whatsapp');
-  if(wa) wa.classList.add('show');
-
-  // Reuse the existing V8 detail modal instead of creating a second calculator.
-  if(typeof openDebtorModal==='function' && id){
-    try { openDebtorModal(id); } catch(err){ console.error('openDebtorModal:',err); }
+  if(typeof openDebtorModal==='function'){
+    try{
+      openDebtorModal(id);
+      return;
+    }catch(err){
+      console.error('openDebtorModal:',err);
+    }
   }
 }
 
 function openWhatsapp(){
-  const o=window.v9Selected;
-  if(!o){
+  // The V8 modal is the source of truth for the selected offer/tenor/message.
+  if(typeof selectedLoanId==='undefined' || !selectedLoanId){
     alert('Pilih debitur terlebih dahulu.');
     return;
   }
-
-  const raw=String(val(o,['no_hp','NO_HP','telepon','TELEPON','whatsapp','WHATSAPP'])||'');
-  if(typeof sendWaDirect==='function'){
-    // The existing modal already contains the complete WA configurator.
-    try { sendWaDirect(); return; } catch(e){}
+  if(typeof openDebtorModal==='function'){
+    try{
+      openDebtorModal(selectedLoanId);
+      return;
+    }catch(e){
+      console.error(e);
+    }
   }
-
-  let p=raw.replace(/\D/g,'');
-  if(!p){
-    alert('Nomor WhatsApp debitur tidak tersedia.');
-    return;
-  }
-  if(p.startsWith('0')) p='62'+p.slice(1);
-  window.open('https://wa.me/'+p,'_blank');
+  alert('Rincian debitur belum siap. Silakan pilih debitur terlebih dahulu.');
 }
 
 function accessButton(type){
@@ -5116,7 +5278,6 @@ function accessButton(type){
     else if(typeof logout==='function') logout();
     return;
   }
-
   if(type==='admin'){
     if(!['ADMIN','SUPERVISOR'].includes(role)){
       alert('Menu Admin hanya tersedia untuk Admin/Supervisor.');
@@ -5125,7 +5286,6 @@ function accessButton(type){
     if(typeof switchView==='function') switchView('ADMIN');
     return;
   }
-
   if(type==='ao'){
     if(typeof switchView==='function') switchView('AO');
     go('home');
@@ -5136,6 +5296,7 @@ function bind(){
   updateIdentity();
   renderDashboard();
   populateFilters(getLoans());
+  renderV9Activity();
 
   document.querySelectorAll('#v9BottomNav [data-v9-page]').forEach(btn=>{
     btn.addEventListener('click',()=>go(btn.dataset.v9Page));
@@ -5146,11 +5307,35 @@ function bind(){
   });
 
   document.getElementById('v9WaNav')?.addEventListener('click',openWhatsapp);
-  document.getElementById('v9Whatsapp')?.addEventListener('click',openWhatsapp);
+  document.getElementById('v9ExportActivity')?.addEventListener('click',exportActivityExcel);
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
     const card=e.target.closest('.v9-debtor');
     if(card) openSelected(card);
+  });
+
+  document.getElementById('v9ActivityList')?.addEventListener('click',e=>{
+    const open=e.target.closest('.v9-activity-open');
+    const wa=e.target.closest('.v9-activity-wa');
+
+    if(open){
+      const key=open.dataset.activityKey;
+      const item=getActivity().find(x=>String(x.key)===String(key));
+      if(!item) return;
+      const loan=getLoans().find(x=>String(x.loan_id)===String(item.loan_id) || String(x.no_pinjaman)===String(item.no_pinjaman));
+      if(loan && typeof openDebtorModal==='function'){
+        try{ openDebtorModal(loan.loan_id); }catch(err){ console.error(err); }
+      }else{
+        alert('Data debitur tersebut sudah tidak tersedia pada database sesi ini.');
+      }
+    }
+
+    if(wa){
+      let p=String(wa.dataset.activityPhone||'').replace(/\D/g,'');
+      if(!p){ alert('Nomor WhatsApp tidak tersedia.'); return; }
+      if(p.startsWith('0')) p='62'+p.slice(1);
+      window.open('https://wa.me/'+p,'_blank');
+    }
   });
 
   ['v9FilterProduk','v9FilterJenis','v9FilterStatus','v9FilterAO'].forEach(id=>{
@@ -5158,19 +5343,20 @@ function bind(){
   });
   document.getElementById('v9FilterSearch')?.addEventListener('input',renderDebtors);
 
-  // Existing app loads the database asynchronously. Refresh the mobile view
-  // after each likely load stage without touching the existing loader.
+  // Refresh lightweight mobile summaries after the existing V8 database finishes loading.
   [800,1800,3500,7000,12000].forEach(ms=>{
     setTimeout(()=>{
       updateIdentity();
       renderDashboard();
-      if(document.getElementById('v9PageDebitur')?.classList.contains('active')){
-        populateFilters(getLoans());
-        renderDebtors();
-      }
+      populateFilters(getLoans());
+      if(document.getElementById('v9PageDebitur')?.classList.contains('active')) renderDebtors();
+      if(document.getElementById('v9PageActivity')?.classList.contains('active')) renderV9Activity();
     },ms);
   });
 }
+
+window.renderV9Activity=renderV9Activity;
+window.exportV9ActivityExcel=exportActivityExcel;
 
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',bind,{once:true});
