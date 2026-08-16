@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- V17 V4: stable base; WA selected-row + tenor preview + NEW fix -->
-    <!-- V17 V6: V5 stable base + mobile WA modal z-index/layer fix -->
+    <!-- V17 V9: V8 stable base + WA introduction uses logged-in KODE_AO -->
     <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1347,6 +1347,25 @@ body.v15-mobile-admin-active #viewAdmin button{
 }
 </style>
 
+
+<style id="v17-v8-wa-nominal-choice">
+@media (max-width:768px){
+  #debtorModal input[name="nominalType"]{
+    width:18px!important;
+    height:18px!important;
+    min-height:18px!important;
+    accent-color:#4f46e5;
+  }
+  #debtorModal input[name="nominalType"] + span{
+    font-size:11px!important;
+    white-space:nowrap;
+  }
+  #debtorModal input[name="nominalType"]{
+    pointer-events:auto!important;
+  }
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -1371,7 +1390,7 @@ body.v15-mobile-admin-active #viewAdmin button{
 </div>
 <section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
 <section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
-<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option value="">Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><input id="v9FilterSearch" type="hidden"></div></div></section>
+<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status Pegawai<select id="v9FilterStatus"><option value="">Semua Status Pegawai</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><input id="v9FilterSearch" type="hidden"></div></div></section>
 <section class="v9-page" id="v9PageActivity">
   <div class="v9-title">My Activity</div>
   <div class="v9-panel" style="margin-top:0">
@@ -2196,7 +2215,7 @@ body.v15-mobile-admin-active #viewAdmin button{
 
                         <!-- Opsi Jenis Nominal WA (Gross vs Net) -->
                         <div>
-                            <label class="block text-slate-600 font-semibold mb-1">Nominal Disampaikan di WA:</label>
+                            <label class="block text-slate-600 font-semibold mb-1">Pilihan Penawaran WA:</label>
                             <div class="flex gap-1.5 pt-1">
                                 <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
                                     <input type="radio" name="nominalType" value="NET" onchange="updateWaPreview()" checked>
@@ -2204,7 +2223,7 @@ body.v15-mobile-admin-active #viewAdmin button{
                                 </label>
                                 <label class="border bg-white px-2 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer text-xs font-semibold hover:border-indigo-400">
                                     <input type="radio" name="nominalType" value="GROSS" onchange="updateWaPreview()">
-                                    <span class="text-indigo-800">Plafon Gross</span>
+                                    <span class="text-indigo-800">Plafond Gross</span>
                                 </label>
                             </div>
                         </div>
@@ -4292,7 +4311,21 @@ function updateWaPreview() {
                 `\n• Estimasi Angsuran: *Rp ${Math.round(nominalAngsuran).toLocaleString('id-ID')}/bulan*` +
                 `\n• Estimasi Nett: *Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}*`;
 
-            const msg = `Assalamualaikum, Yth. Bapak/Ibu *${deb.nama}*,\n\nPerkenalkan saya Didin dari *Bank bjb*.\n\nIjin menginformasikan promo *${jenisPenawaranStr}* khusus *${statusStr}*.\n\n${infoDetail}${ringkasanPenawaran}\n\nProses cepat, Promo Bunga sampai akhir bulan ini. Apakah Bapak/Ibu berminat untuk simulasi perhitungan lengkapnya?\n\nTerima kasih.`;
+            const aoLogin = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
+            const kodeAoLogin = String(
+                aoLogin.kodeAO ||
+                aoLogin.kode_ao ||
+                aoLogin.KODE_AO ||
+                deb.kode_ao ||
+                deb.kodeAO ||
+                ''
+            ).trim();
+
+            const perkenalanAo = kodeAoLogin
+                ? `Perkenalkan saya *${kodeAoLogin}* dari *Bank bjb*.`
+                : `Perkenalkan saya dari *Bank bjb*.`;
+
+            const msg = `Assalamualaikum, Yth. Bapak/Ibu *${deb.nama}*,\n\n${perkenalanAo}\n\nIjin menginformasikan promo *${jenisPenawaranStr}* khusus *${statusStr}*.\n\n${infoDetail}${ringkasanPenawaran}\n\nProses cepat, Promo Bunga sampai akhir bulan ini. Apakah Bapak/Ibu berminat untuk simulasi perhitungan lengkapnya?\n\nTerima kasih.`;
 
             document.getElementById('waPreviewText').value = msg;
         }
@@ -5948,7 +5981,13 @@ window.v16BackToAdminMenu=function(){
 function uniqueValues(rows, keys){
   const s=new Set();
   rows.forEach(o=>{
-    const v=String(val(o,keys)||'').trim();
+    let v=String(val(o,keys)||'').trim();
+
+    // Kode AO pada loanDatabase V17 banyak tersimpan di cifRef.
+    if(!v && keys.some(k=>['kode_ao','KODE_AO','kodeAO','KODEAO'].includes(k))){
+      v=String(o?.cifRef?.kode_ao || o?.cifRef?.kodeAO || '').trim();
+    }
+
     if(v) s.add(v);
   });
   return [...s].sort((a,b)=>a.localeCompare(b,'id'));
@@ -5968,79 +6007,154 @@ function fillSelect(id, values, first){
   if([...el.options].some(x=>x.value===current)) el.value=current;
 }
 
+function normalizeEmployeeStatus(value){
+  const raw=String(value||'').trim().toUpperCase();
+  if(raw.includes('PPPK') || raw.includes('P3K')) return 'PPPK';
+  if(raw.includes('PNS')) return 'PNS';
+  return raw;
+}
+
+function getEmployeeStatus(o){
+  return normalizeEmployeeStatus(
+    o?.cifRef?.status_pegawai ||
+    o?.status_pegawai ||
+    o?.STATUS_PEGAWAI ||
+    o?.statusPegawai ||
+    ''
+  );
+}
+
+function normalizeOfferFilter(value){
+  const raw=String(value||'').trim().toUpperCase();
+  if(raw==='TOPUP' || raw==='TOP UP' || raw==='TOP-UP') return 'TOP-UP';
+  if(raw==='MENGULANG') return 'MENGULANG';
+  if(raw==='NEW') return 'NEW';
+  return raw;
+}
+
+function isOfferEligible(o,type){
+  const offer=normalizeOfferFilter(type);
+  if(offer==='NEW'){
+    return Number(o?.potensiNew||0)>0 ||
+      String(o?.loan_id||'').toUpperCase().endsWith('_NEW');
+  }
+  if(offer==='TOP-UP'){
+    return Number(o?.potensiPlafonTopUp||0)>0;
+  }
+  if(offer==='MENGULANG'){
+    return Number(o?.potensiMengulang||0)>0 &&
+      (Boolean(o?.isEligibleMengulang) || Number(o?.potensiMengulang||0)>0);
+  }
+  return false;
+}
+
+function getOfferPotential(o,type){
+  const offer=normalizeOfferFilter(type);
+  if(offer==='NEW') return Number(o?.potensiNew||0);
+  if(offer==='TOP-UP') return Number(o?.potensiPlafonTopUp||0);
+  if(offer==='MENGULANG') return Number(o?.potensiMengulang||0);
+  return 0;
+}
+
 function populateFilters(rows){
   fillSelect('v9FilterProduk',uniqueValues(rows,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']),'Semua Produk');
-  fillSelect('v9FilterJenis',uniqueValues(rows,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN','JENIS_PENAWARAN']),'Semua Jenis Pengajuan');
-  fillSelect('v9FilterStatus',uniqueValues(rows,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']),'Semua Status');
+
+  // Jenis pengajuan berasal dari potensi aktual, bukan kolom mentah database.
+  fillSelect('v9FilterJenis',['NEW','TOP-UP','MENGULANG'],'Semua Jenis Pengajuan');
+
+  // Status yang dimaksud adalah status pegawai debitur.
+  fillSelect('v9FilterStatus',['PNS','PPPK'],'Semua Status Pegawai');
+
   fillSelect('v9FilterAO',uniqueValues(rows,['kode_ao','KODE_AO','kodeAO','KODEAO']),'Semua AO');
 }
 
 function normFilterValue(v){ return String(v ?? '').trim().toUpperCase(); }
 
 function getFilteredLoans(){
-  let rows=getLoans();
-
-  // V14 quick product filter: NEW / TOP-UP / MENGULANG.
-  // These are derived from the same potential fields used by the credit analysis.
-  if(v9QuickOfferType==='NEW') {
-    rows=rows.filter(o=>Number(o.potensiNew||0)>0 || String(o.loan_id||'').toUpperCase().endsWith('_NEW'));
-  } else if(v9QuickOfferType==='TOP-UP') {
-    rows=rows.filter(o=>Number(o.potensiPlafonTopUp||0)>0 && !!o.facilityRef);
-  } else if(v9QuickOfferType==='MENGULANG') {
-    rows=rows.filter(o=>Boolean(o.isEligibleMengulang) && Number(o.potensiMengulang||0)>0);
-  }
+  let rows=getLoans().slice();
 
   const p=document.getElementById('v9FilterProduk')?.value || '';
-  const j=document.getElementById('v9FilterJenis')?.value || '';
-  const s=document.getElementById('v9FilterStatus')?.value || '';
+  const j=normalizeOfferFilter(document.getElementById('v9FilterJenis')?.value || '');
+  const s=normalizeEmployeeStatus(document.getElementById('v9FilterStatus')?.value || '');
   const a=document.getElementById('v9FilterAO')?.value || '';
   const q=(document.getElementById('v9FilterSearch')?.value || '').trim().toLowerCase();
 
-  if(p) rows=rows.filter(o=>normFilterValue(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===normFilterValue(p));
-  if(j) rows=rows.filter(o=>normFilterValue(val(o,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN','JENIS_PENAWARAN']))===normFilterValue(j));
-  if(s) rows=rows.filter(o=>normFilterValue(val(o,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']))===normFilterValue(s));
-  if(a) rows=rows.filter(o=>normFilterValue(val(o,['kode_ao','KODE_AO','kodeAO','KODEAO']))===normFilterValue(a));
+  // Filter dasar dilakukan pada record asli. loanDatabase tidak digandakan.
+  if(p){
+    rows=rows.filter(o=>
+      normFilterValue(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===normFilterValue(p)
+    );
+  }
+
+  if(s){
+    rows=rows.filter(o=>getEmployeeStatus(o)===s);
+  }
+
+  if(a){
+    rows=rows.filter(o=>
+      normFilterValue(
+        o?.cifRef?.kode_ao ||
+        o?.cifRef?.kodeAO ||
+        val(o,['kode_ao','KODE_AO','kodeAO','KODEAO'])
+      )===normFilterValue(a)
+    );
+  }
+
   if(q){
     rows=rows.filter(o=>{
       const text=[
-        val(o,['nama','NAMA']),val(o,['cif','CIF']),
-        val(o,['no_pinjaman','NO_PINJAMAN']),val(o,['kode_ao','KODE_AO']),
-        val(o,['no_hp','NO_HP']),val(o,['tipe_pinjaman','TIPE_PINJAMAN'])
+        o?.cifRef?.nama || val(o,['nama','NAMA']),
+        o?.cifRef?.cif || val(o,['cif','CIF']),
+        val(o,['no_pinjaman','NO_PINJAMAN']),
+        o?.cifRef?.kode_ao || val(o,['kode_ao','KODE_AO']),
+        o?.cifRef?.no_hp || val(o,['no_hp','NO_HP']),
+        val(o,['tipe_pinjaman','TIPE_PINJAMAN']),
+        getEmployeeStatus(o)
       ].join(' ').toLowerCase();
       return text.includes(q);
     });
   }
 
   /*
-   * V17 STABLE - display expansion only.
-   * Do NOT duplicate loanDatabase itself. When the user selects
-   * "Semua Jenis Pengajuan" (no jenis filter and no quick offer),
-   * a facility that has more than one eligible offer is rendered as
-   * separate display rows with the same debtor / loan number.
-   * This keeps the database/loading architecture unchanged.
+   * Jenis Pengajuan adalah DISPLAY FILTER berdasarkan potensi aktual.
+   * Satu nomor pinjaman dapat menghasilkan dua baris:
+   * TOP-UP dan MENGULANG.
+   * loanDatabase tetap satu record sehingga loading V17 tetap ringan.
    */
-  if(v9QuickOfferType){
-    const potential = o => {
-      if(v9QuickOfferType==='NEW') return Number(o.potensiNew||0);
-      if(v9QuickOfferType==='TOP-UP') return Number(o.potensiPlafonTopUp||0);
-      return Number(o.potensiMengulang||0);
-    };
-    rows.sort((a,b)=>potential(b)-potential(a));
-  } else if(!j) {
-    const expanded=[];
-    rows.forEach(o=>{
-      const topup=Number(o.potensiPlafonTopUp||0)>0;
-      const mengulang=Boolean(o.isEligibleMengulang) || Number(o.potensiMengulang||0)>0;
-      const baru=Number(o.potensiNew||0)>0 || String(o.loan_id||'').toUpperCase().endsWith('_NEW');
+  const requestedOffer=normalizeOfferFilter(v9QuickOfferType || j);
 
-      if(topup) expanded.push(Object.assign({}, o, {__offerType:'TOP-UP'}));
-      if(mengulang) expanded.push(Object.assign({}, o, {__offerType:'MENGULANG'}));
-      if(!topup && !mengulang && baru) expanded.push(Object.assign({}, o, {__offerType:'NEW'}));
-      if(!topup && !mengulang && !baru) expanded.push(Object.assign({}, o, {__offerType:''}));
-    });
-    rows=expanded;
+  if(requestedOffer){
+    rows=rows
+      .filter(o=>isOfferEligible(o,requestedOffer))
+      .map(o=>Object.assign({},o,{__offerType:requestedOffer}))
+      .sort((a,b)=>getOfferPotential(b,requestedOffer)-getOfferPotential(a,requestedOffer));
+
+    return rows;
   }
-  return rows;
+
+  // "Semua Jenis Pengajuan": expand hanya pada layer tampilan.
+  const expanded=[];
+  rows.forEach(o=>{
+    const topup=isOfferEligible(o,'TOP-UP');
+    const mengulang=isOfferEligible(o,'MENGULANG');
+    const baru=isOfferEligible(o,'NEW');
+
+    if(topup) expanded.push(Object.assign({},o,{__offerType:'TOP-UP'}));
+    if(mengulang) expanded.push(Object.assign({},o,{__offerType:'MENGULANG'}));
+
+    // NEW biasanya adalah debitur tanpa fasilitas/synthetic NEW row.
+    // Jangan menambahkan NEW pada fasilitas existing hanya karena field
+    // potensiNew kebetulan terisi.
+    if(!topup && !mengulang && baru){
+      expanded.push(Object.assign({},o,{__offerType:'NEW'}));
+    }
+
+    if(!topup && !mengulang && !baru){
+      expanded.push(Object.assign({},o,{__offerType:''}));
+    }
+  });
+
+  return expanded;
 }
 
 function renderDashboard(){
@@ -6306,12 +6420,14 @@ function openWhatsapp(){
 
     const net = document.querySelector('input[name="nominalType"][value="NET"]');
     const gross = document.querySelector('input[name="nominalType"][value="GROSS"]');
-    if(net) net.checked = true;
-    if(gross) gross.disabled = true;
+
+    // Default tetap Nett, tetapi pengguna boleh memilih Gross.
+    if(net && !net.checked && !gross?.checked) net.checked = true;
+    if(gross) gross.disabled = false;
 
     const nominalInput = document.querySelector('input[name="nominalType"]');
     const nominalBlock = nominalInput ? nominalInput.closest('.grid > div') : null;
-    if(nominalBlock) nominalBlock.style.display = 'none';
+    if(nominalBlock) nominalBlock.style.display = '';
 
     const target = document.getElementById('modalLoanTarget');
     const targetBlock = target ? target.closest('.grid > div') : null;
