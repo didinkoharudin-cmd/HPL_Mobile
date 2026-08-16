@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
+    <title>Analisis Kredit - Kredit Konsumer</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (XLSX) CDN -->
@@ -947,6 +947,17 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
 @media(min-width:769px){#mobileV9Pages,#mobileV9Whatsapp{display:none!important}}
 </style>
 
+
+<style id="v9fixcss">
+@media(max-width:768px){
+ body{padding-bottom:76px!important}
+ body.mobileV9RealPages #mobileV9Pages{display:block!important}
+ body.mobileV9RealPages header,body.mobileV9RealPages main{display:none!important}
+ #mobileV9Pages{padding:10px 12px 90px!important;min-height:100dvh;background:#f8fafc}
+ .mobileV9Page{display:none!important}.mobileV9Page.active{display:block!important}
+ #mobileV9Whatsapp{bottom:84px!important}
+}
+</style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -2402,7 +2413,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
                 };
             }
 
-             // 1. Biaya Provisi
+            // 1. Biaya Provisi
             jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
 
 tarifProvisi =
@@ -4843,5 +4854,35 @@ window.addEventListener('load',function(){setTimeout(build,1200);});
 })();
 </script>
 
+
+<script id="v9fixjs">
+(function(){
+ if(window.innerWidth>768)return;
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+ function money(v){return 'Rp '+(Number(v)||0).toLocaleString('id-ID');}
+ function data(){return Array.isArray(window.loanDatabase)?window.loanDatabase:[];}
+ function render(id,sort){
+  const box=document.getElementById(id), all=data().slice();
+  if(sort)all.sort((a,b)=>(Number(b.netPencairan)||0)-(Number(a.netPencairan)||0));
+  if(!all.length){box.innerHTML='<div class="mobileV9Empty">Data belum tersedia. Pastikan database sudah selesai dimuat.</div>';return;}
+  box.innerHTML=all.map((o,i)=>`<div class="mobileV9Item" data-loan="${esc(o.loan_id)}" data-i="${i}"><div class="mobileV9ItemTop"><div class="mobileV9ItemName">${esc(o.nama||'Debitur')}</div><span class="mobileV9Badge">${esc(o.tipe_pinjaman||'ANALISA')}</span></div><div class="mobileV9Meta"><span>CIF<b>${esc(o.cif||'-')}</b></span><span>No. Pinjaman<b>${esc(o.no_pinjaman||'-')}</b></span><span>Sumber<b>${esc(o.sumber_penghasilan||'-')}</b></span><span>Potensi NETT<b>${money(o.netPencairan)}</b></span></div></div>`).join('');
+ }
+ function go(p){document.querySelectorAll('.mobileV9Page').forEach(x=>x.classList.remove('active'));const el=document.getElementById('mobileV9-'+p);if(el)el.classList.add('active');document.querySelectorAll('#modernMobileNavV8 button').forEach((b,i)=>b.classList.toggle('active',['beranda','debitur','analisa','menu'][i]===p));document.getElementById('mobileV9Whatsapp')?.classList.remove('show');window.scrollTo(0,0);if(p==='debitur')render('mobileV9DebiturList',true);if(p==='analisa')render('mobileV9AnalisaList',false);}
+ function init(){
+  document.body.classList.add('mobileV9RealPages');
+  const old=document.getElementById('mobileV9Pages');if(old)old.remove();
+  const wrap=document.createElement('div');wrap.id='mobileV9Pages';
+  wrap.innerHTML=`<section class="mobileV9Page active" id="mobileV9-beranda"><div class="mobileV9Hero"><h2>Beranda</h2><p>Dashboard Analisa Kredit</p></div><div class="mobileV9Grid"><div class="mobileV9Stat"><small>Total Fasilitas</small><strong id="v9Total">0</strong></div><div class="mobileV9Stat"><small>Total Potensi NETT</small><strong id="v9Nett">Rp 0</strong></div></div><div class="mobileV9Section"><h3>Dashboard</h3><div class="mobileV9Empty">Ringkasan dashboard utama</div></div><div class="mobileV9Section"><h3>Pengumuman</h3><div class="mobileV9Announcement">Belum ada pengumuman.</div></div></section><section class="mobileV9Page" id="mobileV9-debitur"><div class="mobileV9Hero"><h2>Debitur Potensial</h2><p>Diurutkan berdasarkan potensi NETT tertinggi</p></div><div id="mobileV9DebiturList" class="mobileV9List"></div></section><section class="mobileV9Page" id="mobileV9-analisa"><div class="mobileV9Hero"><h2>Analisa</h2><p>Seluruh fasilitas/debitur yang tersedia</p></div><div id="mobileV9AnalisaList" class="mobileV9List"></div></section><section class="mobileV9Page" id="mobileV9-menu"><div class="mobileV9Hero"><h2>Menu</h2><p>Filter dan pengaturan</p></div><div class="mobileV9Section"><h3>Filter</h3><div class="mobileV9FilterGrid"><label>Produk<select><option>Semua Produk</option></select></label><label>Jenis Pengajuan<select><option>Semua Jenis</option></select></label><label>Status<select><option>Semua Status</option></select></label><label>Kode AO<select><option>Semua AO</option></select></label></div></div></section>`;
+  document.body.appendChild(wrap);
+  let nav=document.getElementById('modernMobileNavV8');if(!nav){nav=document.createElement('nav');nav.id='modernMobileNavV8';document.body.appendChild(nav);}
+  const labels=[['⌂','Beranda','beranda'],['▣','Debitur Potensial','debitur'],['▤','Analisa','analisa'],['☰','Menu','menu']];nav.innerHTML=labels.map((x,i)=>`<button type="button" class="${i===0?'active':''}" data-v9page="${x[2]}"><span class="nav-icon">${x[0]}</span><span>${x[1]}</span></button>`).join('');nav.querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.v9page));
+  let wa=document.getElementById('mobileV9Whatsapp');if(!wa){wa=document.createElement('button');wa.id='mobileV9Whatsapp';wa.textContent='WhatsApp Debitur';document.body.appendChild(wa);}
+  wrap.addEventListener('click',e=>{const item=e.target.closest('.mobileV9Item');if(!item)return;const loan=data().find(x=>String(x.loan_id)===item.dataset.loan);if(typeof window.openDebtorModal==='function'&&loan){window.openDebtorModal(loan.loan_id);wa.classList.add('show');wa.onclick=()=>{const p=String(loan.no_hp||loan.whatsapp||'').replace(/\D/g,'');if(p)window.open('https://wa.me/'+(p.startsWith('0')?'62'+p.slice(1):p),'_blank');};}});
+  const refresh=()=>{const d=data();const t=document.getElementById('v9Total'),n=document.getElementById('v9Nett');if(t)t.textContent=d.length.toLocaleString('id-ID');if(n)n.textContent=money(d.reduce((s,x)=>s+(Number(x.netPencairan)||0),0));};
+  refresh();setTimeout(refresh,1000);setTimeout(refresh,3000);
+ }
+ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
+})();
+</script>
 </body>
 </html>
