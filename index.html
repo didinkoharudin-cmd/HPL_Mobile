@@ -1166,6 +1166,104 @@ body{background:#f5f8fc!important;padding:0!important}
 }
 @media(max-width:390px){.v12-mobile-admin-grid{grid-template-columns:1fr}.v12-mobile-admin-grid button{min-height:112px}}
 </style>
+<style id="v15-mobile-routing-fix">
+/* V15: admin mobile uses the real existing #viewAdmin as a full-screen native page.
+   This avoids routing through the desktop switchView layer, which was hidden behind
+   the mobile shell in portrait mode. */
+#v15AdminMobileBar{display:none}
+@media(max-width:768px){
+  .v15-home-search{
+    display:flex;align-items:center;gap:9px;
+    margin:0 0 10px;padding:0 12px;
+    height:44px;border:1px solid #dbe2ea;border-radius:14px;
+    background:#fff;box-shadow:0 5px 16px rgba(15,23,42,.055);
+  }
+  .v15-home-search i{color:#64748b;font-size:13px;flex:0 0 auto}
+  .v15-home-search input{
+    width:100%;height:42px!important;border:0!important;outline:0!important;
+    background:transparent!important;box-shadow:none!important;
+    padding:0!important;font-size:13px!important;color:#0f172a;
+  }
+  .v15-home-search input::placeholder{color:#94a3b8}
+  #v9PageMenu #v9FilterSearch{display:none!important}
+}
+body.v15-mobile-admin-active{
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+body.v15-mobile-admin-active header{
+  display:none!important;
+}
+body.v15-mobile-admin-active #mobileV9Home,
+body.v15-mobile-admin-active #v9BottomNav,
+body.v15-mobile-admin-active #v12RoleGate,
+body.v15-mobile-admin-active #v12MobileAdminPanel{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+body.v15-mobile-admin-active main{
+  position:fixed!important;
+  inset:0!important;
+  z-index:400000!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:56px 10px 18px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  background:#f5f7fb!important;
+}
+body.v15-mobile-admin-active #viewAO{display:none!important}
+body.v15-mobile-admin-active #viewAdmin{
+  display:block!important;
+  position:absolute!important;
+  inset:56px 0 0 0!important;
+  width:100%!important;
+  height:calc(100dvh - 56px)!important;
+  max-height:calc(100dvh - 56px)!important;
+  margin:0!important;
+  padding:10px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+  background:#f5f7fb!important;
+}
+#v15AdminMobileBar{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:56px;
+  z-index:500000;
+  align-items:center;
+  gap:10px;
+  padding:7px 10px;
+  padding-top:calc(7px + env(safe-area-inset-top));
+  box-sizing:border-box;
+  background:rgba(49,46,129,.98);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(15,23,42,.20);
+}
+body.v15-mobile-admin-active #v15AdminMobileBar{display:flex!important}
+#v15AdminMobileBar button{
+  height:38px;padding:0 10px;border:0;border-radius:11px;
+  background:rgba(255,255,255,.16);color:#fff;
+  font-size:11px;font-weight:800;touch-action:manipulation;
+}
+#v15AdminMobileBar button i{margin-right:5px}
+#v15AdminMobileBar>div{display:flex;flex-direction:column;min-width:0}
+#v15AdminMobileBar b{font-size:12px;line-height:1.1}
+#v15AdminMobileBar span{font-size:9px;opacity:.78;margin-top:2px}
+body.v15-mobile-admin-active #viewAdmin input,
+body.v15-mobile-admin-active #viewAdmin select,
+body.v15-mobile-admin-active #viewAdmin button{
+  touch-action:manipulation;
+}
+@media(min-width:769px){
+  #v15AdminMobileBar{display:none!important}
+}
+</style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -1173,6 +1271,10 @@ body{background:#f5f8fc!important;padding:0!important}
 <div class="v9-shell">
 <div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div></div>
 <div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Potensi debitur berdasarkan jenis pengajuan</p></div>
+<div class="v15-home-search">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input id="v9HomeSearch" type="search" autocomplete="off" placeholder="Cari nama, CIF, no. pinjaman, AO...">
+</div>
 <div class="v9-access v9-product-access">
   <button data-v9-offer="NEW" title="Potensi Debitur NEW"><i class="fa-solid fa-user-plus"></i><b>NEW</b><span>Debitur Baru</span></button>
   <button data-v9-offer="TOP-UP" title="Potensi Debitur TOP-UP"><i class="fa-solid fa-arrow-up-right-dots"></i><b>TOP-UP</b><span>Tambah Plafon</span></button>
@@ -1181,7 +1283,7 @@ body{background:#f5f8fc!important;padding:0!important}
 </div>
 <section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
 <section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
-<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option value="">Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><label>Pencarian<input id="v9FilterSearch" placeholder="Nama / CIF / No. Pinjaman"></label></div></div></section>
+<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option value="">Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><input id="v9FilterSearch" type="hidden"></div></div></section>
 <section class="v9-page" id="v9PageActivity">
   <div class="v9-title">My Activity</div>
   <div class="v9-panel" style="margin-top:0">
@@ -1385,6 +1487,18 @@ body{background:#f5f8fc!important;padding:0!important}
             </div>
         </div>
     </header>
+
+    <!-- V15: native mobile admin navigation bar -->
+    <div id="v15AdminMobileBar">
+      <button type="button" id="v15AdminBackBtn">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Menu Admin</span>
+      </button>
+      <div>
+        <b id="v15AdminMobileTitle">Panel Admin</b>
+        <span id="v15AdminMobileRole">ADMIN</span>
+      </div>
+    </div>
 
     <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
 
@@ -2742,16 +2856,14 @@ body{background:#f5f8fc!important;padding:0!important}
                 };
             }
 
-              // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
+            // 1. Biaya Provisi
+            const pLow = (feeParams.provisiLow || 0.2) / 100;
+            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -4322,6 +4434,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     document.getElementById('v12RoleGate')?.classList.remove('show');
     document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
     document.body.classList.remove('v12-mobile-admin-active');
+    document.body.classList.remove('v15-mobile-admin-active');
     document.getElementById('v12ManualUpload')?.classList.remove('show');
     document.getElementById('userSessionBadge')?.classList.remove('show');
     document.getElementById('logoutBtn')?.classList.remove('show');
@@ -4364,9 +4477,12 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
 
   window.v12OpenAdmin=function(target){
     const r=role();
-    if(r!=='ADMIN' && r!=='SUPERVISOR'){ alert('Akses Admin/Supervisor diperlukan.'); return; }
+    if(r!=='ADMIN' && r!=='SUPERVISOR'){
+      alert('Akses Admin/Supervisor diperlukan.');
+      return;
+    }
 
-    // Desktop: pertahankan alur V12 lama sepenuhnya.
+    // Desktop: keep the existing working routing unchanged.
     if(window.matchMedia && window.matchMedia('(min-width: 769px)').matches){
       gate(false);
       if(typeof switchView==='function') switchView('ADMIN');
@@ -4379,35 +4495,52 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
       return;
     }
 
-    // Mobile: jangan menutup gate lalu menampilkan Home V9.
-    // Buka panel Admin khusus mobile agar tombol benar-benar aktif.
+    // V15 mobile: do NOT call switchView(). It toggles the desktop shell and
+    // was the reason the mobile portrait screen returned to Home.
     gate(false);
-    document.body.classList.add('v12-mobile-admin-active');
-    const panel=document.getElementById('v12MobileAdminPanel');
-    if(panel) panel.classList.add('show');
-    const roleBadge=document.getElementById('v12MobileAdminRole');
-    if(roleBadge) roleBadge.textContent=activeRole;
+    document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
+    document.body.classList.add('v15-mobile-admin-active');
 
-    if(target && target!=='ao'){
-      setTimeout(()=>v12MobileAdminOpenExisting(target),80);
-    }else if(target==='ao'){
-      document.body.classList.remove('v12-mobile-admin-active');
-      panel?.classList.remove('show');
-      if(typeof switchView==='function') switchView('AO');
+    const title=document.getElementById('v15AdminMobileTitle');
+    const rr=document.getElementById('v15AdminMobileRole');
+    if(title) title.textContent =
+      target==='source' ? 'Sumber Database' :
+      target==='dashboard' ? 'Dashboard & Grafik' :
+      target==='parameter' ? 'Setting Parameter' : 'Tampilan AO';
+    if(rr) rr.textContent=activeRole;
+
+    if(target==='ao'){
+      document.body.classList.remove('v15-mobile-admin-active');
+      gate(false);
+      if(typeof window.v9GoHome==='function') window.v9GoHome();
+      return;
     }
+
+    const viewAdmin=document.getElementById('viewAdmin');
+    const viewAO=document.getElementById('viewAO');
+    if(viewAO) viewAO.classList.add('hidden');
+    if(viewAdmin) viewAdmin.classList.remove('hidden');
+
+    setTimeout(function(){
+      const el =
+        target==='source' ? document.getElementById('sourceDatabaseCard') :
+        target==='dashboard' ? document.getElementById('adminDashboardAdditive') :
+        document.getElementById('adminParameterSection');
+      if(el) el.scrollIntoView({behavior:'auto',block:'start'});
+    },80);
+  };
+
+  window.v15CloseMobileAdmin=function(){
+    document.body.classList.remove('v15-mobile-admin-active');
+    document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
+    document.getElementById('viewAdmin')?.classList.add('hidden');
+    document.getElementById('viewAO')?.classList.remove('hidden');
+    if(typeof window.v9GoHome==='function') window.v9GoHome();
   };
 
   window.v12MobileAdminOpenExisting=function(target){
-    const panel=document.getElementById('v12MobileAdminPanel');
-    panel?.classList.remove('show');
-    document.body.classList.remove('v12-mobile-admin-active');
-    if(typeof switchView==='function') switchView('ADMIN');
-    setTimeout(function(){
-      const el = target==='source' ? document.getElementById('dataSourceSelector') :
-                 target==='dashboard' ? document.getElementById('adminDashboardAdditive') :
-                 document.getElementById('adminParameterSection');
-      if(el) el.scrollIntoView({behavior:'auto',block:'start'});
-    },100);
+    // Backward-compatible alias for older V12/V13/V14 handlers.
+    window.v12OpenAdmin(target);
   };
 
   window.v12LoadDatabaseAO=async function(){
@@ -4489,8 +4622,10 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
 
   function bindMobileAdminRouting(){
     document.getElementById('v12MobileAdminClose')?.addEventListener('click',function(){
-      document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
-      document.body.classList.remove('v12-mobile-admin-active');
+      v15CloseMobileAdmin();
+    });
+    document.getElementById('v15AdminBackBtn')?.addEventListener('click',function(){
+      v15CloseMobileAdmin();
       v12RouteAfterLogin(window.currentUser||{});
     });
     document.querySelectorAll('#v12MobileAdminPanel [data-mobile-admin-target]').forEach(btn=>{
@@ -5832,7 +5967,23 @@ function bind(){
   ['v9FilterProduk','v9FilterJenis','v9FilterStatus','v9FilterAO'].forEach(id=>{
     document.getElementById(id)?.addEventListener('change',renderDebtors);
   });
-  document.getElementById('v9FilterSearch')?.addEventListener('input',renderDebtors);
+  const homeSearch=document.getElementById('v9HomeSearch');
+  const filterSearch=document.getElementById('v9FilterSearch');
+  if(homeSearch && filterSearch){
+    const syncSearch=()=>{
+      filterSearch.value=homeSearch.value;
+      renderDebtors();
+    };
+    homeSearch.addEventListener('input',syncSearch);
+    homeSearch.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        go('debitur');
+        renderDebtors();
+      }
+    });
+  }
+  filterSearch?.addEventListener('input',renderDebtors);
 
   // Refresh lightweight mobile summaries after the existing V8 database finishes loading.
   [800,1800,3500,7000,12000].forEach(ms=>{
