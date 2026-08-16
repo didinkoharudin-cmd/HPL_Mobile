@@ -1170,6 +1170,9 @@ body{background:#f5f8fc!important;padding:0!important}
 @media(max-width:768px){
   #v16AdminSwitch{display:none;align-items:center;gap:5px;box-shadow:0 4px 12px rgba(49,46,129,.10)}
   #v16AdminSwitch.show{display:inline-flex!important}
+  #v16AdminActions.show{display:flex!important}
+  #v9DebtorList tr.v9-row-selected{background:#eef2ff!important;box-shadow:inset 3px 0 0 #4f46e5}
+  #v9DebtorList .mini-wa{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:54px;padding:6px 7px}
   #v16LoadGuard{position:fixed;inset:0;z-index:600000;background:rgba(248,250,252,.96);display:none;align-items:center;justify-content:center;padding:24px;text-align:center}
   #v16LoadGuard.show{display:flex}
   #v16LoadGuard .card{width:min(360px,92vw);background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(15,23,42,.16)}
@@ -1282,7 +1285,10 @@ body.v15-mobile-admin-active #viewAdmin button{
 
 <div id="mobileV9Home">
 <div class="v9-shell">
-<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div><button id="v16AdminSwitch" type="button" onclick="v16SwitchToAdmin()" style="display:none;border:0;border-radius:12px;background:#eef2ff;color:#3730a3;padding:8px 10px;font-size:10px;font-weight:900;white-space:nowrap"><i class="fa-solid fa-user-shield"></i> Admin</button></div>
+<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div><div id="v16AdminActions" style="display:none;gap:5px;align-items:center">
+<button id="v16AdminSwitch" type="button" onclick="v16SwitchToAdmin()" style="display:none;border:0;border-radius:12px;background:#eef2ff;color:#3730a3;padding:8px 10px;font-size:10px;font-weight:900;white-space:nowrap"><i class="fa-solid fa-chart-line"></i> Admin</button>
+<button id="v16AdminBackMenu" type="button" onclick="v16BackToAdminMenu()" style="display:none;border:0;border-radius:12px;background:#f1f5f9;color:#475569;padding:8px 10px;font-size:10px;font-weight:900;white-space:nowrap"><i class="fa-solid fa-arrow-left"></i> Menu Admin</button>
+</div></div>
 <div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Potensi debitur berdasarkan jenis pengajuan</p></div>
 <div class="v15-home-search">
   <i class="fa-solid fa-magnifying-glass"></i>
@@ -2869,16 +2875,14 @@ body.v15-mobile-admin-active #viewAdmin button{
                 };
             }
 
-             // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
+            // 1. Biaya Provisi
+            const pLow = (feeParams.provisiLow || 0.2) / 100;
+            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -3066,7 +3070,11 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                     tenorBerjalan,
                     pctBerjalan,
                     isEligibleTenor,
-                    prodInfo: prodInfo
+                    prodInfo: prodInfo,
+                    jenis_pengajuan: k.jenis_pengajuan ?? k.jenisPenawaran ?? k.jenis_penawaran ?? k.JENIS_PENGAJUAN ?? '',
+                    jenis_penawaran: k.jenis_penawaran ?? k.jenisPenawaran ?? k.jenis_pengajuan ?? '',
+                    status: k.status ?? k.STATUS ?? k.status_pengajuan ?? k.STATUS_PENGAJUAN ?? '',
+                    status_pengajuan: k.status_pengajuan ?? k.STATUS_PENGAJUAN ?? k.status ?? k.STATUS ?? ''
                 });
             });
 
@@ -3131,6 +3139,10 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                         plafonGrossNew: grossNew,
                         plafonGrossMengulang: 0,
                         potensiMengulang: 0,
+                        jenis_pengajuan: 'NEW',
+                        jenis_penawaran: 'NEW',
+                        status: 'NEW',
+                        status_pengajuan: 'NEW',
                         prodRule: getProdRule(tipeProdukNew),
                         cifRef: deb
                     });
@@ -3198,6 +3210,10 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                             potensiNew: 0,
                             plafonGrossMengulang: totalPlafonRenewal,
                             potensiMengulang: potensiMengulangNet,
+                            jenis_pengajuan: f.jenis_pengajuan || '',
+                            jenis_penawaran: f.jenis_penawaran || '',
+                            status: f.status || '',
+                            status_pengajuan: f.status_pengajuan || '',
                             prodRule: prodRule,
                             facilityTenorRules: facilityTenorRules,
                             cifRef: deb,
@@ -4476,6 +4492,8 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     document.body.classList.remove('v15-mobile-admin-active');
     document.getElementById('v12ManualUpload')?.classList.remove('show');
     document.getElementById('v16AdminSwitch')?.classList.remove('show');
+    document.getElementById('v16AdminBackMenu')?.classList.remove('show');
+    document.getElementById('v16AdminActions')?.classList.remove('show');
     document.getElementById('userSessionBadge')?.classList.remove('show');
     document.getElementById('logoutBtn')?.classList.remove('show');
     const badge=document.getElementById('adminDataStatusBadge');
@@ -5636,8 +5654,13 @@ function updateIdentity(){
   document.querySelectorAll('[data-v9-access]').forEach(btn=>{
     btn.classList.toggle('v9-access-active',String(btn.dataset.v9Access||'').toUpperCase()===role);
   });
+  const isAdminRole = role==='ADMIN' || role==='SUPERVISOR';
   const adminSwitch=document.getElementById('v16AdminSwitch');
-  if(adminSwitch) adminSwitch.classList.toggle('show', role==='ADMIN' || role==='SUPERVISOR');
+  const adminBack=document.getElementById('v16AdminBackMenu');
+  const adminActions=document.getElementById('v16AdminActions');
+  if(adminSwitch) adminSwitch.classList.toggle('show', isAdminRole);
+  if(adminBack) adminBack.classList.toggle('show', isAdminRole);
+  if(adminActions) adminActions.classList.toggle('show', isAdminRole);
 }
 
 window.v16SwitchToAdmin=function(){
@@ -5648,6 +5671,15 @@ window.v16SwitchToAdmin=function(){
     window.v12OpenAdmin('dashboard');
   }else if(typeof switchView==='function'){
     switchView('ADMIN');
+  }
+};
+
+window.v16BackToAdminMenu=function(){
+  const u=getUser();
+  const r=String(u.role||'').trim().toUpperCase();
+  if(r!=='ADMIN' && r!=='SUPERVISOR') return;
+  if(typeof window.v12RouteAfterLogin==='function'){
+    window.v12RouteAfterLogin(u);
   }
 };
 
@@ -5676,10 +5708,12 @@ function fillSelect(id, values, first){
 
 function populateFilters(rows){
   fillSelect('v9FilterProduk',uniqueValues(rows,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']),'Semua Produk');
-  fillSelect('v9FilterJenis',uniqueValues(rows,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']),'Semua Jenis');
+  fillSelect('v9FilterJenis',uniqueValues(rows,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN','JENIS_PENAWARAN']),'Semua Jenis Pengajuan');
   fillSelect('v9FilterStatus',uniqueValues(rows,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']),'Semua Status');
   fillSelect('v9FilterAO',uniqueValues(rows,['kode_ao','KODE_AO','kodeAO','KODEAO']),'Semua AO');
 }
+
+function normFilterValue(v){ return String(v ?? '').trim().toUpperCase(); }
 
 function getFilteredLoans(){
   let rows=getLoans();
@@ -5700,10 +5734,10 @@ function getFilteredLoans(){
   const a=document.getElementById('v9FilterAO')?.value || '';
   const q=(document.getElementById('v9FilterSearch')?.value || '').trim().toLowerCase();
 
-  if(p) rows=rows.filter(o=>String(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===p);
-  if(j) rows=rows.filter(o=>String(val(o,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN']))===j);
-  if(s) rows=rows.filter(o=>String(val(o,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']))===s);
-  if(a) rows=rows.filter(o=>String(val(o,['kode_ao','KODE_AO','kodeAO','KODEAO']))===a);
+  if(p) rows=rows.filter(o=>normFilterValue(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN']))===normFilterValue(p));
+  if(j) rows=rows.filter(o=>normFilterValue(val(o,['jenis_pengajuan','jenisPenawaran','jenis_penawaran','JENIS_PENGAJUAN','JENIS_PENAWARAN']))===normFilterValue(j));
+  if(s) rows=rows.filter(o=>normFilterValue(val(o,['status','STATUS','status_pengajuan','STATUS_PENGAJUAN']))===normFilterValue(s));
+  if(a) rows=rows.filter(o=>normFilterValue(val(o,['kode_ao','KODE_AO','kodeAO','KODEAO']))===normFilterValue(a));
   if(q){
     rows=rows.filter(o=>{
       const text=[
@@ -5800,7 +5834,7 @@ function renderDebtors(){
       <td style="text-align:center;font-weight:700">${escapeHtml(String(tenor))}${String(tenor)!=='-'?' bln':''}</td>
       <td class="money">${money(angs)}</td>
       <td class="money" style="color:#047857">${money(n)}</td>
-      <td class="action"><button class="mini-wa" data-action-loan-id="${escapeHtml(id)}" title="Rincian / Penawaran"><i class="fa-brands fa-whatsapp"></i></button></td>`;
+      <td class="action"><button class="mini-wa" data-action-loan-id="${escapeHtml(id)}" title="Aksi / Rincian Kredit"><i class="fa-solid fa-file-lines"></i><span style="font-size:8px;font-weight:900;margin-left:3px">Aksi</span></button></td>`;
     tbody.appendChild(tr);
   });
   list.appendChild(table);
@@ -5855,6 +5889,8 @@ function renderV9Activity(){
     list.appendChild(row);
   });
 }
+
+window.renderV9Activity=renderV9Activity;
 
 function exportActivityExcel(){
   const data=getActivity();
@@ -5929,20 +5965,27 @@ function openSelected(card){
 }
 
 function openWhatsapp(){
-  // The V8 modal is the source of truth for the selected offer/tenor/message.
   if(typeof selectedLoanId==='undefined' || !selectedLoanId){
-    alert('Pilih debitur terlebih dahulu.');
+    alert('Pilih debitur terlebih dahulu pada menu Debitur.');
+    go('debitur');
     return;
   }
-  if(typeof openDebtorModal==='function'){
+  const targetItem=getLoans().find(l=>String(l.loan_id)===String(selectedLoanId));
+  const phone=String(targetItem?.cifRef?.no_hp || targetItem?.no_hp || '').replace(/\D/g,'');
+  if(!phone){ alert('Nomor WhatsApp/HP debitur tidak tersedia.'); return; }
+  if(typeof updateWaPreview==='function'){
     try{
-      openDebtorModal(selectedLoanId);
-      return;
-    }catch(e){
-      console.error(e);
-    }
+      if(!document.querySelector('input[name="offerType"]:checked')){
+        const top=document.querySelector('input[name="offerType"][value="TOPUP"]'); if(top) top.checked=true;
+      }
+      updateWaPreview();
+    }catch(e){}
   }
-  alert('Rincian debitur belum siap. Silakan pilih debitur terlebih dahulu.');
+  const message=document.getElementById('waPreviewText')?.value || ('Assalamualaikum, Yth. Bapak/Ibu '+(targetItem?.nama||'Debitur')+', saya Didin dari Bank bjb. Ijin menginformasikan penawaran kredit.');
+  if(typeof saveOfferActivity==='function') { try{ saveOfferActivity(targetItem,message); }catch(e){} }
+  let p=phone; if(p.startsWith('0')) p='62'+p.slice(1);
+  window.open('https://wa.me/'+p+'?text='+encodeURIComponent(message),'_blank');
+  try{ renderV9Activity(); }catch(e){}
 }
 
 function accessButton(type){
@@ -6008,9 +6051,13 @@ function bind(){
     }
     const row=e.target.closest('tr[data-loan-id]');
     if(!row) return;
-    const id=e.target.closest('[data-action-loan-id]')?.dataset.actionLoanId || row.dataset.loanId;
-    const fake={dataset:{loanId:id}};
-    openSelected(fake);
+    const action=e.target.closest('[data-action-loan-id]');
+    const id=action?.dataset.actionLoanId || row.dataset.loanId;
+    selectedLoanId=id;
+    window.v9Selected=getLoans().find(o=>String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']))===String(id)) || null;
+    document.querySelectorAll('#v9DebtorList tbody tr[data-loan-id]').forEach(r=>r.classList.remove('v9-row-selected'));
+    row.classList.add('v9-row-selected');
+    if(action){ openSelected({dataset:{loanId:id}}); }
   });
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
