@@ -1126,6 +1126,27 @@ body{background:#f5f8fc!important;padding:0!important}
 }
 </style>
 
+
+<style id="v12-mobile-admin-fix">
+#v12MobileAdminPanel{display:none}
+@media(max-width:768px){
+  #v12MobileAdminPanel{position:fixed;inset:0;z-index:300000;display:none;background:#f5f7fb;padding:calc(10px + env(safe-area-inset-top)) 10px calc(10px + env(safe-area-inset-bottom));overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+  #v12MobileAdminPanel.show{display:block!important}
+  .v12-mobile-admin-card{min-height:100%;box-sizing:border-box;background:linear-gradient(180deg,#f8faff 0%,#f5f7fb 100%);padding:10px 4px 30px}
+  .v12-mobile-admin-head{display:flex;align-items:center;gap:10px;padding:8px 4px 14px;position:sticky;top:0;z-index:5;background:rgba(248,250,255,.96);backdrop-filter:blur(12px)}
+  .v12-mobile-admin-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#4f46e5,#7c3aed);color:#fff;font-size:19px;box-shadow:0 8px 20px rgba(79,70,229,.2)}
+  .v12-mobile-admin-head h2{margin:0;font-size:18px;font-weight:900;color:#0f172a}.v12-mobile-admin-head p{margin:2px 0 0;font-size:10px;font-weight:800;color:#6366f1}
+  #v12MobileAdminClose{margin-left:auto;width:40px;height:40px;border:0;border-radius:13px;background:#fff;color:#475569;box-shadow:0 5px 16px rgba(15,23,42,.08);font-size:17px;touch-action:manipulation}
+  .v12-mobile-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .v12-mobile-admin-grid button{min-height:140px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;padding:14px;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.05);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .v12-mobile-admin-grid button i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#eef2ff;color:#4f46e5;font-size:17px;margin-bottom:10px}
+  .v12-mobile-admin-grid button b{display:block;font-size:12px;color:#0f172a}.v12-mobile-admin-grid button span{display:block;margin-top:5px;font-size:9px;line-height:1.45;color:#64748b}
+  .v12-mobile-admin-grid button:active{transform:scale(.985);background:#f8faff}
+  .v12-mobile-admin-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:11px;border-radius:14px;background:#eef2ff;color:#475569;font-size:9px;line-height:1.45}.v12-mobile-admin-note i{color:#4f46e5;margin-top:1px}
+  body.v12-mobile-admin-active #mobileV9Home{visibility:hidden!important;pointer-events:none!important}
+}
+@media(max-width:390px){.v12-mobile-admin-grid{grid-template-columns:1fr}.v12-mobile-admin-grid button{min-height:112px}}
+</style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -1227,7 +1248,26 @@ body{background:#f5f8fc!important;padding:0!important}
 </div>
 <!-- ================= END V12 ROLE ROUTING GATE ================= -->
 
-    <!-- ================= GOOGLE LOGIN GATE ================= -->
+    <!-- ================= V12 MOBILE ADMIN PANEL ================= -->
+<div id="v12MobileAdminPanel" aria-modal="true" role="dialog">
+  <div class="v12-mobile-admin-card">
+    <div class="v12-mobile-admin-head">
+      <div class="v12-mobile-admin-icon"><i class="fa-solid fa-user-shield"></i></div>
+      <div><h2>Menu Admin</h2><p id="v12MobileAdminRole">ADMIN</p></div>
+      <button type="button" id="v12MobileAdminClose" aria-label="Kembali"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="v12-mobile-admin-grid">
+      <button type="button" data-mobile-admin-target="source"><i class="fa-solid fa-database"></i><b>Sumber Database</b><span>Google Script atau Upload Manual</span></button>
+      <button type="button" data-mobile-admin-target="dashboard"><i class="fa-solid fa-chart-pie"></i><b>Dashboard & Grafik</b><span>Monitoring AO dan distribusi</span></button>
+      <button type="button" data-mobile-admin-target="parameter"><i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Tarif, bunga, provisi, asuransi</span></button>
+      <button type="button" data-mobile-admin-target="ao"><i class="fa-solid fa-user-tie"></i><b>Tampilan AO</b><span>Kembali ke aplikasi AO</span></button>
+    </div>
+    <div class="v12-mobile-admin-note"><i class="fa-solid fa-circle-info"></i><span>Pada HP, fungsi Admin dibuka sebagai halaman penuh agar semua tombol dapat disentuh dengan normal.</span></div>
+  </div>
+</div>
+<!-- ================= END V12 MOBILE ADMIN PANEL ================= -->
+
+<!-- ================= GOOGLE LOGIN GATE ================= -->
     <div id="googleAuthGate" role="dialog" aria-modal="true" aria-labelledby="googleAuthTitle">
         <div class="auth-card">
             <div class="auth-logo">
@@ -2678,16 +2718,14 @@ body{background:#f5f8fc!important;padding:0!important}
                 };
             }
 
-              // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
+            // 1. Biaya Provisi
+            const pLow = (feeParams.provisiLow || 0.2) / 100;
+            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -4256,6 +4294,8 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     document.body.classList.add('app-locked');
     document.getElementById('googleAuthGate')?.classList.remove('hidden');
     document.getElementById('v12RoleGate')?.classList.remove('show');
+    document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
+    document.body.classList.remove('v12-mobile-admin-active');
     document.getElementById('v12ManualUpload')?.classList.remove('show');
     document.getElementById('userSessionBadge')?.classList.remove('show');
     document.getElementById('logoutBtn')?.classList.remove('show');
@@ -4299,14 +4339,49 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
   window.v12OpenAdmin=function(target){
     const r=role();
     if(r!=='ADMIN' && r!=='SUPERVISOR'){ alert('Akses Admin/Supervisor diperlukan.'); return; }
+
+    // Desktop: pertahankan alur V12 lama sepenuhnya.
+    if(window.matchMedia && window.matchMedia('(min-width: 769px)').matches){
+      gate(false);
+      if(typeof switchView==='function') switchView('ADMIN');
+      setTimeout(function(){
+        if(target==='source') document.getElementById('sourceDatabaseCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+        else if(target==='dashboard') document.getElementById('adminDashboardAdditive')?.scrollIntoView({behavior:'smooth',block:'start'});
+        else if(target==='parameter') document.getElementById('adminParameterSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+        else if(target==='ao' && typeof switchView==='function') switchView('AO');
+      },60);
+      return;
+    }
+
+    // Mobile: jangan menutup gate lalu menampilkan Home V9.
+    // Buka panel Admin khusus mobile agar tombol benar-benar aktif.
     gate(false);
+    document.body.classList.add('v12-mobile-admin-active');
+    const panel=document.getElementById('v12MobileAdminPanel');
+    if(panel) panel.classList.add('show');
+    const roleBadge=document.getElementById('v12MobileAdminRole');
+    if(roleBadge) roleBadge.textContent=activeRole;
+
+    if(target && target!=='ao'){
+      setTimeout(()=>v12MobileAdminOpenExisting(target),80);
+    }else if(target==='ao'){
+      document.body.classList.remove('v12-mobile-admin-active');
+      panel?.classList.remove('show');
+      if(typeof switchView==='function') switchView('AO');
+    }
+  };
+
+  window.v12MobileAdminOpenExisting=function(target){
+    const panel=document.getElementById('v12MobileAdminPanel');
+    panel?.classList.remove('show');
+    document.body.classList.remove('v12-mobile-admin-active');
     if(typeof switchView==='function') switchView('ADMIN');
     setTimeout(function(){
-      if(target==='source') document.getElementById('sourceDatabaseCard')?.scrollIntoView({behavior:'smooth',block:'start'});
-      else if(target==='dashboard') document.getElementById('adminDashboardAdditive')?.scrollIntoView({behavior:'smooth',block:'start'});
-      else if(target==='parameter') document.getElementById('adminParameterSection')?.scrollIntoView({behavior:'smooth',block:'start'});
-      else if(target==='ao' && typeof switchView==='function') switchView('AO');
-    },60);
+      const el = target==='source' ? document.getElementById('dataSourceSelector') :
+                 target==='dashboard' ? document.getElementById('adminDashboardAdditive') :
+                 document.getElementById('adminParameterSection');
+      if(el) el.scrollIntoView({behavior:'auto',block:'start'});
+    },100);
   };
 
   window.v12LoadDatabaseAO=async function(){
@@ -4385,6 +4460,21 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     bindFile('v12KreditFile','v12KreditLabel','kredit');
     bindFile('v12PenghasilanFile','v12PenghasilanLabel','penghasilan');
   });
+
+  function bindMobileAdminRouting(){
+    document.getElementById('v12MobileAdminClose')?.addEventListener('click',function(){
+      document.getElementById('v12MobileAdminPanel')?.classList.remove('show');
+      document.body.classList.remove('v12-mobile-admin-active');
+      v12RouteAfterLogin(window.currentUser||{});
+    });
+    document.querySelectorAll('#v12MobileAdminPanel [data-mobile-admin-target]').forEach(btn=>{
+      btn.addEventListener('click',function(){
+        v12OpenAdmin(this.dataset.mobileAdminTarget);
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindMobileAdminRouting);
+  else bindMobileAdminRouting();
 })();
 </script>
 <script id="mobile-upload-enhancer">
