@@ -1077,6 +1077,55 @@ body{background:#f5f8fc!important;padding:0!important}
 }
 </style>
 
+
+<style id="v12-role-routing-css">
+/* V12: role-based landing/source selector */
+#v12RoleGate{position:fixed;inset:0;z-index:200000;display:none;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,#eef2ff 0%,#f8fafc 55%,#ecfeff 100%);font-family:inherit}
+#v12RoleGate.show{display:flex}
+#v12RoleGate .v12-card{width:min(560px,100%);max-height:min(92dvh,760px);overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(226,232,240,.9);border-radius:26px;box-shadow:0 24px 70px rgba(15,23,42,.18);padding:22px}
+#v12RoleGate .v12-brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+#v12RoleGate .v12-logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#4f46e5,#2563eb);color:#fff;font-size:21px;box-shadow:0 10px 25px rgba(79,70,229,.25)}
+#v12RoleGate h2{margin:0;font-size:21px;font-weight:900;color:#0f172a}
+#v12RoleGate .v12-sub{margin:3px 0 0;font-size:11px;color:#64748b}
+#v12RoleGate .v12-role{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:10px;font-weight:800;margin-bottom:12px}
+#v12RoleGate .v12-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#v12RoleGate .v12-action{border:1px solid #e2e8f0;background:#fff;border-radius:18px;padding:15px;text-align:left;cursor:pointer;transition:.16s ease;min-height:112px}
+#v12RoleGate .v12-action:hover{transform:translateY(-1px);border-color:#c7d2fe;box-shadow:0 10px 25px rgba(15,23,42,.08)}
+#v12RoleGate .v12-action:active{transform:scale(.985)}
+#v12RoleGate .v12-action i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#eef2ff;color:#4f46e5;margin-bottom:9px;font-size:17px}
+#v12RoleGate .v12-action b{display:block;font-size:12px;color:#0f172a}
+#v12RoleGate .v12-action span{display:block;margin-top:4px;font-size:10px;line-height:1.4;color:#64748b}
+#v12RoleGate .v12-action.primary{background:#4f46e5;border-color:#4f46e5;color:#fff}
+#v12RoleGate .v12-action.primary i{background:rgba(255,255,255,.16);color:#fff}
+#v12RoleGate .v12-action.primary b,#v12RoleGate .v12-action.primary span{color:#fff}
+#v12RoleGate .v12-status{margin-top:14px;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;padding:10px;font-size:10px;color:#475569;line-height:1.45}
+#v12RoleGate .v12-progress{height:5px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:8px}
+#v12RoleGate .v12-progress>div{height:100%;width:0;background:#4f46e5;transition:width .2s ease}
+#v12RoleGate .v12-upload{margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;display:none}
+#v12RoleGate .v12-upload.show{display:block}
+#v12RoleGate .v12-upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#v12RoleGate .v12-file{position:relative;display:block;min-height:88px;border:1.5px dashed #cbd5e1;border-radius:15px;padding:12px;background:#f8fafc;cursor:pointer}
+#v12RoleGate .v12-file input{position:absolute;inset:0;width:100%;height:100%;opacity:.01;cursor:pointer}
+#v12RoleGate .v12-file i{font-size:17px;color:#4f46e5;margin-bottom:6px}
+#v12RoleGate .v12-file b{display:block;font-size:11px;color:#334155}
+#v12RoleGate .v12-file span{display:block;font-size:9px;color:#64748b;margin-top:3px}
+#v12RoleGate .v12-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+#v12RoleGate .v12-link{border:0;background:transparent;color:#64748b;font-size:10px;font-weight:700;cursor:pointer}
+#v12RoleGate .v12-continue{border:0;border-radius:11px;background:#0f172a;color:#fff;padding:9px 12px;font-size:10px;font-weight:800;cursor:pointer}
+#v12RoleGate .v12-continue:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:768px){
+  #v12RoleGate{padding:12px;align-items:flex-end}
+  #v12RoleGate .v12-card{border-radius:24px 24px 18px 18px;padding:17px;max-height:94dvh}
+  #v12RoleGate h2{font-size:18px}
+  #v12RoleGate .v12-grid{grid-template-columns:1fr 1fr;gap:8px}
+  #v12RoleGate .v12-action{min-height:104px;padding:12px;border-radius:15px}
+  #v12RoleGate .v12-upload-grid{grid-template-columns:1fr}
+}
+@media(max-width:390px){
+  #v12RoleGate .v12-grid{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -1113,6 +1162,70 @@ body{background:#f5f8fc!important;padding:0!important}
 </nav>
 
 
+
+    
+<!-- ================= V12 ROLE ROUTING GATE ================= -->
+<div id="v12RoleGate" aria-modal="true" role="dialog">
+  <div class="v12-card">
+    <div class="v12-brand">
+      <div class="v12-logo"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <h2 id="v12GateTitle">Memuat akses...</h2>
+        <div class="v12-sub">Sistem Analisis Kredit & Penawaran Debitur</div>
+      </div>
+    </div>
+    <div id="v12RoleBadge" class="v12-role"><i class="fa-solid fa-user"></i><span>ROLE</span></div>
+    <div id="v12AdminChoices" class="v12-grid" style="display:none">
+      <button class="v12-action primary" type="button" onclick="v12OpenAdmin('source')">
+        <i class="fa-solid fa-database"></i><b>Sumber Database</b><span>Pilih Database Server atau Upload Manual.</span>
+      </button>
+      <button class="v12-action" type="button" onclick="v12OpenAdmin('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i><b>Dashboard & Grafik</b><span>Monitoring AO, distribusi dan potensi NEW/TOP-UP/MENGULANG.</span>
+      </button>
+      <button class="v12-action" type="button" onclick="v12OpenAdmin('parameter')">
+        <i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Atur tarif, tenor, provisi, asuransi dan parameter produk.</span>
+      </button>
+      <button class="v12-action" type="button" onclick="v12OpenAdmin('ao')">
+        <i class="fa-solid fa-user-tie"></i><b>Tampilan AO</b><span>Masuk ke aplikasi AO setelah database siap.</span>
+      </button>
+    </div>
+
+    <div id="v12AOChoices" class="v12-grid" style="display:none">
+      <button class="v12-action primary" type="button" onclick="v12LoadDatabaseAO()">
+        <i class="fa-solid fa-cloud-arrow-down"></i><b>Database Google Script</b><span>Ambil database sesuai hak akses AO dari server.</span>
+      </button>
+      <button class="v12-action" type="button" onclick="v12ShowManualUpload()">
+        <i class="fa-solid fa-file-excel"></i><b>Upload Database Manual</b><span>Pilih file Kredit dan Penghasilan dari perangkat.</span>
+      </button>
+    </div>
+
+    <div id="v12ManualUpload" class="v12-upload">
+      <div style="font-size:11px;font-weight:800;color:#334155;margin-bottom:8px">Upload Database Manual</div>
+      <div class="v12-upload-grid">
+        <label class="v12-file">
+          <input id="v12KreditFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+          <i class="fa-solid fa-file-invoice-dollar"></i><b id="v12KreditLabel">Pilih File Kredit</b><span>No Pinjaman, CIF, Produk, Baki Debet, Angsuran, dll.</span>
+        </label>
+        <label class="v12-file">
+          <input id="v12PenghasilanFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+          <i class="fa-solid fa-wallet"></i><b id="v12PenghasilanLabel">Pilih File Penghasilan</b><span>CIF, Kode AO, Gaji, TPP, Sertifikasi, dll.</span>
+        </label>
+      </div>
+      <div class="v12-status" id="v12ManualStatus">Silakan pilih kedua file database.</div>
+      <div class="v12-progress"><div id="v12ManualProgress"></div></div>
+      <div class="v12-footer">
+        <button class="v12-link" type="button" onclick="v12BackToRoleChoices()">← Kembali</button>
+        <button class="v12-continue" id="v12ManualContinue" type="button" disabled onclick="v12FinishManualAO()">Masuk ke Aplikasi AO</button>
+      </div>
+    </div>
+
+    <div class="v12-status" id="v12GateStatus">Menyiapkan pilihan akses...</div>
+    <div class="v12-footer">
+      <button class="v12-link" type="button" onclick="logoutGoogleUser()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+    </div>
+  </div>
+</div>
+<!-- ================= END V12 ROLE ROUTING GATE ================= -->
 
     <!-- ================= GOOGLE LOGIN GATE ================= -->
     <div id="googleAuthGate" role="dialog" aria-modal="true" aria-labelledby="googleAuthTitle">
@@ -2575,6 +2688,7 @@ tarifProvisi =
 
 biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
 
+
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
             if (plafonGross > 350000000) {
@@ -3909,6 +4023,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
 
   window.googleCredential = null;
   window.currentUser = null;
+  window.lastProtectedLoadOk = false;
 
   function showAuthError(message){
     const el=document.getElementById('googleAuthError');
@@ -3952,7 +4067,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
       if(!result.success) throw new Error(result.error||'Akses ditolak.');
       currentUser=result.user;
       showApp(currentUser);
-      await loadProtectedData();
+      v12RouteAfterLogin(currentUser);
     }catch(err){
       console.error(err);
       googleCredential=null;
@@ -4079,6 +4194,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
   }
 
   window.loadProtectedData = async function(){
+    window.lastProtectedLoadOk = false;
     if(!googleCredential) throw new Error('Sesi Google tidak tersedia.');
     if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(8, 'Menghubungi database server...');
     const badge=document.getElementById('adminDataStatusBadge');
@@ -4111,6 +4227,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
           processBothData();
           if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(100, 'Database berhasil diselaraskan.');
           if(badge) badge.textContent='Database berhasil diselaraskan.';
+          window.lastProtectedLoadOk = true;
         } catch(processError) {
           console.error('[ANALISA KREDIT] Error saat menyusun database:', processError);
           if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal menyusun database: ' + (processError.message || 'error'));
@@ -4126,6 +4243,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
       // Muat Database kembali.
       if(badge) badge.textContent='Database belum selesai dimuat. Sesi tetap aktif.';
       showAuthError(err.message||'Data gagal dimuat.');
+      window.lastProtectedLoadOk = false;
     }
   };
 
@@ -4137,6 +4255,8 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     try{ localStorage.removeItem('kreditRawData_v3'); localStorage.removeItem('penghasilanRawData_v3'); }catch(e){}
     document.body.classList.add('app-locked');
     document.getElementById('googleAuthGate')?.classList.remove('hidden');
+    document.getElementById('v12RoleGate')?.classList.remove('show');
+    document.getElementById('v12ManualUpload')?.classList.remove('show');
     document.getElementById('userSessionBadge')?.classList.remove('show');
     document.getElementById('logoutBtn')?.classList.remove('show');
     const badge=document.getElementById('adminDataStatusBadge');
@@ -4145,6 +4265,126 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
     if(dash) dash.classList.add('hidden');
     try{ if(window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
   };
+})();
+</script>
+
+<script id="v12-role-routing-controller">
+(function(){
+  'use strict';
+  let manualKreditReady=false;
+  let manualPenghasilanReady=false;
+  let activeRole='';
+
+  function role(){
+    return String(window.currentUser?.role || '').trim().toUpperCase();
+  }
+  function setText(id,text){ const el=document.getElementById(id); if(el) el.textContent=text; }
+  function setProgress(p){ const el=document.getElementById('v12ManualProgress'); if(el) el.style.width=Math.max(0,Math.min(100,p))+'%'; }
+  function gate(show){ document.getElementById('v12RoleGate')?.classList.toggle('show',!!show); }
+
+  window.v12RouteAfterLogin=function(user){
+    activeRole=String(user?.role||'').toUpperCase();
+    const admin=activeRole==='ADMIN' || activeRole==='SUPERVISOR';
+    setText('v12GateTitle', admin ? 'Menu Admin' : 'Pilih Sumber Database');
+    const badge=document.getElementById('v12RoleBadge');
+    if(badge) badge.innerHTML='<i class="fa-solid '+(admin?'fa-user-shield':'fa-user-tie')+'"></i><span>'+activeRole+'</span>';
+    document.getElementById('v12AdminChoices').style.display=admin?'grid':'none';
+    document.getElementById('v12AOChoices').style.display=admin?'none':'grid';
+    document.getElementById('v12ManualUpload').classList.remove('show');
+    setText('v12GateStatus', admin ? 'Anda dapat memilih sumber database, membuka dashboard/grafik, atau mengubah parameter.' : 'Pilih Database Google Script untuk mengambil data server, atau Upload Database Manual untuk memakai file dari perangkat.');
+    gate(true);
+    // Jangan lagi memuat database otomatis setelah login.
+  };
+
+  window.v12OpenAdmin=function(target){
+    const r=role();
+    if(r!=='ADMIN' && r!=='SUPERVISOR'){ alert('Akses Admin/Supervisor diperlukan.'); return; }
+    gate(false);
+    if(typeof switchView==='function') switchView('ADMIN');
+    setTimeout(function(){
+      if(target==='source') document.getElementById('sourceDatabaseCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+      else if(target==='dashboard') document.getElementById('adminDashboardAdditive')?.scrollIntoView({behavior:'smooth',block:'start'});
+      else if(target==='parameter') document.getElementById('adminParameterSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+      else if(target==='ao' && typeof switchView==='function') switchView('AO');
+    },60);
+  };
+
+  window.v12LoadDatabaseAO=async function(){
+    const r=role();
+    if(r!=='AO') return;
+    setText('v12GateStatus','Mengambil database Google Script sesuai hak akses AO...');
+    setProgress(15);
+    try{
+      if(typeof window.loadProtectedData!=='function') throw new Error('Fungsi database belum tersedia.');
+      await window.loadProtectedData();
+      if(window.lastProtectedLoadOk !== true){
+        throw new Error('Database belum berhasil dimuat. Periksa status proses atau coba lagi.');
+      }
+      setProgress(100);
+      setText('v12GateStatus','Database berhasil diselaraskan. Membuka aplikasi AO...');
+      setTimeout(function(){ gate(false); if(typeof switchView==='function') switchView('AO'); if(typeof window.v9GoHome==='function') window.v9GoHome(); },250);
+    }catch(e){
+      setProgress(0);
+      setText('v12GateStatus','Gagal mengambil database: '+(e.message||'error')+'. Sesi tetap aktif; Anda dapat mencoba lagi atau memilih Upload Manual.');
+    }
+  };
+
+  window.v12ShowManualUpload=function(){
+    if(role()!=='AO') return;
+    document.getElementById('v12AOChoices').style.display='none';
+    document.getElementById('v12ManualUpload').classList.add('show');
+    setText('v12GateStatus','Mode Upload Manual aktif. Pilih file Kredit dan Penghasilan.');
+    setProgress(0);
+  };
+
+  window.v12BackToRoleChoices=function(){
+    document.getElementById('v12ManualUpload').classList.remove('show');
+    document.getElementById('v12AOChoices').style.display='grid';
+    setText('v12GateStatus','Pilih sumber database.');
+  };
+
+  window.v12FinishManualAO=function(){
+    if(!manualKreditReady || !manualPenghasilanReady){
+      alert('Kedua file Kredit dan Penghasilan harus dipilih terlebih dahulu.');
+      return;
+    }
+    setProgress(100);
+    setText('v12GateStatus','Database manual siap. Membuka aplikasi AO...');
+    setTimeout(function(){ gate(false); if(typeof switchView==='function') switchView('AO'); if(typeof window.v9GoHome==='function') window.v9GoHome(); },250);
+  };
+
+  function bindFile(id,labelId,type){
+    const input=document.getElementById(id); if(!input) return;
+    input.addEventListener('change',function(){
+      const file=input.files?.[0]; if(!file) return;
+      setText(labelId,file.name);
+      setText('v12ManualStatus','Membaca '+file.name+'...');
+      if(type==='kredit'){
+        manualKreditReady=true;
+        if(typeof window.handleKreditUpload==='function') window.handleKreditUpload(file);
+      }else{
+        manualPenghasilanReady=true;
+        if(typeof window.handlePenghasilanUpload==='function') window.handlePenghasilanUpload(file);
+      }
+      setProgress((manualKreditReady?45:0)+(manualPenghasilanReady?45:0));
+      if(manualKreditReady && manualPenghasilanReady){
+        setProgress(90); setText('v12ManualStatus','Kedua file sudah dipilih. Menyusun database...');
+        // beri waktu reader FileReader dari handler menyelesaikan proses.
+        setTimeout(function(){
+          try{ if(typeof processBothData==='function') processBothData(); }catch(e){ console.error(e); }
+          setProgress(100); setText('v12ManualStatus','Database manual siap digunakan.');
+          const btn=document.getElementById('v12ManualContinue'); if(btn) btn.disabled=false;
+        },900);
+      }else{
+        setText('v12ManualStatus', manualKreditReady?'File Kredit siap. Pilih File Penghasilan.':'File Penghasilan siap. Pilih File Kredit.');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    bindFile('v12KreditFile','v12KreditLabel','kredit');
+    bindFile('v12PenghasilanFile','v12PenghasilanLabel','penghasilan');
+  });
 })();
 </script>
 <script id="mobile-upload-enhancer">
@@ -5366,12 +5606,12 @@ function accessButton(type){
       alert('Menu Admin hanya tersedia untuk Admin/Supervisor.');
       return;
     }
-    if(typeof switchView==='function') switchView('ADMIN');
+    if(typeof v12RouteAfterLogin==='function') v12RouteAfterLogin(u);
     return;
   }
   if(type==='ao'){
-    if(typeof switchView==='function') switchView('AO');
-    go('home');
+    if(typeof v12RouteAfterLogin==='function') v12RouteAfterLogin(u);
+    return;
   }
 }
 
