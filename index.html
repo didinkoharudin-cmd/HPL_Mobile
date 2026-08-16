@@ -182,6 +182,131 @@ main{padding:12px!important;max-width:1280px!important}
   #dashboardSection>.grid{grid-template-columns:1fr 1fr!important}
 }
 
+
+/* =========================================================
+   DISPLAY MODE SWITCH: MOBILE CARDS / DESKTOP TABLE
+   Does not alter data or calculation logic.
+========================================================= */
+body.display-desktop #loanTableWrap{
+  overflow-x:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+body.display-desktop #loanTable{
+  display:table!important;
+  width:100%!important;
+  min-width:1180px!important;
+  table-layout:auto!important;
+}
+body.display-desktop #loanTable thead{
+  display:table-header-group!important;
+}
+body.display-desktop #loanTable tbody{
+  display:table-row-group!important;
+  width:auto!important;
+}
+body.display-desktop #loanTable tbody tr{
+  display:table-row!important;
+  width:auto!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-bottom:1px solid #e2e8f0!important;
+  border-radius:0!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  position:static!important;
+  overflow:visible!important;
+}
+body.display-desktop #loanTable tbody tr:before{display:none!important}
+body.display-desktop #loanTable tbody td{
+  display:table-cell!important;
+  width:auto!important;
+  padding:10px!important;
+  border-bottom:1px solid #f1f5f9!important;
+  background:transparent!important;
+  text-align:initial!important;
+  align-items:initial!important;
+  overflow-wrap:normal!important;
+}
+body.display-desktop #loanTable tbody td:before{display:none!important;content:none!important}
+body.display-desktop #loanTable tbody td:nth-child(9),
+body.display-desktop #loanTable tbody td:nth-child(11){font-size:inherit!important}
+body.display-desktop #loanTable tbody td:nth-child(12) button{width:auto!important;min-height:38px!important}
+body.display-desktop #loanTable tbody .tenor-num-input{width:64px!important;min-height:36px!important}
+body.display-desktop #loanTable tbody .tenor-range-input{width:85px!important}
+
+/* Mode switch */
+.display-mode-switch{
+  display:flex;align-items:center;gap:2px;padding:3px;
+  border-radius:12px;background:rgba(15,23,42,.35);
+  border:1px solid rgba(255,255,255,.16);
+}
+.display-mode-switch button{
+  min-height:36px!important;padding:7px 10px!important;
+  border-radius:9px!important;color:#cbd5e1;
+  font-size:10px;font-weight:800;white-space:nowrap;
+}
+.display-mode-switch button.active{
+  background:#fff;color:#312e81;box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+/* Detail Debtor: comfortable landscape phone layout */
+@media (max-width: 900px) and (orientation: landscape){
+  #debtorModal,#mengulangDetailModal{
+    padding:5px!important;
+    align-items:center!important;
+  }
+  #debtorModal>div{
+    width:100%!important;
+    max-width:none!important;
+    max-height:98dvh!important;
+    height:98dvh!important;
+    border-radius:14px!important;
+  }
+  #debtorModal .bg-indigo-900.p-5{
+    padding:8px 12px!important;
+    min-height:48px!important;
+  }
+  #debtorModal .bg-indigo-900.p-5 h2{
+    font-size:14px!important;
+    line-height:1.15!important;
+  }
+  #debtorModal .bg-indigo-900.p-5 p{font-size:9px!important;line-height:1.2!important}
+  #debtorModal .p-6{
+    padding:8px!important;
+    gap:8px!important;
+  }
+  #debtorModal .grid.grid-cols-1.md\\:grid-cols-4{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+    padding:7px!important;
+  }
+  #debtorModal .grid.grid-cols-1.md\\:grid-cols-4 span{font-size:8px!important}
+  #debtorModal .grid.grid-cols-1.md\\:grid-cols-4 strong{font-size:10px!important}
+  #debtorModal .border.rounded-xl{overflow:auto!important;max-height:145px!important}
+  #debtorModal .border.rounded-xl table{min-width:780px!important;font-size:8px!important}
+  #debtorModal .border.rounded-xl th,
+  #debtorModal .border.rounded-xl td{padding:4px!important}
+  #debtorModal .bg-indigo-50\\/50{
+    padding:8px!important;gap:6px!important;
+  }
+  #debtorModal .bg-indigo-50\\/50 .grid.grid-cols-1.md\\:grid-cols-4{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+  #debtorModal .bg-indigo-50\\/50 textarea{min-height:70px!important;height:70px!important}
+  #debtorModal .bg-slate-100.p-4{
+    flex-direction:row!important;align-items:center!important;
+    justify-content:space-between!important;padding:6px 10px!important;
+  }
+  #debtorModal .bg-slate-100.p-4 button{width:auto!important;min-height:36px!important;padding:6px 10px!important}
+  #debtorModal .bg-slate-100.p-4 .flex{gap:6px!important}
+}
+
+/* Desktop mode: the debtor detail itself uses the full desktop width. */
+@media (min-width: 901px){
+  #debtorModal>div{max-width:1180px!important;max-height:94vh!important}
+}
+
 /* ===== GOOGLE AUTH PROTECTION ===== */
 body.app-locked > header,
 body.app-locked > main { display:none !important; }
@@ -311,6 +436,15 @@ body.app-locked > main { display:none !important; }
                     </button>
                     <button id="navBtnAdmin" onclick="switchView('ADMIN')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60">
                         <i class="fa-solid fa-sliders"></i> Panel Admin & Upload
+                    </button>
+                </div>
+
+                <div class="display-mode-switch" title="Pilih format daftar debitur">
+                    <button id="displayModeMobileBtn" type="button" onclick="setDisplayMode('mobile')">
+                        <i class="fa-solid fa-mobile-screen-button mr-1"></i> Mobile
+                    </button>
+                    <button id="displayModeDesktopBtn" type="button" onclick="setDisplayMode('desktop')">
+                        <i class="fa-solid fa-table-list mr-1"></i> Desktop
                     </button>
                 </div>
                 
@@ -2785,8 +2919,36 @@ body.app-locked > main { display:none !important; }
             XLSX.writeFile(wb, "Template_Data_Penghasilan_AO.xlsx");
         }
 
+        // =========================================================
+        // DISPLAY MODE: MOBILE CARD / DESKTOP TABLE
+        // Only changes presentation; all data/calculation functions remain untouched.
+        // =========================================================
+        function setDisplayMode(mode, persist = true) {
+            const normalized = mode === 'desktop' ? 'desktop' : 'mobile';
+            document.body.classList.toggle('display-desktop', normalized === 'desktop');
+            document.body.classList.toggle('display-mobile', normalized === 'mobile');
+
+            const mobileBtn = document.getElementById('displayModeMobileBtn');
+            const desktopBtn = document.getElementById('displayModeDesktopBtn');
+            if (mobileBtn) mobileBtn.classList.toggle('active', normalized === 'mobile');
+            if (desktopBtn) desktopBtn.classList.toggle('active', normalized === 'desktop');
+
+            if (persist) safeLocalStorageSet('loanDisplayMode_v1', normalized);
+        }
+
+        function initDisplayMode() {
+            let saved = safeLocalStorageGet('loanDisplayMode_v1');
+            if (saved !== 'mobile' && saved !== 'desktop') {
+                saved = window.matchMedia && window.matchMedia('(min-width: 769px)').matches
+                    ? 'desktop'
+                    : 'mobile';
+            }
+            setDisplayMode(saved, false);
+        }
+
         // --- INISIALISASI HALAMAN & PERSISTENSI DATA ---
         window.addEventListener('DOMContentLoaded', async () => {
+            initDisplayMode();
             const savedProd = safeLocalStorageGet('productParams_v3');
             if (savedProd) { try { productParams = JSON.parse(savedProd); } catch (e) { console.error(e); } }
 
