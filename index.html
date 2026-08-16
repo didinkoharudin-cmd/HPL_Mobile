@@ -2446,16 +2446,13 @@ body{background:#f5f8fc!important;padding-bottom:92px!important}
                 };
             }
 
-             // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
+            // 1. Biaya Provisi
+            const pLow = (feeParams.provisiLow || 0.2) / 100;
+            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
             );
 
             // 2. Biaya Administrasi
