@@ -1018,6 +1018,65 @@ body{background:#f5f8fc!important;padding:0!important}
 }
 </style>
 
+
+<style id="v11-mobile-table-fix">
+@media(max-width:768px){
+  /* V11: mobile app is an opaque layer; desktop UI must never bleed through. */
+  #mobileV9Home{
+    background:#f5f8fc!important;
+    isolation:isolate!important;
+    z-index:100000!important;
+  }
+  #mobileV9Home .v9-shell{
+    background:#f5f8fc!important;
+    padding:10px 10px calc(92px + env(safe-area-inset-bottom))!important;
+  }
+  /* Keep the mobile header compact and prevent accidental inherited desktop spacing. */
+  #mobileV9Home .v9-top{margin-bottom:9px!important}
+  #mobileV9Home .v9-avatar{width:38px!important;height:38px!important;border-radius:12px!important;font-size:17px!important}
+  #mobileV9Home .v9-user b{font-size:13px!important}
+  #mobileV9Home .v9-user span{font-size:10px!important}
+  #mobileV9Home .v9-exit{width:36px!important;height:36px!important;border-radius:11px!important}
+  #mobileV9Home .v9-greeting h1{font-size:20px!important;line-height:1.15!important}
+  #mobileV9Home .v9-greeting p{font-size:10px!important;margin:2px 0 9px!important}
+  #mobileV9Home .v9-access{gap:7px!important;margin-bottom:10px!important}
+  #mobileV9Home .v9-access button{padding:10px 5px!important;border-radius:15px!important;font-size:10px!important}
+  #mobileV9Home .v9-access i{width:36px!important;height:36px!important;margin-bottom:5px!important;font-size:16px!important;border-radius:12px!important}
+
+  /* Debitur: compact desktop-like table, not cards. */
+  #v9PageDebitur .v9-panel{padding:0!important;overflow:hidden!important;border-radius:14px!important}
+  #v9PageDebitur .v9-list{display:block!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important}
+  #v9PageDebitur .v9-table{width:980px!important;min-width:980px!important;border-collapse:separate!important;border-spacing:0!important;font-size:10px!important;background:#fff!important}
+  #v9PageDebitur .v9-table th{position:sticky!important;top:0!important;z-index:2!important;background:#f1f5f9!important;color:#475569!important;font-weight:800!important;padding:8px 7px!important;border-bottom:1px solid #dbe3ee!important;white-space:nowrap!important;text-align:left!important}
+  #v9PageDebitur .v9-table td{padding:8px 7px!important;border-bottom:1px solid #edf2f7!important;white-space:nowrap!important;color:#334155!important;vertical-align:middle!important}
+  #v9PageDebitur .v9-table tbody tr{cursor:pointer!important}
+  #v9PageDebitur .v9-table tbody tr:active{background:#eff6ff!important}
+  #v9PageDebitur .v9-table .num{text-align:center!important;color:#94a3b8!important;width:35px!important}
+  #v9PageDebitur .v9-table .name{font-weight:800!important;color:#0f172a!important;max-width:190px!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  #v9PageDebitur .v9-table .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace!important}
+  #v9PageDebitur .v9-table .money{text-align:right!important;font-family:ui-monospace,SFMono-Regular,Menlo,monospace!important;font-weight:800!important}
+  #v9PageDebitur .v9-table .action{position:sticky;right:0;background:#fff;text-align:center!important;box-shadow:-5px 0 10px rgba(15,23,42,.05)}
+  #v9PageDebitur .v9-table tbody tr:active .action{background:#eff6ff!important}
+  #v9PageDebitur .v9-table .mini-wa{border:0!important;border-radius:9px!important;background:#16a34a!important;color:#fff!important;padding:6px 8px!important;min-height:30px!important;font-size:9px!important;font-weight:800!important}
+  #v9PageDebitur .v9-table .mini-wa i{font-size:13px!important}
+  #v9PageDebitur .v9-table .chip{display:inline-block!important;padding:3px 6px!important;border-radius:999px!important;background:#eef2ff!important;color:#4338ca!important;font-size:8px!important;font-weight:800!important}
+  #v9PageDebitur .v9-empty{padding:28px 12px!important}
+
+  /* V9-style WhatsApp action: icon-first, clean circle, no extra WA text. */
+  #v9BottomNav{height:64px!important;left:8px!important;right:8px!important;bottom:max(7px,env(safe-area-inset-bottom))!important;grid-template-columns:1fr 1fr 1.08fr 1fr 1fr!important;padding:3px!important;border-radius:20px!important}
+  #v9BottomNav button{height:56px!important;min-height:56px!important;font-size:8.5px!important}
+  #v9BottomNav button i{font-size:18px!important}
+  #v9BottomNav .wa-nav{margin-top:-22px!important;width:62px!important;height:62px!important;border-radius:50%!important;border:4px solid #f5f8fc!important;background:#16a34a!important;box-shadow:0 9px 24px rgba(22,163,74,.35)!important;font-size:0!important;justify-self:center!important}
+  #v9BottomNav .wa-nav i{font-size:30px!important;line-height:1!important;margin:0!important}
+  #v9BottomNav .wa-nav span{display:none!important}
+}
+@media(max-width:380px){
+  #v9PageDebitur .v9-table{width:900px!important;min-width:900px!important}
+  #v9BottomNav .wa-nav{width:58px!important;height:58px!important;margin-top:-19px!important}
+  #v9BottomNav .wa-nav i{font-size:28px!important}
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -2515,7 +2574,6 @@ tarifProvisi =
         : 0.15 / 100;
 
 biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -5121,21 +5179,46 @@ function renderDebtors(){
     return;
   }
 
-  rows.forEach(o=>{
-    const card=document.createElement('div');
-    card.className='v9-debtor';
-    card.dataset.loanId=String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']));
-    card.innerHTML=
-      '<div class="top"><b>'+escapeHtml(val(o,['nama','NAMA'])||'Debitur')+'</b>'+
-      '<span class="v9-chip">'+escapeHtml(val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN'])||'Analisa')+'</span></div>'+
-      '<div class="v9-grid">'+
-      '<span>CIF<strong>'+escapeHtml(val(o,['cif','CIF'])||'-')+'</strong></span>'+
-      '<span>Kode AO<strong>'+escapeHtml(val(o,['kode_ao','KODE_AO','kodeAO'])||'-')+'</strong></span>'+
-      '<span>No. Pinjaman<strong>'+escapeHtml(val(o,['no_pinjaman','NO_PINJAMAN','loan_id'])||'-')+'</strong></span>'+
-      '<span>Potensi NETT<strong>'+money(nett(o))+'</strong></span>'+
-      '</div>';
-    list.appendChild(card);
+  const table=document.createElement('table');
+  table.className='v9-table';
+  table.innerHTML=`<thead><tr>
+    <th class="num">No</th>
+    <th>Debitur / CIF</th>
+    <th>No. Pinjaman</th>
+    <th>Kode AO</th>
+    <th>Produk</th>
+    <th>Tenor</th>
+    <th>Angsuran</th>
+    <th>Potensi NETT</th>
+    <th class="action">Aksi</th>
+  </tr></thead><tbody></tbody>`;
+  const tbody=table.querySelector('tbody');
+
+  rows.forEach((o,index)=>{
+    const tr=document.createElement('tr');
+    const id=String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN'])||'');
+    tr.dataset.loanId=id;
+    const nama=val(o,['nama','NAMA'])||'Debitur';
+    const cif=val(o,['cif','CIF'])||'-';
+    const noPin=val(o,['no_pinjaman','NO_PINJAMAN','loan_id'])||'-';
+    const ao=val(o,['kode_ao','KODE_AO','kodeAO'])||'-';
+    const produk=val(o,['tipe_pinjaman','produk','PRODUK','TIPE_PINJAMAN'])||'Analisa';
+    const tenor=val(o,['selectedTenor','tenor','TENOR','jangka_waktu','JANGKA_WAKTU'])||'-';
+    const angs=Number(val(o,['angsuran_eksisting','angsuran','ANGSURAN','cicilan'])||0);
+    const n=nett(o);
+    tr.innerHTML=`
+      <td class="num">${index+1}</td>
+      <td class="name"><div>${escapeHtml(nama)}</div><div class="mono" style="font-size:8px;color:#94a3b8;margin-top:2px">CIF: ${escapeHtml(cif)}</div></td>
+      <td class="mono" style="font-weight:700;color:#3730a3">${escapeHtml(noPin)}</td>
+      <td class="mono">${escapeHtml(ao)}</td>
+      <td><span class="chip">${escapeHtml(produk)}</span></td>
+      <td style="text-align:center;font-weight:700">${escapeHtml(String(tenor))}${String(tenor)!=='-'?' bln':''}</td>
+      <td class="money">${money(angs)}</td>
+      <td class="money" style="color:#047857">${money(n)}</td>
+      <td class="action"><button class="mini-wa" data-action-loan-id="${escapeHtml(id)}" title="Rincian / Penawaran"><i class="fa-brands fa-whatsapp"></i></button></td>`;
+    tbody.appendChild(tr);
   });
+  list.appendChild(table);
 }
 
 function getActivity(){
@@ -5310,8 +5393,11 @@ function bind(){
   document.getElementById('v9ExportActivity')?.addEventListener('click',exportActivityExcel);
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
-    const card=e.target.closest('.v9-debtor');
-    if(card) openSelected(card);
+    const row=e.target.closest('tr[data-loan-id]');
+    if(!row) return;
+    const id=e.target.closest('[data-action-loan-id]')?.dataset.actionLoanId || row.dataset.loanId;
+    const fake={dataset:{loanId:id}};
+    openSelected(fake);
   });
 
   document.getElementById('v9ActivityList')?.addEventListener('click',e=>{
