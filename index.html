@@ -1436,7 +1436,7 @@ body.app-locked > main { display:none !important; }
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <i class="fa-solid fa-coins text-amber-600"></i> Pengaturan Tarif & Biaya-Biaya Kredit
                         </h3>
-                        <p class="text-xs text-slate-500">Pengaturan biaya provisi, jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
+                        <p class="text-xs text-slate-500">Pengaturan biaya , jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="resetFeeParamsToDefault()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition">
@@ -2371,8 +2371,8 @@ body.app-locked > main { display:none !important; }
 
 tarifProvisi =
     tenorBulan < 84
-        ? 0.2 / 100
-        : 1.5 / 100;
+        ? 0.02 / 100
+        : 0.15 / 100;
 
 biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
 
