@@ -603,6 +603,207 @@ body.app-locked > main { display:none !important; }
 }
 </style>
 
+
+<style id="v2-ui-fixes">
+/* ===== MOBILE HEADER: real <header>, not a guessed id ===== */
+@media (max-width: 768px){
+  body{
+    --mobile-header-h: 52px;
+  }
+
+  body > header,
+  header.sticky{
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    padding: 6px 8px !important;
+    transition: transform .22s ease, opacity .22s ease, box-shadow .22s ease !important;
+    min-height: 0 !important;
+  }
+
+  header.v2-header-hidden{
+    transform: translateY(calc(-100% - 8px)) !important;
+    opacity: .02 !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+  }
+
+  header > div{
+    gap: 5px !important;
+  }
+
+  header h1{
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+  }
+
+  header h1 i{
+    font-size: 12px !important;
+  }
+
+  header p{
+    display: none !important;
+  }
+
+  header .flex.items-center.gap-2.flex-wrap{
+    gap: 4px !important;
+  }
+
+  header .bg-indigo-950\/80{
+    padding: 2px !important;
+    border-radius: 8px !important;
+    gap: 2px !important;
+  }
+
+  header button{
+    min-height: 29px !important;
+    height: 29px !important;
+    padding: 3px 7px !important;
+    border-radius: 7px !important;
+    font-size: 9px !important;
+    white-space: nowrap !important;
+  }
+
+  header #userSessionBadge{
+    font-size: 9px !important;
+  }
+
+  header .display-mode-switch{
+    transform: scale(.88);
+    transform-origin: right center;
+    margin-left: -8px !important;
+    margin-right: -5px !important;
+  }
+
+  header .flex.gap-1\.5.ml-2{
+    display: none !important;
+  }
+
+  main{
+    padding: 8px !important;
+  }
+
+  #dashboardSection{
+    gap: 8px !important;
+  }
+
+  /* Mobile detail: use the full portrait viewport efficiently */
+  #debtorModal,
+  #mengulangDetailModal{
+    padding: 4px !important;
+  }
+
+  #debtorModal > div,
+  #mengulangDetailModal > div{
+    max-height: calc(100dvh - 8px) !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ===== DESKTOP FILTERS: explicitly target the real filter row ===== */
+@media (min-width: 769px){
+  #loanFilterBar{
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    gap:6px !important;
+    padding-top:7px !important;
+  }
+
+  #loanFilterBar > span{
+    font-size:10px !important;
+  }
+
+  #loanFilterBar select{
+    width:auto !important;
+    min-width:118px !important;
+    max-width:190px !important;
+    height:30px !important;
+    min-height:30px !important;
+    padding:3px 8px !important;
+    border-radius:7px !important;
+    font-size:10px !important;
+    line-height:1 !important;
+  }
+
+  #loanFilterBar #filterJenisPegawai{ max-width:205px !important; }
+  #loanFilterBar #filterStatus{ max-width:215px !important; }
+  #loanFilterBar #sortPotensi{ max-width:170px !important; }
+
+  #searchInput{
+    height:30px !important;
+    padding-top:4px !important;
+    padding-bottom:4px !important;
+    font-size:11px !important;
+  }
+}
+
+/* ===== DATA SOURCE / PROGRESS ===== */
+.data-source-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.data-source-card{
+  border:1px solid #e2e8f0;
+  background:#fff;
+  border-radius:12px;
+  padding:11px;
+  transition:.18s ease;
+}
+.data-source-card.active{
+  border-color:#6366f1;
+  box-shadow:0 0 0 2px rgba(99,102,241,.10);
+  background:#f8faff;
+}
+.data-source-card button{
+  width:100%;
+}
+.data-load-progress{
+  margin-top:10px;
+  height:7px;
+  background:#e2e8f0;
+  border-radius:999px;
+  overflow:hidden;
+}
+.data-load-progress > div{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#4f46e5,#06b6d4);
+  transition:width .25s ease;
+}
+.data-load-status{
+  min-height:18px;
+  margin-top:5px;
+  font-size:10px;
+  color:#64748b;
+}
+@media(max-width:768px){
+  .data-source-grid{grid-template-columns:1fr}
+}
+
+/* ===== ADMIN AO CHART ===== */
+.admin-ao-chart-wrap{
+  position:relative;
+  width:100%;
+  min-height:260px;
+}
+#adminAOChart{
+  display:block;
+  width:100%;
+  height:260px;
+}
+.admin-ao-chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  font-size:10px;
+  color:#64748b;
+}
+</style>
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -778,7 +979,7 @@ body.app-locked > main { display:none !important; }
                         </div>
 
                         <!-- Filters -->
-                        <div class="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 text-xs">
+                        <div id="loanFilterBar" class="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 text-xs">
                             <span class="font-semibold text-slate-500"><i class="fa-solid fa-filter mr-1"></i>Filter:</span>
                             
                             <select id="filterProduk" onchange="filterData()" class="py-1 px-2 border border-slate-300 rounded bg-white font-medium text-slate-700">
@@ -889,6 +1090,35 @@ body.app-locked > main { display:none !important; }
                     <div class="admin-card-additive"><div class="admin-card-label-additive">Maks. Angsuran Top-Up</div><div id="adminAngsuranTopUpAdditive" class="admin-card-value-additive">Rp 0</div><div class="admin-card-sub-additive">Potensi per bulan</div></div>
                 </div>
 
+                
+<div class="admin-panel-additive">
+  <div class="admin-panel-header-additive">
+    <div>
+      <div class="admin-panel-title-additive">
+        <i class="fa-solid fa-chart-column text-indigo-600 mr-1"></i>
+        Grafik Distribusi KODE AO
+      </div>
+      <div class="admin-panel-subtitle-additive">
+        Jumlah fasilitas dan potensi NEW, MENGULANG, serta TOP-UP per AO.
+        Klik AO pada tabel Monitoring AO untuk drill-down.
+      </div>
+    </div>
+    <select id="adminAOChartMetric"
+            onchange="renderAdminAOChart()"
+            class="text-[10px] border border-slate-300 rounded-lg px-2 py-1.5">
+      <option value="fasilitas">Jumlah Fasilitas</option>
+      <option value="new">Potensi NEW</option>
+      <option value="mengulang">Potensi MENGULANG</option>
+      <option value="topup">Potensi TOP-UP</option>
+    </select>
+  </div>
+  <div class="p-3 admin-ao-chart-wrap">
+    <canvas id="adminAOChart"></canvas>
+    <div id="adminAOChartLegend" class="admin-ao-chart-legend mt-2"></div>
+  </div>
+</div>
+
+
                 <div class="admin-panel-additive">
                     <div class="admin-panel-header-additive">
                         <div>
@@ -943,6 +1173,69 @@ body.app-locked > main { display:none !important; }
                     </button>
                 </div>
             </div>
+
+            
+<!-- DATA SOURCE SELECTOR -->
+<div id="dataSourceSelector"
+     class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+    <div>
+      <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-database text-indigo-600"></i>
+        Sumber Data
+      </h3>
+      <p class="text-[10px] text-slate-500">
+        Pilih sumber data yang akan dipakai aplikasi. Database server mengikuti hak akses pengguna.
+      </p>
+    </div>
+    <span id="dataSourceCurrent"
+          class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+      Belum dipilih
+    </span>
+  </div>
+
+  <div class="data-source-grid">
+    <div id="sourceDatabaseCard" class="data-source-card active">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-cloud text-indigo-600"></i>
+        <div>
+          <div class="text-xs font-bold text-slate-800">Database Server</div>
+          <div class="text-[9px] text-slate-500">Data Apps Script / Google Drive</div>
+        </div>
+      </div>
+      <button type="button"
+              onclick="loadDataFromDatabaseV2()"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-3 py-2 rounded-lg">
+        <i class="fa-solid fa-cloud-arrow-down mr-1"></i>
+        Ambil Database
+      </button>
+    </div>
+
+    <div id="sourceManualCard" class="data-source-card">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-file-excel text-teal-600"></i>
+        <div>
+          <div class="text-xs font-bold text-slate-800">Upload Manual</div>
+          <div class="text-[9px] text-slate-500">Gunakan file Excel lokal</div>
+        </div>
+      </div>
+      <button type="button"
+              onclick="selectManualSourceV2()"
+              class="bg-teal-600 hover:bg-teal-700 text-white text-[10px] font-bold px-3 py-2 rounded-lg">
+        <i class="fa-solid fa-folder-open mr-1"></i>
+        Gunakan Upload Manual
+      </button>
+    </div>
+  </div>
+
+  <div id="dataLoadStatusV2" class="data-load-status">
+    Siap mengambil data.
+  </div>
+  <div class="data-load-progress">
+    <div id="dataLoadProgressV2"></div>
+  </div>
+</div>
+
 
             <!-- Upload Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2726,6 +3019,7 @@ body.app-locked > main { display:none !important; }
             });
 
             renderTable(sortLoanData(filtered));
+            if (typeof renderAdminAOChart === 'function') renderAdminAOChart(filtered);
         }
 
         let loanRenderSource = [];
@@ -3375,16 +3669,20 @@ body.app-locked > main { display:none !important; }
 
   window.loadProtectedData = async function(){
     if(!googleCredential) throw new Error('Sesi Google tidak tersedia.');
+    if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(8, 'Menghubungi database server...');
     const badge=document.getElementById('adminDataStatusBadge');
     if(badge) badge.textContent='Mengambil data sesuai hak akses...';
     try{
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(22, 'Mengambil data kredit & penghasilan...');
       const data=await callApi('getData',googleCredential);
       if(!data.success) throw new Error(data.error||'Akses data ditolak.');
       // Normalisasi data server agar format Apps Script (header Excel asli)
       // sama dengan format yang digunakan processor lokal.
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(55, 'Normalisasi data kredit...');
       kreditRawData = normalizeServerKreditData(
         Array.isArray(data.kredit) ? data.kredit : []
       );
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(70, 'Normalisasi data penghasilan...');
       penghasilanRawData = normalizeServerPenghasilanData(
         Array.isArray(data.penghasilan) ? data.penghasilan : []
       );
@@ -3397,6 +3695,7 @@ body.app-locked > main { display:none !important; }
       if(badge) badge.textContent='Data diterima. Menyiapkan database...';
       requestAnimationFrame(() => processBothData());
     }catch(err){
+      if(typeof setDataLoadProgressV2 === 'function') setDataLoadProgressV2(0, 'Gagal mengambil database: ' + (err.message || 'error'));
       console.error(err);
       logoutGoogleUser();
       showAuthError(err.message||'Data gagal dimuat.');
@@ -4007,6 +4306,262 @@ function updateAdminActiveFilter() {
         renderInteractiveAdmin();
       }
     }, 200);
+  });
+})();
+</script>
+
+
+<script id="v2-final-fixes">
+/* =========================================================
+   V2 FIXES
+========================================================= */
+
+/* ---------- Mobile header auto hide ---------- */
+(function(){
+  let lastY = window.scrollY || 0;
+  let ticking = false;
+
+  function getHeader(){
+    return document.querySelector('body > header') || document.querySelector('header.sticky');
+  }
+
+  function update(){
+    const header = getHeader();
+    if(!header) return;
+
+    if(window.innerWidth > 768){
+      header.classList.remove('v2-header-hidden');
+      return;
+    }
+
+    const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+    const delta = y - lastY;
+
+    if(y <= 8){
+      header.classList.remove('v2-header-hidden');
+    }else if(delta > 3){
+      header.classList.add('v2-header-hidden');
+    }else if(delta < -3){
+      header.classList.remove('v2-header-hidden');
+    }
+
+    lastY = y;
+  }
+
+  function onScroll(){
+    if(!ticking){
+      requestAnimationFrame(function(){
+        update();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, {passive:true});
+  document.addEventListener('scroll', onScroll, {passive:true, capture:true});
+
+  window.addEventListener('resize', function(){
+    const header = getHeader();
+    if(header && window.innerWidth > 768){
+      header.classList.remove('v2-header-hidden');
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(update, 100);
+  });
+})();
+
+/* ---------- Data source / progress ---------- */
+window.setDataLoadProgressV2 = function(percent, message){
+  const bar = document.getElementById('dataLoadProgressV2');
+  const status = document.getElementById('dataLoadStatusV2');
+  if(bar) bar.style.width = Math.max(0, Math.min(100, percent || 0)) + '%';
+  if(status) status.textContent = message || '';
+};
+
+window.setDataSourceV2 = function(source){
+  const db = document.getElementById('sourceDatabaseCard');
+  const manual = document.getElementById('sourceManualCard');
+  const current = document.getElementById('dataSourceCurrent');
+
+  if(db) db.classList.toggle('active', source === 'database');
+  if(manual) manual.classList.toggle('active', source === 'manual');
+
+  if(current){
+    current.textContent =
+      source === 'database' ? 'Database Server' :
+      source === 'manual' ? 'Upload Manual' : 'Belum dipilih';
+  }
+};
+
+window.selectManualSourceV2 = function(){
+  setDataSourceV2('manual');
+  setDataLoadProgressV2(100, 'Mode upload manual aktif. Silakan pilih file Kredit dan Penghasilan.');
+  document.getElementById('dropZoneKredit')?.scrollIntoView({behavior:'smooth', block:'center'});
+};
+
+window.loadDataFromDatabaseV2 = async function(){
+  setDataSourceV2('database');
+  setDataLoadProgressV2(5, 'Memulai pengambilan database...');
+
+  try{
+    if(typeof window.loadProtectedData !== 'function'){
+      throw new Error('Fungsi database belum tersedia.');
+    }
+
+    await window.loadProtectedData();
+  }catch(err){
+    setDataLoadProgressV2(0, 'Gagal: ' + (err.message || 'Database tidak dapat dimuat.'));
+  }
+};
+
+/* ---------- AO chart ---------- */
+window.renderAdminAOChart = function(filteredData){
+  const canvas = document.getElementById('adminAOChart');
+  const legend = document.getElementById('adminAOChartLegend');
+  if(!canvas) return;
+
+  const data = Array.isArray(filteredData)
+    ? filteredData
+    : (Array.isArray(window.loanDatabase) ? window.loanDatabase : []);
+
+  const metric = document.getElementById('adminAOChartMetric')?.value || 'fasilitas';
+
+  const groups = {};
+  data.forEach(function(l){
+    const ao = String(l.kode_ao || '-').trim().toUpperCase() || '-';
+
+    if(!groups[ao]){
+      groups[ao] = {
+        fasilitas:0,
+        new:0,
+        mengulang:0,
+        topup:0
+      };
+    }
+
+    groups[ao].fasilitas++;
+    groups[ao].new += Number(l.potensiNew || 0);
+    groups[ao].mengulang += Number(l.potensiMengulang || 0);
+    groups[ao].topup += Number(l.potensiPlafonTopUp || 0);
+  });
+
+  let rows = Object.entries(groups).map(function(entry){
+    return {ao:entry[0], value:Number(entry[1][metric] || 0)};
+  });
+
+  rows.sort(function(a,b){ return b.value - a.value; });
+  rows = rows.slice(0, 20);
+
+  const width = Math.max(canvas.clientWidth || 600, 300);
+  const height = 260;
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,width,height);
+
+  if(!rows.length){
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Belum ada data AO.', width/2, height/2);
+    if(legend) legend.textContent = '';
+    return;
+  }
+
+  const left = 48, right = 12, top = 14, bottom = 52;
+  const plotW = width-left-right;
+  const plotH = height-top-bottom;
+  const max = Math.max(1, ...rows.map(r=>r.value));
+
+  ctx.font = '9px Arial';
+  ctx.textAlign = 'center';
+
+  /* grid */
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.fillStyle = '#64748b';
+  ctx.textAlign = 'right';
+
+  for(let i=0;i<=4;i++){
+    const y = top + plotH - plotH*i/4;
+    ctx.beginPath();
+    ctx.moveTo(left,y);
+    ctx.lineTo(left+plotW,y);
+    ctx.stroke();
+
+    const v = max*i/4;
+    ctx.fillText(
+      metric === 'fasilitas'
+        ? Math.round(v).toLocaleString('id-ID')
+        : formatRupiahShort(v),
+      left-6,y
+    );
+  }
+
+  const gap = 6;
+  const barW = Math.max(10,(plotW-gap*(rows.length-1))/rows.length);
+
+  rows.forEach(function(r,i){
+    const x = left+i*(barW+gap);
+    const h = (r.value/max)*plotH;
+    const y = top+plotH-h;
+
+    ctx.fillStyle = '#4f46e5';
+    ctx.fillRect(x,y,barW,h);
+
+    ctx.fillStyle = '#334155';
+    ctx.textAlign = 'center';
+    ctx.font = '8px Arial';
+
+    const label = r.ao.length > 8 ? r.ao.slice(0,7)+'…' : r.ao;
+    ctx.fillText(label,x+barW/2,height-30);
+
+    if(barW >= 22){
+      ctx.font = '8px Arial';
+      ctx.fillText(
+        metric === 'fasilitas'
+          ? Math.round(r.value).toLocaleString('id-ID')
+          : formatRupiahShort(r.value),
+        x+barW/2,
+        Math.max(10,y-7)
+      );
+    }
+  });
+
+  if(legend){
+    legend.innerHTML =
+      '<span><b>Menampilkan:</b> ' +
+      (metric === 'fasilitas' ? 'jumlah fasilitas' :
+       metric === 'new' ? 'potensi NEW' :
+       metric === 'mengulang' ? 'potensi MENGULANG' :
+       'potensi TOP-UP') +
+      ' • maksimal 20 AO</span>';
+  }
+};
+
+(function(){
+  function boot(){
+    if(typeof renderAdminAOChart === 'function'){
+      setTimeout(function(){ renderAdminAOChart(); }, 500);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  }else{
+    boot();
+  }
+
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 768 && typeof renderAdminAOChart === 'function'){
+      renderAdminAOChart();
+    }
   });
 })();
 </script>
