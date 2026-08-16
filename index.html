@@ -985,7 +985,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
                     Sistem Analisis Kredit & Penawaran Debitur
                 </h1>
                 <p class="text-indigo-200 text-xs mt-0.5">
-                    Presisi Per No Pinjaman, RPC, Tenor Pegawai & Configurator WA
+                    Kredit Konsumer Karawang
                 </p>
             </div>
             
@@ -2284,7 +2284,14 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
             const jenis = (jenisPenawaran || '').toString().trim().toUpperCase();
 
             if (productParams[tipe]) {
-                return (jenis === 'MENGULANG') ? productParams[tipe].rateMengulang : productParams[tipe].rateTopUp;
+                if (jenis === 'MENGULANG') {
+                    return Number(productParams[tipe].rateMengulang || 0);
+                }
+                // NEW dan TOPUP menggunakan rateTopUp / rate NEW-TOPUP.
+                if (jenis === 'NEW' || jenis === 'TOPUP' || jenis === 'TOP-UP') {
+                    return Number(productParams[tipe].rateTopUp || 0);
+                }
+                return Number(productParams[tipe].rateTopUp || 0);
             }
             return 0.13;
         }
@@ -2353,7 +2360,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
         }
 
         // PERHITUNGAN BIAYA DINAMIS & NET PENCAIRAN BERSIH (Anuitas & Parameter Biaya Admin)
-        function calculateCreditFees(plafonGross, tenorBulan, tipePinjaman, statusPegawai, usiaTahun, bakiDebet = 0, angsuranBaru = 0, bungaBerjalan = 0, musisiAsuransi = 0) {
+        function calculateCreditFees(plafonGross, tenorBulan, tipePinjaman, statusPegawai, usiaTahun, bakiDebet = 0, angsuranBaru = 0, bungaBerjalan = 0, musisiAsuransi = 0, jenisPenawaran = 'MENGULANG') {
             if (plafonGross <= 0 || tenorBulan <= 0) {
                 return {
                     tarifProvisi: 0,
@@ -2373,15 +2380,13 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
             }
 
             // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
-
+            const pLow = (feeParams.provisiLow || 0.02) / 100;
+            const pHigh = (feeParams.provisiHigh || 0.15) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -2606,7 +2611,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                     const angsuranNew = calculateInstallmentFromPlafon(grossNew, initialTenor, tipeProdukNew, 'NEW');
 
                     const feesNew = calculateCreditFees(
-                        grossNew, initialTenor, tipeProdukNew, deb.status_pegawai, tenorRulesNew.usiaTahun, 0, angsuranNew, 0, 0
+                        grossNew, initialTenor, tipeProdukNew, deb.status_pegawai, tenorRulesNew.usiaTahun, 0, angsuranNew, 0, 0, 'NEW'
                     );
 
                     loanDatabase.push({
@@ -2655,7 +2660,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                         
                         // Nett Top-Up
                         const feesTopUp = calculateCreditFees(
-                            grossTopUp, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0
+                            grossTopUp, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0, 'TOPUP'
                         );
 
                         let totalPlafonRenewal = 0;
@@ -2671,7 +2676,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                             
                             // Potensi Mengulang Net
                             const feesMengulang = calculateCreditFees(
-                                totalPlafonRenewal, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, f.baki_debet, angsuranMengulangBaru, f.bunga_berjalan, f.musisi_asuransi
+                                totalPlafonRenewal, initialTenor, f.tipe_pinjaman, deb.status_pegawai, facilityTenorRules.usiaTahun, f.baki_debet, angsuranMengulangBaru, f.bunga_berjalan, f.musisi_asuransi, 'MENGULANG'
                             );
 
                             potensiMengulangNet = feesMengulang.netPencairan;
@@ -3030,7 +3035,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
             const angsuranTopUpBaru = calculateInstallmentFromPlafon(grossTopUp, item.selectedTenor, item.tipe_pinjaman, 'TOPUP');
             
             const feesTopUp = calculateCreditFees(
-                grossTopUp, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0
+                grossTopUp, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranTopUpBaru, 0, 0, 'TOPUP'
             );
             item.potensiPlafonTopUp = feesTopUp.netPencairan;
 
@@ -3042,7 +3047,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                 const angsuranMengulangBaru = calculateInstallmentFromPlafon(totalPlafonRenewal, item.selectedTenor, item.tipe_pinjaman, 'MENGULANG');
 
                 const feesMengulang = calculateCreditFees(
-                    totalPlafonRenewal, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, item.baki_debet, angsuranMengulangBaru, item.bunga_berjalan, item.musisi_asuransi
+                    totalPlafonRenewal, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, item.baki_debet, angsuranMengulangBaru, item.bunga_berjalan, item.musisi_asuransi, 'MENGULANG'
                 );
                 item.potensiMengulang = feesMengulang.netPencairan;
             } else if (item.cifRef.facilities.length === 0) {
@@ -3051,7 +3056,7 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                 const angsuranNew = calculateInstallmentFromPlafon(grossNew, item.selectedTenor, item.tipe_pinjaman, 'NEW');
 
                 const feesNew = calculateCreditFees(
-                    grossNew, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranNew, 0, 0
+                    grossNew, item.selectedTenor, item.tipe_pinjaman, item.cifRef.status_pegawai, item.cifRef.tenorRules.usiaTahun, 0, angsuranNew, 0, 0, 'NEW'
                 );
                 item.potensiNew = feesNew.netPencairan;
             }
@@ -3290,6 +3295,10 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
             const bungaBerjalan = isMengulang ? item.bunga_berjalan : 0;
             const musisiAsuransi = isMengulang ? item.musisi_asuransi : 0;
 
+            const jenisPenawaranDetail =
+                isMengulang ? 'MENGULANG' :
+                (isTopUp ? 'TOPUP' : 'NEW');
+
             const fees = calculateCreditFees(
                 plafonGross,
                 tenor,
@@ -3299,7 +3308,8 @@ biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
                 bakiDebet,
                 angsuranBaru,
                 bungaBerjalan,
-                musisiAsuransi
+                musisiAsuransi,
+                jenisPenawaranDetail
             );
 
             const headerEl = document.getElementById('modalDetailHeader');
