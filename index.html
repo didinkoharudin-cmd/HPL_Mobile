@@ -1492,7 +1492,7 @@ body.v15-mobile-admin-active #viewAdmin button{
         <i class="fa-solid fa-chart-pie"></i><b>Dashboard & Grafik</b><span>Monitoring AO, distribusi dan potensi NEW/TOP-UP/MENGULANG.</span>
       </button>
       <button class="v12-action" type="button" onclick="v12OpenAdmin('parameter')">
-        <i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Atur tarif, tenor, provisi, asuransi dan parameter produk.</span>
+        <i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Atur tarif, tenor, , asuransi dan parameter produk.</span>
       </button>
       <button class="v12-action" type="button" onclick="v12OpenAdmin('ao')">
         <i class="fa-solid fa-user-tie"></i><b>Tampilan AO</b><span>Masuk ke aplikasi AO setelah database siap.</span>
@@ -1547,7 +1547,7 @@ body.v15-mobile-admin-active #viewAdmin button{
     <div class="v12-mobile-admin-grid">
       <button type="button" data-mobile-admin-target="source"><i class="fa-solid fa-database"></i><b>Sumber Database</b><span>Google Script atau Upload Manual</span></button>
       <button type="button" data-mobile-admin-target="dashboard"><i class="fa-solid fa-chart-pie"></i><b>Dashboard & Grafik</b><span>Monitoring AO dan distribusi</span></button>
-      <button type="button" data-mobile-admin-target="parameter"><i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Tarif, bunga, provisi, asuransi</span></button>
+      <button type="button" data-mobile-admin-target="parameter"><i class="fa-solid fa-sliders"></i><b>Setting Parameter</b><span>Tarif, bunga, , asuransi</span></button>
       <button type="button" data-mobile-admin-target="ao"><i class="fa-solid fa-user-tie"></i><b>Tampilan AO</b><span>Kembali ke aplikasi AO</span></button>
     </div>
     <div class="v12-mobile-admin-note"><i class="fa-solid fa-circle-info"></i><span>Pada HP, fungsi Admin dibuka sebagai halaman penuh agar semua tombol dapat disentuh dengan normal.</span></div>
@@ -2081,7 +2081,7 @@ body.v15-mobile-admin-active #viewAdmin button{
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <i class="fa-solid fa-coins text-amber-600"></i> Pengaturan Tarif & Biaya-Biaya Kredit
                         </h3>
-                        <p class="text-xs text-slate-500">Pengaturan biaya provisi, jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
+                        <p class="text-xs text-slate-500">Pengaturan biaya , jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="resetFeeParamsToDefault()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition">
@@ -3039,14 +3039,16 @@ body.v15-mobile-admin-active #viewAdmin button{
                 };
             }
 
-            // 1. Biaya Provisi
-            const pLow = (feeParams.provisiLow || 0.2) / 100;
-            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
-            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
-            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-            const biayaProvisi = Math.round(
-                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
-            );
+             // 1. Biaya Provisi
+            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+
+tarifProvisi =
+    tenorBulan < 84
+        ? 0.02 / 100
+        : 0.15 / 100;
+
+biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
+
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
