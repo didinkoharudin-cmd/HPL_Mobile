@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Analisis Kredit - Kredit Konsumer</title>
+    <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (XLSX) CDN -->
@@ -925,40 +925,73 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
 </script>
 
 
-<style id="mobile-v9-pages-css">
-@media(max-width:768px){
-#mobileV9Pages{display:block!important;padding:0 12px 95px!important}
-.mobileV9Page{display:none!important}.mobileV9Page.active{display:block!important}
-.mobileV9Hero{padding:14px 2px 8px}.mobileV9Hero h2{margin:0!important;font-size:21px!important}.mobileV9Hero p{margin:5px 0 0;color:#718096;font-size:12px}
-.mobileV9Grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.mobileV9Stat{background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:17px;padding:13px;box-shadow:0 7px 22px rgba(15,23,42,.06)}
-.mobileV9Stat small{display:block;color:#718096;font-size:11px;margin-bottom:5px}.mobileV9Stat strong{font-size:20px}
-.mobileV9Section{margin-top:12px;background:#fff;border-radius:18px;border:1px solid rgba(15,23,42,.07);padding:13px;box-shadow:0 7px 22px rgba(15,23,42,.05)}
-.mobileV9Section h3{margin:0 0 9px;font-size:14px}.mobileV9Announcement{min-height:145px;border:1.5px dashed #cbd5e1;border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;color:#94a3b8;padding:18px}
-.mobileV9List{display:flex;flex-direction:column;gap:8px}.mobileV9Item{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:12px;box-shadow:0 5px 18px rgba(15,23,42,.05);cursor:pointer}
-.mobileV9ItemTop{display:flex;justify-content:space-between;gap:8px;align-items:center}.mobileV9ItemName{font-weight:750;font-size:14px}
-.mobileV9Badge{font-size:10px;padding:4px 7px;border-radius:99px;background:#eff6ff;color:#2563eb}.mobileV9Meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
-.mobileV9Meta span{font-size:11px;color:#64748b}.mobileV9Meta b{display:block;color:#172033;font-size:12px;margin-top:2px}.mobileV9Empty{padding:30px 12px;text-align:center;color:#94a3b8}
-.mobileV9FilterGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mobileV9FilterGrid label{font-size:11px;color:#64748b}
-.mobileV9FilterGrid input,.mobileV9FilterGrid select{width:100%;box-sizing:border-box;margin-top:4px;background:#f8fafc;border:1px solid #e2e8f0}
-#mobileV9Whatsapp{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;z-index:99995;display:none;width:min(78vw,330px);height:54px;border:0!important;border-radius:28px!important;background:#16a34a!important;color:#fff!important;box-shadow:0 10px 30px rgba(22,163,74,.35);font-size:15px!important;font-weight:750!important}
-#mobileV9Whatsapp.show{display:block}
+<style id="modern-mobile-app-v8">
+@media (max-width:768px){
+:root{--mbg:#f5f7fb;--mcard:rgba(255,255,255,.96);--mborder:rgba(15,23,42,.08);--mtext:#172033;--mmuted:#718096;--mprimary:#2563eb}
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;background:var(--mbg)!important;-webkit-tap-highlight-color:transparent}
+body{margin:0!important;padding:0 0 82px!important;font-size:14px!important;color:var(--mtext)}
+header,.header,.topbar,.navbar,.app-header{transition:transform .25s ease,opacity .25s ease,box-shadow .25s ease}
+body.mobile-header-hidden header,body.mobile-header-hidden .header,body.mobile-header-hidden .topbar,body.mobile-header-hidden .navbar,body.mobile-header-hidden .app-header{transform:translateY(-110%);opacity:.15;pointer-events:none}
+main,.container,.content,.main-content,.dashboard,.page-content{width:100%!important;max-width:none!important;box-sizing:border-box!important}
+main,.main-content,.dashboard,.page-content{padding:12px!important}
+h1{font-size:21px!important;line-height:1.2!important;margin:8px 0 12px!important}
+h2{font-size:17px!important;margin:10px 0 8px!important}
+.card,.panel,.dashboard-card,.stat-card,.section-card,.debtor-card,.facility-card{border:1px solid var(--mborder)!important;border-radius:18px!important;box-shadow:0 8px 30px rgba(15,23,42,.07)!important;background:var(--mcard)!important;margin-bottom:12px!important}
+button,.btn,input,select{min-height:40px!important;border-radius:12px!important;font-size:13px!important}
+button{padding:8px 12px!important}
+.filters,.filter-row,.toolbar,.actions,.action-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:8px 0!important}
+.table-container,.table-responsive,.data-table-wrap,.table-wrapper{width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;border-radius:14px}
+table{min-width:680px;font-size:11px!important}th,td{padding:7px 8px!important;white-space:nowrap}
+.stats,.stat-grid,.dashboard-stats,.summary-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.stat-card{padding:12px!important;min-height:72px!important}
+#modernMobileNavV8{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:99990;height:62px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:6px;border:1px solid rgba(255,255,255,.7);border-radius:20px;background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(15,23,42,.16)}
+#modernMobileNavV8 button{border:0!important;background:transparent!important;color:#718096!important;min-height:48px!important;padding:3px!important;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;font-size:10px!important;font-weight:600}
+#modernMobileNavV8 button.active{color:var(--mprimary)!important;background:rgba(37,99,235,.09)!important}
+#modernMobileNavV8 .nav-icon{font-size:20px;line-height:20px}
+.modal,.dialog,.drawer,.detail-panel{max-width:calc(100vw - 20px)!important;border-radius:20px!important}
+.desktop-only{display:none!important}
 }
-@media(min-width:769px){#mobileV9Pages,#mobileV9Whatsapp{display:none!important}}
+@media (max-width:900px) and (orientation:landscape){
+#modernMobileNavV8{height:52px;bottom:6px}
+#modernMobileNavV8 button{min-height:40px!important;flex-direction:row;gap:5px;font-size:10px!important}
+body{padding-bottom:64px!important}
+}
 </style>
 
-
-<style id="v9fixcss">
+<style id="v9-mobile-app">
 @media(max-width:768px){
- body{padding-bottom:76px!important}
- body.mobileV9RealPages #mobileV9Pages{display:block!important}
- body.mobileV9RealPages header,body.mobileV9RealPages main{display:none!important}
- #mobileV9Pages{padding:10px 12px 90px!important;min-height:100dvh;background:#f8fafc}
- .mobileV9Page{display:none!important}.mobileV9Page.active{display:block!important}
- #mobileV9Whatsapp{bottom:84px!important}
+body{background:#f5f8fc!important;padding-bottom:92px!important}
+#mobileV9Home{display:block!important}
+.v9-shell{min-height:calc(100vh - 20px);padding:14px 14px 105px}
+.v9-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.v9-user{display:flex;align-items:center;gap:10px}.v9-avatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#2563eb,#4f46e5);color:#fff;font-size:19px}
+.v9-user b{display:block;font-size:14px}.v9-user span{font-size:11px;color:#64748b}.v9-exit{width:40px;height:40px;border:0;border-radius:13px;background:#fff;color:#ef4444;box-shadow:0 5px 18px rgba(15,23,42,.08)}
+.v9-greeting h1{font-size:24px!important;margin:0!important}.v9-greeting p{margin:4px 0 13px;color:#64748b;font-size:12px}
+.v9-access{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}.v9-access button{border:0;border-radius:18px;background:#fff;padding:14px 7px;box-shadow:0 7px 22px rgba(15,23,42,.07);color:#475569;font-size:11px;font-weight:700}.v9-access i{display:grid;place-items:center;width:42px;height:42px;margin:0 auto 7px;border-radius:14px;background:#eef2ff;color:#4f46e5;font-size:18px}
+.v9-page{display:none}.v9-page.active{display:block}.v9-title{font-size:19px;font-weight:800;margin:5px 2px 12px}
+.v9-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.v9-card,.v9-panel{background:#fff;border-radius:18px;border:1px solid #edf2f7;box-shadow:0 7px 22px rgba(15,23,42,.06)}.v9-card{padding:13px}.v9-card small{color:#64748b;font-size:10px}.v9-card strong{display:block;margin-top:5px;font-size:18px}.v9-panel{padding:14px;margin-top:11px}.v9-panel h3{font-size:13px;margin:0 0 10px}
+.v9-list{display:grid;gap:8px}.v9-debtor{border:1px solid #e5eaf1;background:#fff;border-radius:16px;padding:12px}.v9-debtor .top{display:flex;justify-content:space-between;gap:8px}.v9-debtor b{font-size:13px}.v9-chip{font-size:9px;border-radius:999px;padding:4px 7px;background:#eef2ff;color:#4338ca}.v9-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.v9-grid span{font-size:10px;color:#64748b}.v9-grid strong{display:block;color:#1e293b;font-size:11px;margin-top:2px}
+.v9-filters{display:grid;gap:9px}.v9-filters label{font-size:10px;color:#64748b;font-weight:600}.v9-filters select,.v9-filters input{width:100%;margin-top:4px;border:1px solid #dbe3ee;border-radius:11px;padding:10px;background:#f8fafc;font-size:12px}
+#v9Whatsapp{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:100001;width:66px;height:66px;border:0;border-radius:50%;background:#16a34a;color:#fff;box-shadow:0 10px 30px rgba(22,163,74,.4);display:none;font-size:28px}#v9Whatsapp.show{display:grid;place-items:center}
+#v9BottomNav{position:fixed;left:10px;right:10px;bottom:max(8px,env(safe-area-inset-bottom));height:64px;z-index:100000;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;padding:5px;border-radius:21px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(15,23,42,.16)}
+#v9BottomNav button{border:0;background:transparent;color:#64748b;height:54px;border-radius:16px;font-size:10px;font-weight:700}#v9BottomNav button i{display:block;font-size:19px;margin-bottom:3px}.v9-nav-active{color:#2563eb!important;background:#eff6ff!important}
+#v9BottomNav .wa-nav{margin-top:-28px;width:66px;height:66px;border-radius:50%;background:#16a34a;color:#fff;box-shadow:0 10px 26px rgba(22,163,74,.35);border:5px solid #f5f8fc;font-size:25px}#v9BottomNav .wa-nav i{font-size:25px;margin:0}
+#modernMobileNavV8{display:none!important}
 }
+@media(min-width:769px){#mobileV9Home,#v9BottomNav,#v9Whatsapp{display:none!important}}
 </style>
 </head>
+<div id="mobileV9Home">
+<div class="v9-shell">
+<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div><button class="v9-exit" id="v9Exit"><i class="fa-solid fa-right-from-bracket"></i></button></div>
+<div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Analisis Kredit Presisi</p></div>
+<div class="v9-access"><button data-v9-access="admin"><i class="fa-solid fa-user-shield"></i>Admin</button><button data-v9-access="ao"><i class="fa-solid fa-user-tie"></i>AO</button><button data-v9-access="exit"><i class="fa-solid fa-power-off"></i>Exit</button></div>
+<section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
+<section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
+<section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option>Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option>Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option>Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option>Semua AO</option></select></label><label>Pencarian<input id="v9FilterSearch" placeholder="Nama / CIF / No. Pinjaman"></label></div></div></section>
+</div></div>
+<button id="v9Whatsapp" title="Kirim WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+<nav id="v9BottomNav"><button data-v9-page="home" class="v9-nav-active"><i class="fa-solid fa-house"></i>Home</button><button data-v9-page="debitur"><i class="fa-solid fa-users"></i>Debitur</button><button class="wa-nav" id="v9WaNav"><i class="fa-brands fa-whatsapp"></i></button><button data-v9-page="menu"><i class="fa-solid fa-sliders"></i>Menu</button></nav>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
 
@@ -2413,7 +2446,7 @@ window.DATABASE_LOAD_TIMEOUT_MS = 300000;
                 };
             }
 
-            // 1. Biaya Provisi
+             // 1. Biaya Provisi
             jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
 
 tarifProvisi =
@@ -2423,6 +2456,7 @@ tarifProvisi =
 
 biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
 
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -4804,84 +4838,42 @@ window.hideDatabaseProgressV6 = function() {
 </script>
 
 
-<script id="mobile-v9-pages-js">
+<script id="modern-mobile-app-v8-js">
 (function(){
 'use strict';
 if(window.innerWidth>768)return;
-function pick(o,keys){for(var i=0;i<keys.length;i++){var k=keys[i];if(o&&o[k]!=null&&o[k]!=='')return o[k];}return'';}
-function money(v){return 'Rp '+(Number(v)||0).toLocaleString('id-ID');}
-function rows(){
- var names=['kreditRawData','kreditData','loanDatabase','loansDatabase','cifDatabase','allDebtors','filteredData'];
- for(var i=0;i<names.length;i++){var x=window[names[i]];if(Array.isArray(x))return x;if(x&&typeof x==='object')return Object.values(x);}
- return [];
-}
-function render(list,mode){
- var r=rows().slice();
- if(mode==='potensial')r.sort(function(a,b){return (Number(pick(b,['nett','NETT','potensi_nett','nett_potensi','net_pencairan']))||0)-(Number(pick(a,['nett','NETT','potensi_nett','nett_potensi','net_pencairan']))||0);});
- if(!r.length){list.innerHTML='<div class="mobileV9Empty">Data belum tersedia atau belum selesai dimuat.</div>';return;}
- list.innerHTML=r.slice(0,100).map(function(o,i){
-  return '<div class="mobileV9Item" data-i="'+i+'"><div class="mobileV9ItemTop"><div class="mobileV9ItemName">'+String(pick(o,['nama','NAMA','nama_debitur','NAMA_DEBITUR','debitur'])||'Debitur')+'</div><span class="mobileV9Badge">'+String(pick(o,['jenis_pengajuan','JENIS_PENGAJUAN','tipe_pinjaman','TIPE_PINJAMAN','produk','PRODUK'])||'ANALISA')+'</span></div><div class="mobileV9Meta"><span>CIF<b>'+String(pick(o,['cif','CIF'])||'-')+'</b></span><span>Kode AO<b>'+String(pick(o,['kode_ao','KODE_AO','kodeAO','AO'])||'-')+'</b></span><span>Produk<b>'+String(pick(o,['tipe_pinjaman','TIPE_PINJAMAN','produk','PRODUK'])||'-')+'</b></span><span>Potensi NETT<b>'+money(pick(o,['nett','NETT','potensi_nett','nett_potensi','net_pencairan']))+'</b></span></div></div>';
- }).join('');
-}
-function go(page){
- document.querySelectorAll('.mobileV9Page').forEach(function(x){x.classList.remove('active');});
- var p=document.getElementById('mobileV9-'+page);if(p)p.classList.add('active');
- document.querySelectorAll('#modernMobileNavV8 button').forEach(function(b){b.classList.toggle('active',b.dataset.v9page===page);});
- var w=document.getElementById('mobileV9Whatsapp');if(w)w.classList.remove('show');
- window.scrollTo({top:0,behavior:'smooth'});
- if(page==='debitur')render(document.getElementById('mobileV9DebiturList'),'potensial');
- if(page==='analisa')render(document.getElementById('mobileV9AnalisaList'),'all');
-}
-function build(){
- var old=document.getElementById('mobileV9Pages');if(old)old.remove();
- var wrap=document.createElement('div');wrap.id='mobileV9Pages';
- wrap.innerHTML='<section class="mobileV9Page active" id="mobileV9-beranda"><div class="mobileV9Hero"><h2>Beranda</h2><p>Dashboard Analisa Kredit</p></div><div class="mobileV9Grid"><div class="mobileV9Stat"><small>Total Data</small><strong id="v9Total">0</strong></div><div class="mobileV9Stat"><small>Potensi NETT</small><strong id="v9Nett">Rp 0</strong></div></div><div class="mobileV9Section"><h3>Dashboard</h3><div class="mobileV9Empty">Ringkasan dashboard utama.</div></div><div class="mobileV9Section"><h3>Pengumuman</h3><div class="mobileV9Announcement">Area Pengumuman<br><small>Pengumuman akan ditampilkan di sini.</small></div></div></section>'+
- '<section class="mobileV9Page" id="mobileV9-debitur"><div class="mobileV9Hero"><h2>Debitur Potensial</h2><p>Prioritas berdasarkan potensi NETT tertinggi</p></div><div id="mobileV9DebiturList" class="mobileV9List"></div></section>'+
- '<section class="mobileV9Page" id="mobileV9-analisa"><div class="mobileV9Hero"><h2>Analisa</h2><p>Rincian analisa seluruh debitur</p></div><div id="mobileV9AnalisaList" class="mobileV9List"></div></section>'+
- '<section class="mobileV9Page" id="mobileV9-menu"><div class="mobileV9Hero"><h2>Menu</h2><p>Filter data analisa</p></div><div class="mobileV9Section"><div class="mobileV9FilterGrid"><label>Produk<select><option>Semua Produk</option></select></label><label>Jenis Pengajuan<select><option>Semua Jenis</option></select></label><label>Status<select><option>Semua Status</option></select></label><label>Kode AO<select><option>Semua AO</option></select></label></div></div></section>';
- var nav=document.getElementById('modernMobileNavV8');
- if(nav)nav.parentNode.insertBefore(wrap,nav);else document.body.appendChild(wrap);
- var labels=['beranda','debitur','analisa','menu'];
- document.querySelectorAll('#modernMobileNavV8 button').forEach(function(b,i){b.dataset.v9page=labels[i];b.onclick=function(){go(labels[i]);};});
- var wa=document.getElementById('mobileV9Whatsapp')||document.createElement('button');wa.id='mobileV9Whatsapp';wa.type='button';wa.textContent='WhatsApp Debitur';document.body.appendChild(wa);
- wrap.addEventListener('click',function(e){var item=e.target.closest('.mobileV9Item');if(!item)return;var r=rows()[Number(item.dataset.i)];wa.classList.add('show');wa.onclick=function(){var ph=pick(r,['no_hp','NO_HP','telepon','TELEPON','whatsapp','WHATSAPP']);if(ph){ph=String(ph).replace(/\D/g,'');if(ph.indexOf('0')===0)ph='62'+ph.slice(1);location.href='https://wa.me/'+ph;}};});
- var r=rows(),t=document.getElementById('v9Total'),n=document.getElementById('v9Nett');
- if(t)t.textContent=r.length.toLocaleString('id-ID');
- if(n)n.textContent=money(r.reduce(function(s,o){return s+(Number(pick(o,['nett','NETT','potensi_nett','nett_potensi','net_pencairan']))||0)},0));
-}
-document.addEventListener('DOMContentLoaded',build,{once:true});
-window.addEventListener('load',function(){setTimeout(build,1200);});
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn,{once:true});else fn();}
+ready(function(){
+if(!document.getElementById('modernMobileNavV8')){
+const nav=document.createElement('nav');nav.id='modernMobileNavV8';nav.setAttribute('aria-label','Navigasi aplikasi mobile');
+[['⌂','Beranda'],['▣','Debitur'],['▤','Analisa'],['☰','Menu']].forEach(function(x,i){
+const b=document.createElement('button');b.type='button';b.innerHTML='<span class="nav-icon">'+x[0]+'</span><span>'+x[1]+'</span>';if(i===0)b.classList.add('active');
+b.onclick=function(){document.querySelectorAll('#modernMobileNavV8 button').forEach(y=>y.classList.remove('active'));b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});};
+nav.appendChild(b);});document.body.appendChild(nav);}
+let lastY=window.scrollY,ticking=false;
+window.addEventListener('scroll',function(){if(ticking)return;ticking=true;requestAnimationFrame(function(){const y=window.scrollY,d=y-lastY;if(Math.abs(d)>5){if(y>80&&d>0)document.body.classList.add('mobile-header-hidden');else if(d<0||y<30)document.body.classList.remove('mobile-header-hidden');}lastY=y;ticking=false;});},{passive:true});
+document.querySelectorAll('img,video,iframe').forEach(function(el){el.style.maxWidth='100%';el.style.height='auto';});
+const meta=document.querySelector('meta[name="viewport"]');if(meta)meta.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover');
+});
 })();
 </script>
 
-
-<script id="v9fixjs">
+<script id="v9-mobile-app-js">
 (function(){
- if(window.innerWidth>768)return;
- function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
- function money(v){return 'Rp '+(Number(v)||0).toLocaleString('id-ID');}
- function data(){return Array.isArray(window.loanDatabase)?window.loanDatabase:[];}
- function render(id,sort){
-  const box=document.getElementById(id), all=data().slice();
-  if(sort)all.sort((a,b)=>(Number(b.netPencairan)||0)-(Number(a.netPencairan)||0));
-  if(!all.length){box.innerHTML='<div class="mobileV9Empty">Data belum tersedia. Pastikan database sudah selesai dimuat.</div>';return;}
-  box.innerHTML=all.map((o,i)=>`<div class="mobileV9Item" data-loan="${esc(o.loan_id)}" data-i="${i}"><div class="mobileV9ItemTop"><div class="mobileV9ItemName">${esc(o.nama||'Debitur')}</div><span class="mobileV9Badge">${esc(o.tipe_pinjaman||'ANALISA')}</span></div><div class="mobileV9Meta"><span>CIF<b>${esc(o.cif||'-')}</b></span><span>No. Pinjaman<b>${esc(o.no_pinjaman||'-')}</b></span><span>Sumber<b>${esc(o.sumber_penghasilan||'-')}</b></span><span>Potensi NETT<b>${money(o.netPencairan)}</b></span></div></div>`).join('');
- }
- function go(p){document.querySelectorAll('.mobileV9Page').forEach(x=>x.classList.remove('active'));const el=document.getElementById('mobileV9-'+p);if(el)el.classList.add('active');document.querySelectorAll('#modernMobileNavV8 button').forEach((b,i)=>b.classList.toggle('active',['beranda','debitur','analisa','menu'][i]===p));document.getElementById('mobileV9Whatsapp')?.classList.remove('show');window.scrollTo(0,0);if(p==='debitur')render('mobileV9DebiturList',true);if(p==='analisa')render('mobileV9AnalisaList',false);}
- function init(){
-  document.body.classList.add('mobileV9RealPages');
-  const old=document.getElementById('mobileV9Pages');if(old)old.remove();
-  const wrap=document.createElement('div');wrap.id='mobileV9Pages';
-  wrap.innerHTML=`<section class="mobileV9Page active" id="mobileV9-beranda"><div class="mobileV9Hero"><h2>Beranda</h2><p>Dashboard Analisa Kredit</p></div><div class="mobileV9Grid"><div class="mobileV9Stat"><small>Total Fasilitas</small><strong id="v9Total">0</strong></div><div class="mobileV9Stat"><small>Total Potensi NETT</small><strong id="v9Nett">Rp 0</strong></div></div><div class="mobileV9Section"><h3>Dashboard</h3><div class="mobileV9Empty">Ringkasan dashboard utama</div></div><div class="mobileV9Section"><h3>Pengumuman</h3><div class="mobileV9Announcement">Belum ada pengumuman.</div></div></section><section class="mobileV9Page" id="mobileV9-debitur"><div class="mobileV9Hero"><h2>Debitur Potensial</h2><p>Diurutkan berdasarkan potensi NETT tertinggi</p></div><div id="mobileV9DebiturList" class="mobileV9List"></div></section><section class="mobileV9Page" id="mobileV9-analisa"><div class="mobileV9Hero"><h2>Analisa</h2><p>Seluruh fasilitas/debitur yang tersedia</p></div><div id="mobileV9AnalisaList" class="mobileV9List"></div></section><section class="mobileV9Page" id="mobileV9-menu"><div class="mobileV9Hero"><h2>Menu</h2><p>Filter dan pengaturan</p></div><div class="mobileV9Section"><h3>Filter</h3><div class="mobileV9FilterGrid"><label>Produk<select><option>Semua Produk</option></select></label><label>Jenis Pengajuan<select><option>Semua Jenis</option></select></label><label>Status<select><option>Semua Status</option></select></label><label>Kode AO<select><option>Semua AO</option></select></label></div></div></section>`;
-  document.body.appendChild(wrap);
-  let nav=document.getElementById('modernMobileNavV8');if(!nav){nav=document.createElement('nav');nav.id='modernMobileNavV8';document.body.appendChild(nav);}
-  const labels=[['⌂','Beranda','beranda'],['▣','Debitur Potensial','debitur'],['▤','Analisa','analisa'],['☰','Menu','menu']];nav.innerHTML=labels.map((x,i)=>`<button type="button" class="${i===0?'active':''}" data-v9page="${x[2]}"><span class="nav-icon">${x[0]}</span><span>${x[1]}</span></button>`).join('');nav.querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.v9page));
-  let wa=document.getElementById('mobileV9Whatsapp');if(!wa){wa=document.createElement('button');wa.id='mobileV9Whatsapp';wa.textContent='WhatsApp Debitur';document.body.appendChild(wa);}
-  wrap.addEventListener('click',e=>{const item=e.target.closest('.mobileV9Item');if(!item)return;const loan=data().find(x=>String(x.loan_id)===item.dataset.loan);if(typeof window.openDebtorModal==='function'&&loan){window.openDebtorModal(loan.loan_id);wa.classList.add('show');wa.onclick=()=>{const p=String(loan.no_hp||loan.whatsapp||'').replace(/\D/g,'');if(p)window.open('https://wa.me/'+(p.startsWith('0')?'62'+p.slice(1):p),'_blank');};}});
-  const refresh=()=>{const d=data();const t=document.getElementById('v9Total'),n=document.getElementById('v9Nett');if(t)t.textContent=d.length.toLocaleString('id-ID');if(n)n.textContent=money(d.reduce((s,x)=>s+(Number(x.netPencairan)||0),0));};
-  refresh();setTimeout(refresh,1000);setTimeout(refresh,3000);
- }
- document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
+function A(){for(const n of ['loanDatabase','cifDatabase','kreditData','filteredData']){const x=window[n];if(Array.isArray(x))return x;if(x&&typeof x==='object')return Object.values(x)}return[]}
+function V(o,k){for(const x of k)if(o&&o[x]!=null&&o[x]!=='')return o[x];return''}
+function M(v){return'Rp '+(Number(v)||0).toLocaleString('id-ID')}
+function render(){
+ const d=A(),t=document.getElementById('v9TotalDebitur'),n=document.getElementById('v9TotalNett'),l=document.getElementById('v9DebtorList');
+ if(t)t.textContent=d.length.toLocaleString('id-ID');
+ if(n)n.textContent=M(d.reduce((s,o)=>s+(Number(V(o,['nett','NETT','net_pencairan','potensi_nett']))||0),0));
+ if(!l)return;
+ l.innerHTML=d.length?d.map((o,i)=>`<div class="v9-debtor" data-i="${i}"><div class="top"><b>${V(o,['nama','NAMA','nama_debitur','NAMA_DEBITUR'])||'Debitur'}</b><span class="v9-chip">${V(o,['produk','PRODUK','tipe_pinjaman','TIPE_PINJAMAN'])||'Analisa'}</span></div><div class="v9-grid"><span>CIF<strong>${V(o,['cif','CIF'])||'-'}</strong></span><span>Kode AO<strong>${V(o,['kode_ao','KODE_AO','kodeAO'])||'-'}</strong></span><span>No. Pinjaman<strong>${V(o,['no_pinjaman','NO_PINJAMAN','loan_id'])||'-'}</strong></span><span>Potensi NETT<strong>${M(V(o,['nett','NETT','net_pencairan','potensi_nett']))}</strong></span></div></div>`).join(''):'<div style="text-align:center;color:#94a3b8;padding:25px">Database belum tersedia.</div>';
+}
+function go(p){document.querySelectorAll('.v9-page').forEach(x=>x.classList.remove('active'));document.getElementById('v9Page'+p[0].toUpperCase()+p.slice(1)).classList.add('active');document.querySelectorAll('#v9BottomNav [data-v9-page]').forEach(x=>x.classList.toggle('v9-nav-active',x.dataset.v9Page===p));document.getElementById('v9Whatsapp').classList.remove('show');if(p==='debitur')render();scrollTo(0,0)}
+function wa(){const o=window.v9Selected;if(!o)return alert('Pilih debitur terlebih dahulu.');let p=String(V(o,['no_hp','NO_HP','telepon','TELEPON','whatsapp','WHATSAPP'])||'').replace(/\D/g,'');if(!p)return alert('Nomor WhatsApp debitur tidak tersedia.');if(p[0]==='0')p='62'+p.slice(1);location.href='https://wa.me/'+p}
+function init(){render();document.querySelectorAll('#v9BottomNav [data-v9-page]').forEach(b=>b.onclick=()=>go(b.dataset.v9Page));document.getElementById('v9WaNav').onclick=wa;document.getElementById('v9Whatsapp').onclick=wa;document.getElementById('v9Exit').onclick=()=>typeof logout==='function'?logout():location.reload();document.getElementById('v9DebtorList').onclick=e=>{const x=e.target.closest('.v9-debtor');if(!x)return;window.v9Selected=A()[+x.dataset.i];document.getElementById('v9Whatsapp').classList.add('show');if(typeof openDebtorModal==='function'){const id=V(window.v9Selected,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']);if(id)openDebtorModal(id)}}}
+document.addEventListener('DOMContentLoaded',init,{once:true});window.addEventListener('load',()=>setTimeout(init,1200));
 })();
 </script>
 </body>
