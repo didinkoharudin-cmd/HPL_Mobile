@@ -2370,7 +2370,7 @@ body.app-locked > main { display:none !important; }
             const pLow = (feeParams.provisiLow || 0.2) / 100;
             const pHigh = (feeParams.provisiHigh || 1.5) / 100;
             const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
-            const biayaProvisi = Math.ceil(plafonGross * tarifProvisi);
+            const biayaProvisi = Math.ceil((tenorBulan / 12) * plafonGross * tarifProvisi);
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
