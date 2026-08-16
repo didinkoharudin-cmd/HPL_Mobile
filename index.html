@@ -4,6 +4,7 @@
 <!-- V17 STABLE BASE: preserve proven mobile database loading and admin routing. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- V17 V3: selected-offer WA flow, tenor editor, preview, same-tab -->
     <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -4005,9 +4006,25 @@ body.v15-mobile-admin-active #viewAdmin button{
 
         function closeDebtorModal() {
             document.getElementById('debtorModal').classList.add('hidden');
+
+            try{
+                document.querySelectorAll('input[name="offerType"]').forEach(r=>r.disabled=false);
+                const offerBlock=document.querySelector('input[name="offerType"]')?.closest('.grid > div');
+                if(offerBlock) offerBlock.style.display='';
+
+                const gross=document.querySelector('input[name="nominalType"][value="GROSS"]');
+                if(gross) gross.disabled=false;
+                const nominalBlock=document.querySelector('input[name="nominalType"]')?.closest('.grid > div');
+                if(nominalBlock) nominalBlock.style.display='';
+
+                const targetBlock=document.getElementById('modalLoanTarget')?.closest('.grid > div');
+                if(targetBlock) targetBlock.style.display='';
+
+                window.v9WaOnlyMode=false;
+            }catch(e){}
         }
 
-        function updateWaPreview() {
+function updateWaPreview() {
             const loanTargetVal = document.getElementById('modalLoanTarget').value;
             const offerType = document.querySelector('input[name="offerType"]:checked').value;
             const nominalType = document.querySelector('input[name="nominalType"]:checked').value;
@@ -4132,25 +4149,34 @@ body.v15-mobile-admin-active #viewAdmin button{
         }
 
         function sendWaDirect() {
-            const targetItem = loanDatabase.find(l => l.loan_id === selectedLoanId);
+            const targetItem = loanDatabase.find(l => String(l.loan_id) === String(selectedLoanId));
             if (!targetItem || !targetItem.cifRef || !targetItem.cifRef.no_hp) {
                 alert("Nomor WhatsApp/HP debitur tidak tersedia!");
                 return;
             }
 
             const message = document.getElementById('waPreviewText')?.value || '';
+            if (!message.trim()) {
+                alert("Preview pesan WhatsApp belum tersedia.");
+                return;
+            }
+
             saveOfferActivity(targetItem, message);
 
-            const waUrl = `https://wa.me/${targetItem.cifRef.no_hp}?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
+            let phone = String(targetItem.cifRef.no_hp || '').replace(/\D/g, '');
+            if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-            // Perbarui halaman My Activity segera setelah tombol penawaran diklik.
+            const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+            // Gunakan halaman/tab yang sama, bukan membuka tab baru.
+            window.location.href = waUrl;
+
             try {
                 if (typeof window.renderV9Activity === 'function') window.renderV9Activity();
             } catch (e) {}
         }
 
-        // --- EXCEL TEMPLATE DOWNLOADERS ---
+// --- EXCEL TEMPLATE DOWNLOADERS ---
         function downloadTemplateKredit() {
             const sampleData = [
                 { "No Pinjaman": "PK-2021-001", "CIF": "CIF001", "Tipe Pinjaman": "G6B", "Tanggal Mulai": "2021-01-15", "Tanggal Berakhir": "2026-01-15", "Baki Debet": 45000000, "Bunga Berjalan": 487500, "Musisi Asuransi": 250000, "Angsuran Eksisting": 2000000, "No HP": "081234567890" },
@@ -5998,22 +6024,52 @@ function openWhatsapp(){
     go('debitur');
     return;
   }
+
   const targetItem=getLoans().find(l=>String(l.loan_id)===String(selectedLoanId));
-  const phone=String(targetItem?.cifRef?.no_hp || targetItem?.no_hp || '').replace(/\D/g,'');
-  if(!phone){ alert('Nomor WhatsApp/HP debitur tidak tersedia.'); return; }
-  if(typeof updateWaPreview==='function'){
-    try{
-      if(!document.querySelector('input[name="offerType"]:checked')){
-        const top=document.querySelector('input[name="offerType"][value="TOPUP"]'); if(top) top.checked=true;
-      }
-      updateWaPreview();
-    }catch(e){}
+  if(!targetItem){
+    alert('Data debitur tidak ditemukan.');
+    return;
   }
-  const message=document.getElementById('waPreviewText')?.value || ('Assalamualaikum, Yth. Bapak/Ibu '+(targetItem?.nama||'Debitur')+', saya Didin dari Bank bjb. Ijin menginformasikan penawaran kredit.');
-  if(typeof saveOfferActivity==='function') { try{ saveOfferActivity(targetItem,message); }catch(e){} }
-  let p=phone; if(p.startsWith('0')) p='62'+p.slice(1);
-  window.open('https://wa.me/'+p+'?text='+encodeURIComponent(message),'_blank');
-  try{ renderV9Activity(); }catch(e){}
+
+  const offerType=String(window.v9SelectedOfferType || targetItem.__offerType || '').toUpperCase();
+  if(!offerType){
+    alert('Pilih baris penawaran terlebih dahulu (NEW / TOP-UP / MENGULANG).');
+    return;
+  }
+
+  try{
+    window.v9WaOnlyMode=true;
+    window.v9SelectedOfferType=offerType;
+
+    if(typeof openDebtorModal==='function'){
+      openDebtorModal(String(targetItem.loan_id || selectedLoanId));
+    }
+
+    document.querySelectorAll('input[name="offerType"]').forEach(r=>{
+      r.checked=(String(r.value).toUpperCase()===offerType);
+      r.disabled=true;
+    });
+
+    const offerBlock=document.querySelector('input[name="offerType"]')?.closest('.grid > div');
+    if(offerBlock) offerBlock.style.display='none';
+
+    const net=document.querySelector('input[name="nominalType"][value="NET"]');
+    const gross=document.querySelector('input[name="nominalType"][value="GROSS"]');
+    if(net) net.checked=true;
+    if(gross) gross.disabled=true;
+
+    const nominalBlock=document.querySelector('input[name="nominalType"]')?.closest('.grid > div');
+    if(nominalBlock) nominalBlock.style.display='none';
+
+    const targetBlock=document.getElementById('modalLoanTarget')?.closest('.grid > div');
+    if(targetBlock) targetBlock.style.display='none';
+
+    if(typeof updateWaPreview==='function') updateWaPreview();
+  }catch(err){
+    console.error('openWhatsapp:',err);
+    window.v9WaOnlyMode=false;
+    alert('Editor WhatsApp tidak dapat dibuka.');
+  }
 }
 
 function accessButton(type){
@@ -6082,10 +6138,14 @@ function bind(){
     const action=e.target.closest('[data-action-loan-id]');
     const id=action?.dataset.actionLoanId || row.dataset.loanId;
     selectedLoanId=id;
+    window.v9SelectedOfferType=String(row.dataset.offerType || action?.dataset.actionOfferType || '').toUpperCase();
     window.v9Selected=getLoans().find(o=>String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']))===String(id)) || null;
     document.querySelectorAll('#v9DebtorList tbody tr[data-loan-id]').forEach(r=>r.classList.remove('v9-row-selected'));
     row.classList.add('v9-row-selected');
-    if(action){ openSelected({dataset:{loanId:id}}); }
+    if(action){
+      window.v9SelectedOfferType=String(action.dataset.actionOfferType || row.dataset.offerType || '').toUpperCase();
+      openSelected({dataset:{loanId:id}});
+    }
   });
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
