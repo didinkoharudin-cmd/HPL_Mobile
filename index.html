@@ -1145,6 +1145,25 @@ body{background:#f5f8fc!important;padding:0!important}
   .v12-mobile-admin-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:11px;border-radius:14px;background:#eef2ff;color:#475569;font-size:9px;line-height:1.45}.v12-mobile-admin-note i{color:#4f46e5;margin-top:1px}
   body.v12-mobile-admin-active #mobileV9Home{visibility:hidden!important;pointer-events:none!important}
 }
+
+/* V14 QUICK PRODUCT ACTIONS */
+@media(max-width:768px){
+  #mobileV9Home .v9-product-access{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px!important;margin:8px 0 10px!important}
+  #mobileV9Home .v9-product-access button{min-width:0!important;padding:8px 4px!important;border:1px solid #e2e8f0!important;border-radius:15px!important;background:#fff!important;box-shadow:0 5px 14px rgba(15,23,42,.07)!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;color:#334155!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
+  #mobileV9Home .v9-product-access button i{width:34px!important;height:34px!important;margin:0!important;border-radius:11px!important;display:grid!important;place-items:center!important;background:#eef2ff!important;color:#4f46e5!important;font-size:15px!important}
+  #mobileV9Home .v9-product-access button b{font-size:9px!important;line-height:1!important;font-weight:900!important}
+  #mobileV9Home .v9-product-access button span{font-size:7px!important;line-height:1.1!important;color:#64748b!important;text-align:center!important}
+  #mobileV9Home .v9-product-access button[data-v9-offer="TOP-UP"] i{background:#ecfdf5!important;color:#059669!important}
+  #mobileV9Home .v9-product-access button[data-v9-offer="MENGULANG"] i{background:#fff7ed!important;color:#ea580c!important}
+  #mobileV9Home .v9-product-access button[data-v9-access="exit"] i{background:#fef2f2!important;color:#dc2626!important}
+  #mobileV9Home .v9-product-access button:active{transform:scale(.96)!important}
+}
+@media(max-width:360px){
+  #mobileV9Home .v9-product-access{gap:5px!important}
+  #mobileV9Home .v9-product-access button{padding:7px 2px!important}
+  #mobileV9Home .v9-product-access button i{width:30px!important;height:30px!important;font-size:13px!important}
+  #mobileV9Home .v9-product-access button span{font-size:6.5px!important}
+}
 @media(max-width:390px){.v12-mobile-admin-grid{grid-template-columns:1fr}.v12-mobile-admin-grid button{min-height:112px}}
 </style>
 </head>
@@ -1152,9 +1171,14 @@ body{background:#f5f8fc!important;padding:0!important}
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 <div id="mobileV9Home">
 <div class="v9-shell">
-<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div><button class="v9-exit" id="v9Exit"><i class="fa-solid fa-right-from-bracket"></i></button></div>
-<div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Analisis Kredit Presisi</p></div>
-<div class="v9-access"><button data-v9-access="admin"><i class="fa-solid fa-user-shield"></i>Admin</button><button data-v9-access="ao"><i class="fa-solid fa-user-tie"></i>AO</button><button data-v9-access="exit"><i class="fa-solid fa-power-off"></i>Exit</button></div>
+<div class="v9-top"><div class="v9-user"><div class="v9-avatar"><i class="fa-solid fa-user"></i></div><div><b id="v9UserName">Pengguna</b><span id="v9UserRole">Hak akses</span></div></div></div>
+<div class="v9-greeting"><h1>Dashboard Kredit</h1><p>Potensi debitur berdasarkan jenis pengajuan</p></div>
+<div class="v9-access v9-product-access">
+  <button data-v9-offer="NEW" title="Potensi Debitur NEW"><i class="fa-solid fa-user-plus"></i><b>NEW</b><span>Debitur Baru</span></button>
+  <button data-v9-offer="TOP-UP" title="Potensi Debitur TOP-UP"><i class="fa-solid fa-arrow-up-right-dots"></i><b>TOP-UP</b><span>Tambah Plafon</span></button>
+  <button data-v9-offer="MENGULANG" title="Potensi Debitur MENGULANG"><i class="fa-solid fa-rotate"></i><b>MENGULANG</b><span>Renewal</span></button>
+  <button data-v9-access="exit" title="Keluar"><i class="fa-solid fa-power-off"></i><b>Exit</b><span>Keluar</span></button>
+</div>
 <section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
 <section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
 <section class="v9-page" id="v9PageMenu"><div class="v9-title">Menu & Filter</div><div class="v9-panel" style="margin-top:0"><div class="v9-filters"><label>Produk<select id="v9FilterProduk"><option value="">Semua Produk</option></select></label><label>Jenis Pengajuan<select id="v9FilterJenis"><option value="">Semua Jenis</option></select></label><label>Status<select id="v9FilterStatus"><option value="">Semua Status</option></select></label><label>Kode AO<select id="v9FilterAO"><option value="">Semua AO</option></select></label><label>Pencarian<input id="v9FilterSearch" placeholder="Nama / CIF / No. Pinjaman"></label></div></div></section>
@@ -2718,14 +2742,16 @@ body{background:#f5f8fc!important;padding:0!important}
                 };
             }
 
-            // 1. Biaya Provisi
-            const pLow = (feeParams.provisiLow || 0.2) / 100;
-            const pHigh = (feeParams.provisiHigh || 1.5) / 100;
-            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
-            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-            const biayaProvisi = Math.round(
-                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
-            );
+              // 1. Biaya Provisi
+            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+
+tarifProvisi =
+    tenorBulan < 84
+        ? 0.02 / 100
+        : 0.15 / 100;
+
+biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
+
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -5381,10 +5407,12 @@ const meta=document.querySelector('meta[name="viewport"]');if(meta)meta.setAttri
 </script>
 
 <script id="v9-mobile-app-js">
+// V14: mobile role routing is handled after login; home access buttons are quick product filters.
 (function(){
 'use strict';
 
 const ACTIVITY_KEY = 'analisaKredit_offerActivity_v1';
+let v9QuickOfferType = '';
 
 function getLoans(){
   try { return Array.isArray(loanDatabase) ? loanDatabase : []; }
@@ -5467,6 +5495,17 @@ function populateFilters(rows){
 
 function getFilteredLoans(){
   let rows=getLoans().slice();
+
+  // V14 quick product filter: NEW / TOP-UP / MENGULANG.
+  // These are derived from the same potential fields used by the credit analysis.
+  if(v9QuickOfferType==='NEW') {
+    rows=rows.filter(o=>Number(o.potensiNew||0)>0 || String(o.loan_id||'').toUpperCase().endsWith('_NEW'));
+  } else if(v9QuickOfferType==='TOP-UP') {
+    rows=rows.filter(o=>Number(o.potensiPlafonTopUp||0)>0 && !!o.facilityRef);
+  } else if(v9QuickOfferType==='MENGULANG') {
+    rows=rows.filter(o=>Boolean(o.isEligibleMengulang) && Number(o.potensiMengulang||0)>0);
+  }
+
   const p=document.getElementById('v9FilterProduk')?.value || '';
   const j=document.getElementById('v9FilterJenis')?.value || '';
   const s=document.getElementById('v9FilterStatus')?.value || '';
@@ -5487,6 +5526,15 @@ function getFilteredLoans(){
       return text.includes(q);
     });
   }
+
+  if(v9QuickOfferType){
+    const potential = o => {
+      if(v9QuickOfferType==='NEW') return Number(o.potensiNew||0);
+      if(v9QuickOfferType==='TOP-UP') return Number(o.potensiPlafonTopUp||0);
+      return Number(o.potensiMengulang||0);
+    };
+    rows.sort((a,b)=>potential(b)-potential(a));
+  }
   return rows;
 }
 
@@ -5504,6 +5552,15 @@ function renderDebtors(){
 
   const rows=getFilteredLoans();
   list.innerHTML='';
+
+  if(v9QuickOfferType){
+    const quickLabel = v9QuickOfferType==='TOP-UP' ? 'TOP-UP' : v9QuickOfferType;
+    const quick = document.createElement('div');
+    quick.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding:8px 10px;border-radius:11px;background:#eef2ff;color:#3730a3;font-size:10px;font-weight:800';
+    quick.innerHTML='<span><i class="fa-solid fa-filter"></i> Potensi '+escapeHtml(quickLabel)+'</span><button type="button" id="v9ClearQuickOffer" style="border:0;background:#fff;color:#64748b;border-radius:8px;padding:4px 7px;font-size:9px;font-weight:800">Semua</button>';
+    list.appendChild(quick);
+  }
+
   if(!rows.length){
     list.innerHTML='<div class="v9-empty">Tidak ada data debitur sesuai filter.</div>';
     return;
@@ -5691,18 +5748,28 @@ function accessButton(type){
     else if(typeof logout==='function') logout();
     return;
   }
-  if(type==='admin'){
-    if(!['ADMIN','SUPERVISOR'].includes(role)){
-      alert('Menu Admin hanya tersedia untuk Admin/Supervisor.');
-      return;
-    }
+
+  // V14: role routing happens immediately after login.
+  // The old Admin/AO shortcut is intentionally removed from the mobile home.
+  if(type==='admin' || type==='ao'){
     if(typeof v12RouteAfterLogin==='function') v12RouteAfterLogin(u);
-    return;
   }
-  if(type==='ao'){
-    if(typeof v12RouteAfterLogin==='function') v12RouteAfterLogin(u);
-    return;
-  }
+}
+
+function quickOffer(type){
+  const allowed=['NEW','TOP-UP','MENGULANG'];
+  type=String(type||'').toUpperCase();
+  if(!allowed.includes(type)) return;
+  v9QuickOfferType=type;
+
+  // Move directly to the debtor potential list.
+  go('debitur');
+  renderDebtors();
+}
+
+function clearQuickOffer(){
+  v9QuickOfferType='';
+  renderDebtors();
 }
 
 function bind(){
@@ -5719,10 +5786,18 @@ function bind(){
     btn.addEventListener('click',()=>accessButton(btn.dataset.v9Access));
   });
 
+  document.querySelectorAll('[data-v9-offer]').forEach(btn=>{
+    btn.addEventListener('click',()=>quickOffer(btn.dataset.v9Offer));
+  });
+
   document.getElementById('v9WaNav')?.addEventListener('click',openWhatsapp);
   document.getElementById('v9ExportActivity')?.addEventListener('click',exportActivityExcel);
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
+    if(e.target.closest('#v9ClearQuickOffer')){
+      clearQuickOffer();
+      return;
+    }
     const row=e.target.closest('tr[data-loan-id]');
     if(!row) return;
     const id=e.target.closest('[data-action-loan-id]')?.dataset.actionLoanId || row.dataset.loanId;
