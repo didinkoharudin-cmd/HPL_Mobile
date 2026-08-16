@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- V17 V4: stable base; WA selected-row + tenor preview + NEW fix -->
-    <!-- V17 V5: stable base; WA tenor + gross editor + preview -->
+    <!-- V17 V6: V5 stable base + mobile WA modal z-index/layer fix -->
     <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1281,6 +1281,72 @@ body.v15-mobile-admin-active #viewAdmin button{
   #v15AdminMobileBar{display:none!important}
 }
 </style>
+
+<style id="v17-v6-wa-modal-layer-fix">
+/* =========================================================
+   V17 V6 — MOBILE MODAL LAYER FIX
+   Mobile shell uses z-index 90000 and bottom nav 100001.
+   The original V17 debtor modal used Tailwind z-50, so it
+   opened BEHIND the mobile app and looked like the WA button
+   did nothing. Raise only modal layers; no database logic changed.
+   ========================================================= */
+@media (max-width: 768px) {
+  #debtorModal {
+    z-index: 100300 !important;
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex;
+  }
+
+  #debtorModal.hidden {
+    display: none !important;
+  }
+
+  #debtorModal > div {
+    position: relative !important;
+    z-index: 100301 !important;
+    max-height: calc(100dvh - 10px) !important;
+  }
+
+  #mengulangDetailModal {
+    z-index: 100400 !important;
+    position: fixed !important;
+    inset: 0 !important;
+  }
+
+  #mengulangDetailModal.hidden {
+    display: none !important;
+  }
+
+  /* Modal must sit above bottom navigation while editing/sending WA. */
+  body:has(#debtorModal:not(.hidden)) #v9BottomNav {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Prevent the mobile app shell from intercepting modal taps. */
+  body:has(#debtorModal:not(.hidden)) #mobileV9Home {
+    pointer-events: none !important;
+  }
+
+  body:has(#debtorModal:not(.hidden)) #debtorModal,
+  body:has(#debtorModal:not(.hidden)) #debtorModal * {
+    pointer-events: auto !important;
+  }
+
+  /* Gross + tenor editor remains comfortable on portrait mobile. */
+  #debtorModal #waGrossEditorBlock input,
+  #debtorModal #modalTenorInput,
+  #debtorModal #modalTenorRange {
+    touch-action: manipulation !important;
+  }
+
+  #debtorModal #waPreviewText {
+    min-height: 115px !important;
+  }
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
