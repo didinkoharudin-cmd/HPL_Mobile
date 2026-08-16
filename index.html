@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- V17 V4: stable base; WA selected-row + tenor preview + NEW fix -->
-    <!-- V17 V9: V8 stable base + WA introduction uses logged-in KODE_AO -->
+    <!-- V17 V10: V9 stable base + income-source quick icons + calculated credit detail modal -->
     <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1366,6 +1366,53 @@ body.v15-mobile-admin-active #viewAdmin button{
 }
 </style>
 
+
+<style id="v17-v10-income-source-ui">
+@media(max-width:768px){
+  .v17-income-title{
+    display:flex;align-items:center;gap:6px;
+    margin:3px 2px 7px;
+    color:#64748b;font-size:10px;font-weight:900;
+    text-transform:uppercase;letter-spacing:.04em;
+  }
+  .v17-income-access{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:7px!important;margin-bottom:12px!important;
+  }
+  .v17-income-access button{
+    min-width:0!important;padding:9px 3px!important;
+    border-radius:15px!important;
+  }
+  .v17-income-access button i{
+    width:35px!important;height:35px!important;
+    font-size:15px!important;margin-bottom:5px!important;
+  }
+  .v17-income-access button b{
+    display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .v17-income-access button span{
+    display:block;font-size:7px;color:#94a3b8;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .v17-income-access button.v17-income-active{
+    background:#eff6ff!important;color:#1d4ed8!important;
+    box-shadow:0 0 0 2px rgba(37,99,235,.12),0 7px 22px rgba(15,23,42,.07)!important;
+  }
+  .v17-income-access button[data-v9-income="GAJI"] i{background:#ecfdf5!important;color:#059669!important}
+  .v17-income-access button[data-v9-income="SERTIFIKASI"] i{background:#fefce8!important;color:#ca8a04!important}
+  .v17-income-access button[data-v9-income="TPP"] i{background:#fff7ed!important;color:#ea580c!important}
+  .v17-income-access button[data-v9-income="SEMUA"] i{background:#eef2ff!important;color:#4f46e5!important}
+
+  #mengulangDetailModal{
+    z-index:100400!important;
+  }
+  #mengulangDetailModal.hidden{display:none!important}
+  body:has(#mengulangDetailModal:not(.hidden)) #v9BottomNav{
+    visibility:hidden!important;pointer-events:none!important;
+  }
+}
+</style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
@@ -1387,6 +1434,14 @@ body.v15-mobile-admin-active #viewAdmin button{
   <button data-v9-offer="TOP-UP" title="Potensi Debitur TOP-UP"><i class="fa-solid fa-arrow-up-right-dots"></i><b>TOP-UP</b><span>Tambah Plafon</span></button>
   <button data-v9-offer="MENGULANG" title="Potensi Debitur MENGULANG"><i class="fa-solid fa-rotate"></i><b>MENGULANG</b><span>Renewal</span></button>
   <button data-v9-access="exit" title="Keluar"><i class="fa-solid fa-power-off"></i><b>Exit</b><span>Keluar</span></button>
+</div>
+
+<div class="v17-income-title"><i class="fa-solid fa-wallet"></i> Sumber Penghasilan</div>
+<div class="v9-access v17-income-access">
+  <button data-v9-income="GAJI" title="Filter sumber penghasilan Gaji"><i class="fa-solid fa-money-bill-wave"></i><b>GAJI</b><span>Gaji Pokok</span></button>
+  <button data-v9-income="SERTIFIKASI" title="Filter sumber penghasilan Sertifikasi"><i class="fa-solid fa-certificate"></i><b>SERTIFIKASI</b><span>Tunjangan Sertifikasi</span></button>
+  <button data-v9-income="TPP" title="Filter sumber penghasilan TPP"><i class="fa-solid fa-coins"></i><b>TPP</b><span>TPP / Tukin</span></button>
+  <button data-v9-income="SEMUA" title="Tampilkan semua sumber penghasilan"><i class="fa-solid fa-layer-group"></i><b>SEMUA</b><span>Semua Sumber</span></button>
 </div>
 <section class="v9-page active" id="v9PageHome"><div class="v9-title">Home</div><div class="v9-cards"><div class="v9-card"><small>Total Debitur</small><strong id="v9TotalDebitur">0</strong></div><div class="v9-card"><small>Potensi NETT</small><strong id="v9TotalNett">Rp 0</strong></div></div><div class="v9-panel"><h3>Dashboard Kredit</h3><div style="font-size:11px;color:#64748b">Ringkasan mengikuti database yang sudah dimuat.</div></div></section>
 <section class="v9-page" id="v9PageDebitur"><div class="v9-title">Debitur</div><div class="v9-panel" style="margin-top:0"><div id="v9DebtorList" class="v9-list"></div></div></section>
@@ -3895,96 +3950,147 @@ body.v15-mobile-admin-active #viewAdmin button{
 
         // --- MODALS (RINCIAN BIAYA & DEBITUR WA) ---
         function openCreditDetailModal(loanId, mode = 'MENGULANG') {
-            const item = loanDatabase.find(l => l.loan_id === loanId);
+            const item = loanDatabase.find(l => String(l.loan_id) === String(loanId));
             if (!item) return;
 
-            const isMengulang = (mode === 'MENGULANG');
-            const isTopUp = (mode === 'TOPUP');
+            mode = normalizeWaOfferType(mode || 'TOPUP');
+            const isMengulang = mode === 'MENGULANG';
+            const isTopUp = mode === 'TOPUP';
+            const isNew = mode === 'NEW';
 
-            let plafonGross = isMengulang ? item.plafonGrossMengulang : item.plafonGrossTopUp;
-            if (!plafonGross || plafonGross <= 0) plafonGross = item.plafonGrossTopUp;
+            let plafonGross =
+                isNew ? Number(item.plafonGrossNew || 0) :
+                isMengulang ? Number(item.plafonGrossMengulang || 0) :
+                Number(item.plafonGrossTopUp || 0);
+
+            if (!plafonGross || plafonGross <= 0) {
+                plafonGross =
+                    Number(item.plafonGrossTopUp || 0) ||
+                    Number(item.plafonGrossNew || 0) ||
+                    Number(item.plafonGrossMengulang || 0);
+            }
 
             const ratePct = getInterestRate(item.tipe_pinjaman, mode);
-            const tenor = item.selectedTenor;
-            const angsuranBaru = calculateInstallmentFromPlafon(plafonGross, tenor, item.tipe_pinjaman, mode);
+            const tenor = Number(item.selectedTenor || item.maxAllowedTenor || 1);
+            const angsuranBaru = calculateInstallmentFromPlafon(
+                plafonGross, tenor, item.tipe_pinjaman, mode
+            );
 
-            const bakiDebet = isMengulang ? item.baki_debet : 0;
-            const bungaBerjalan = isMengulang ? item.bunga_berjalan : 0;
-            const musisiAsuransi = isMengulang ? item.musisi_asuransi : 0;
+            const bakiDebet = isMengulang ? Number(item.baki_debet || 0) : 0;
+            const bungaBerjalan = isMengulang ? Number(item.bunga_berjalan || 0) : 0;
+            const musisiAsuransi = isMengulang ? Number(item.musisi_asuransi || 0) : 0;
 
-            const jenisPenawaranDetail =
-                isMengulang ? 'MENGULANG' :
-                (isTopUp ? 'TOPUP' : 'NEW');
+            const usia = Number(item.cifRef?.tenorRules?.usiaTahun || 0);
 
             const fees = calculateCreditFees(
                 plafonGross,
                 tenor,
                 item.tipe_pinjaman,
-                item.cifRef.status_pegawai,
-                item.cifRef.tenorRules.usiaTahun,
+                item.cifRef?.status_pegawai || '',
+                usia,
                 bakiDebet,
                 angsuranBaru,
                 bungaBerjalan,
                 musisiAsuransi,
-                jenisPenawaranDetail
+                mode
             );
 
             const headerEl = document.getElementById('modalDetailHeader');
             const titleEl = document.getElementById('modalDetailTitle');
             const boxNetEl = document.getElementById('boxNetPencairan');
-            
-            if (isTopUp) {
+
+            if (isNew) {
+                headerEl.className = "bg-blue-800 text-white p-4 flex justify-between items-center transition-colors";
+                titleEl.innerText = "Simulasi Rincian Kredit NEW";
+                boxNetEl.className = "flex justify-between items-center pt-3 bg-blue-50 p-3 rounded-lg border border-blue-300 text-blue-900 font-extrabold text-sm";
+            } else if (isTopUp) {
                 headerEl.className = "bg-amber-800 text-white p-4 flex justify-between items-center transition-colors";
-                titleEl.innerText = "Simulasi Rincian Biaya Dinamis & Net Pencairan Top-Up";
+                titleEl.innerText = "Simulasi Rincian Kredit TOP-UP";
                 boxNetEl.className = "flex justify-between items-center pt-3 bg-amber-50 p-3 rounded-lg border border-amber-300 text-amber-900 font-extrabold text-sm";
-                document.getElementById('rowPelunasanBakiDebet').classList.add('hidden');
-                document.getElementById('rowPelunasanBungaBerjalan').classList.add('hidden');
-                document.getElementById('rowBiayaMusisiAsuransi').classList.add('hidden');
             } else {
                 headerEl.className = "bg-emerald-800 text-white p-4 flex justify-between items-center transition-colors";
-                titleEl.innerText = "Simulasi Rincian Biaya Dinamis & Net Pencairan Mengulang (Renewal)";
+                titleEl.innerText = "Simulasi Rincian Kredit MENGULANG";
                 boxNetEl.className = "flex justify-between items-center pt-3 bg-emerald-50 p-3 rounded-lg border border-emerald-300 text-emerald-900 font-extrabold text-sm";
-                document.getElementById('rowPelunasanBakiDebet').classList.remove('hidden');
-                document.getElementById('rowPelunasanBungaBerjalan').classList.remove('hidden');
-                document.getElementById('rowBiayaMusisiAsuransi').classList.remove('hidden');
             }
 
-            document.getElementById('mNoPinjamanTitle').innerText = `No. Pinjaman: ${item.no_pinjaman} | Mode: ${mode}`;
-            document.getElementById('mNamaDebitur').innerText = `${item.nama} (${item.cifRef.status_pegawai})`;
-            document.getElementById('mProduk').innerText = `${item.tipe_pinjaman} (${isTopUp ? 'Top-Up' : 'Mengulang/Renewal'})`;
-            document.getElementById('mBungaRate').innerText = `${(ratePct * 100).toFixed(1)}% p.a. (Anuitas)`;
-            document.getElementById('mTenorBulan').innerText = `${tenor} Bulan (${fees.jangkaWaktuTahun} Thn)`;
+            // Pelunasan hanya untuk MENGULANG.
+            ['rowPelunasanBakiDebet','rowPelunasanBungaBerjalan','rowBiayaMusisiAsuransi'].forEach(id=>{
+                document.getElementById(id)?.classList.toggle('hidden', !isMengulang);
+            });
 
-            document.getElementById('mPlafonGross').innerText = 'Rp ' + Math.round(plafonGross).toLocaleString('id-ID');
-            document.getElementById('mAngsuranBaru').innerText = 'Rp ' + Math.round(angsuranBaru).toLocaleString('id-ID');
+            const noPinjamanLabel = isNew
+                ? (item.no_pinjaman || item.loan_id || 'NEW')
+                : (item.no_pinjaman || item.loan_id || '-');
 
-            document.getElementById('lblBiayaProvisi').innerText = `• Biaya Provisi (${(fees.tarifProvisi * 100).toFixed(2)}%)`;
-            document.getElementById('mBiayaProvisi').innerText = 'Rp ' + fees.biayaProvisi.toLocaleString('id-ID');
+            document.getElementById('mNoPinjamanTitle').innerText =
+                `No. Pinjaman: ${noPinjamanLabel} | Penawaran: ${isTopUp ? 'TOP-UP' : mode}`;
+
+            document.getElementById('mNamaDebitur').innerText =
+                `${item.nama || item.cifRef?.nama || '-'} (${item.cifRef?.status_pegawai || '-'})`;
+
+            document.getElementById('mProduk').innerText =
+                `${item.tipe_pinjaman || '-'} (${isNew ? 'NEW' : isTopUp ? 'TOP-UP' : 'MENGULANG'})`;
+
+            document.getElementById('mBungaRate').innerText =
+                `${(Number(ratePct || 0) * 100).toFixed(2)}% p.a. (Anuitas)`;
+
+            document.getElementById('mTenorBulan').innerText =
+                `${tenor} Bulan (${fees.jangkaWaktuTahun} Thn)`;
+
+            document.getElementById('mPlafonGross').innerText =
+                'Rp ' + Math.round(plafonGross).toLocaleString('id-ID');
+
+            document.getElementById('mAngsuranBaru').innerText =
+                'Rp ' + Math.round(angsuranBaru).toLocaleString('id-ID');
+
+            document.getElementById('lblBiayaProvisi').innerText =
+                `• Biaya Provisi (${(fees.tarifProvisi * 100).toFixed(2)}%)`;
+            document.getElementById('mBiayaProvisi').innerText =
+                'Rp ' + Math.round(fees.biayaProvisi || 0).toLocaleString('id-ID');
 
             document.getElementById('lblBiayaAdmin').innerText = `• Biaya Administrasi`;
-            document.getElementById('mBiayaAdmin').innerText = 'Rp ' + fees.biayaAdmin.toLocaleString('id-ID');
+            document.getElementById('mBiayaAdmin').innerText =
+                'Rp ' + Math.round(fees.biayaAdmin || 0).toLocaleString('id-ID');
 
-            document.getElementById('lblBiayaAsuransi').innerText = `• Biaya Asuransi (Usia ${item.cifRef.tenorRules.usiaTahun || '-'} Thn, Tarif ${(fees.tarifAsuransi * 100).toFixed(3)}%)`;
-            document.getElementById('mBiayaAsuransi').innerText = 'Rp ' + fees.biayaAsuransi.toLocaleString('id-ID');
+            document.getElementById('lblBiayaAsuransi').innerText =
+                `• Biaya Asuransi (Usia ${usia || '-'} Thn, Tarif ${(fees.tarifAsuransi * 100).toFixed(3)}%)`;
+            document.getElementById('mBiayaAsuransi').innerText =
+                'Rp ' + Math.round(fees.biayaAsuransi || 0).toLocaleString('id-ID');
 
-            document.getElementById('lblTabunganWajib').innerText = `• Tabungan Wajib (${fees.multiplierTabWajib}x Angsuran)`;
-            document.getElementById('mTabunganWajib').innerText = 'Rp ' + fees.tabunganWajib.toLocaleString('id-ID');
+            document.getElementById('lblTabunganWajib').innerText =
+                `• Tabungan Wajib (${fees.multiplierTabWajib}x Angsuran)`;
+            document.getElementById('mTabunganWajib').innerText =
+                'Rp ' + Math.round(fees.tabunganWajib || 0).toLocaleString('id-ID');
 
-            document.getElementById('mPelunasanBakiDebet').innerText = 'Rp ' + Math.round(fees.pelunasanBakiDebet).toLocaleString('id-ID');
-            document.getElementById('mPelunasanBungaBerjalan').innerText = 'Rp ' + Math.round(fees.bungaBerjalan).toLocaleString('id-ID');
-            document.getElementById('mBiayaMusisiAsuransi').innerText = 'Rp ' + Math.round(fees.biayaMusisiAsuransi).toLocaleString('id-ID');
+            document.getElementById('mPelunasanBakiDebet').innerText =
+                'Rp ' + Math.round(fees.pelunasanBakiDebet || 0).toLocaleString('id-ID');
+            document.getElementById('mPelunasanBungaBerjalan').innerText =
+                'Rp ' + Math.round(fees.bungaBerjalan || 0).toLocaleString('id-ID');
+            document.getElementById('mBiayaMusisiAsuransi').innerText =
+                'Rp ' + Math.round(fees.biayaMusisiAsuransi || 0).toLocaleString('id-ID');
 
-            document.getElementById('mTotalPotongan').innerText = 'Rp ' + Math.round(fees.totalPotongan).toLocaleString('id-ID');
-            
+            document.getElementById('mTotalPotongan').innerText =
+                'Rp ' + Math.round(fees.totalPotongan || 0).toLocaleString('id-ID');
+
             const netEl = document.getElementById('mNetPencairan');
-            netEl.innerText = 'Rp ' + Math.round(fees.netPencairan).toLocaleString('id-ID');
-            netEl.className = isTopUp ? 'font-mono text-base text-amber-800' : 'font-mono text-base text-emerald-700';
+            netEl.innerText =
+                'Rp ' + Math.round(fees.netPencairan || 0).toLocaleString('id-ID');
+            netEl.className =
+                isNew ? 'font-mono text-base text-blue-700' :
+                isTopUp ? 'font-mono text-base text-amber-800' :
+                'font-mono text-base text-emerald-700';
 
+            // Tombol WA dari rincian tetap memakai jenis penawaran yang sama.
             const btnWa = document.getElementById('btnMengulangOpenWa');
-            btnWa.onclick = function() {
-                closeMengulangDetailModal();
-                openDebtorModal(loanId);
-            };
+            if (btnWa) {
+                btnWa.onclick = function() {
+                    window.v9Selected = item;
+                    window.v9SelectedOfferType = mode;
+                    selectedLoanId = item.loan_id;
+                    closeMengulangDetailModal();
+                    openWhatsapp();
+                };
+            }
 
             document.getElementById('mengulangDetailModal').classList.remove('hidden');
         }
@@ -5901,6 +6007,7 @@ const meta=document.querySelector('meta[name="viewport"]');if(meta)meta.setAttri
 
 const ACTIVITY_KEY = 'analisaKredit_offerActivity_v1';
 let v9QuickOfferType = '';
+let v9QuickIncomeSource = '';
 
 function getLoans(){
   try { return Array.isArray(loanDatabase) ? loanDatabase : []; }
@@ -6073,6 +6180,19 @@ function normFilterValue(v){ return String(v ?? '').trim().toUpperCase(); }
 function getFilteredLoans(){
   let rows=getLoans().slice();
 
+  if(v9QuickIncomeSource){
+    const targetSource=String(v9QuickIncomeSource).toUpperCase();
+    rows=rows.filter(o=>{
+      const source=String(
+        o?.sumber_penghasilan ||
+        o?.SUMBER_PENGHASILAN ||
+        o?.facilityRef?.sumber_penghasilan ||
+        ''
+      ).trim().toUpperCase();
+      return source===targetSource;
+    });
+  }
+
   const p=document.getElementById('v9FilterProduk')?.value || '';
   const j=normalizeOfferFilter(document.getElementById('v9FilterJenis')?.value || '');
   const s=normalizeEmployeeStatus(document.getElementById('v9FilterStatus')?.value || '');
@@ -6180,6 +6300,13 @@ function renderDebtors(){
     note.style.cssText='margin-bottom:8px;padding:8px 10px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:9px;font-weight:700';
     note.textContent='Menampilkan 60 debitur terlebih dahulu agar aplikasi tetap ringan.';
     list.appendChild(note);
+  }
+
+  if(v9QuickIncomeSource){
+    const sourceNote=document.createElement('div');
+    sourceNote.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding:8px 10px;border-radius:11px;background:#ecfdf5;color:#047857;font-size:10px;font-weight:800';
+    sourceNote.innerHTML='<span><i class="fa-solid fa-wallet"></i> Sumber: '+escapeHtml(v9QuickIncomeSource)+'</span><button type="button" id="v17ClearIncomeSource" style="border:0;background:#fff;color:#64748b;border-radius:8px;padding:4px 7px;font-size:9px;font-weight:800">Semua</button>';
+    list.appendChild(sourceNote);
   }
 
   if(v9QuickOfferType){
@@ -6357,12 +6484,15 @@ function openSelected(card){
 
   window.v9Selected=obj;
 
-  if(typeof openDebtorModal==='function'){
+  const mode=normalizeWaOfferType(window.v9SelectedOfferType || obj.__offerType || 'TOPUP');
+
+  if(typeof openCreditDetailModal==='function'){
     try{
-      openDebtorModal(id);
+      openCreditDetailModal(id,mode);
       return;
     }catch(err){
-      console.error('openDebtorModal:',err);
+      console.error('openCreditDetailModal:',err);
+      alert('Rincian simulasi tidak dapat dibuka: '+(err.message||err));
     }
   }
 }
@@ -6481,6 +6611,31 @@ function clearQuickOffer(){
   renderDebtors();
 }
 
+function quickIncomeSource(source){
+  source=String(source||'').trim().toUpperCase();
+  v9QuickIncomeSource=(source==='SEMUA') ? '' : source;
+  window.v16DebtorOffset=0;
+
+  document.querySelectorAll('[data-v9-income]').forEach(btn=>{
+    btn.classList.toggle(
+      'v17-income-active',
+      (source==='SEMUA' && !v9QuickIncomeSource) || btn.dataset.v9Income===v9QuickIncomeSource
+    );
+  });
+
+  go('debitur');
+  renderDebtors();
+}
+
+function clearQuickIncomeSource(){
+  v9QuickIncomeSource='';
+  window.v16DebtorOffset=0;
+  document.querySelectorAll('[data-v9-income]').forEach(btn=>{
+    btn.classList.toggle('v17-income-active',btn.dataset.v9Income==='SEMUA');
+  });
+  renderDebtors();
+}
+
 function bind(){
   updateIdentity();
   renderDashboard();
@@ -6499,10 +6654,18 @@ function bind(){
     btn.addEventListener('click',()=>quickOffer(btn.dataset.v9Offer));
   });
 
+  document.querySelectorAll('[data-v9-income]').forEach(btn=>{
+    btn.addEventListener('click',()=>quickIncomeSource(btn.dataset.v9Income));
+  });
+
   document.getElementById('v9WaNav')?.addEventListener('click',openWhatsapp);
   document.getElementById('v9ExportActivity')?.addEventListener('click',exportActivityExcel);
 
   document.getElementById('v9DebtorList')?.addEventListener('click',e=>{
+    if(e.target.closest('#v17ClearIncomeSource')){
+      clearQuickIncomeSource();
+      return;
+    }
     if(e.target.closest('#v9ClearQuickOffer')){
       clearQuickOffer();
       return;
