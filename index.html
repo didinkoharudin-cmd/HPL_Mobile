@@ -4,7 +4,8 @@
 <!-- V17 STABLE BASE: preserve proven mobile database loading and admin routing. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <!-- V17 V3: selected-offer WA flow, tenor editor, preview, same-tab -->
+    <!-- V17 V4: stable base; WA selected-row + tenor preview + NEW fix -->
+    <!-- V17 V5: stable base; WA tenor + gross editor + preview -->
     <title>Analisis Kredit - Presisi Parameter Produk, RPC & Tenor Pegawai</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -2153,6 +2154,27 @@ body.v15-mobile-admin-active #viewAdmin button{
                                     class="w-full h-1.5 bg-indigo-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                             </div>
                         </div>
+
+                        <!-- V17 V5: Editor Plafond Gross Penawaran -->
+                        <div id="waGrossEditorBlock">
+                            <label class="block text-slate-600 font-semibold mb-1">Plafond Gross Penawaran:</label>
+                            <div class="bg-white p-1.5 rounded-lg border border-indigo-200">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-500 font-bold">Rp</span>
+                                    <input type="number"
+                                        id="modalGrossInput"
+                                        min="0"
+                                        step="1000000"
+                                        inputmode="numeric"
+                                        oninput="onModalGrossChange(this.value)"
+                                        class="w-full p-1.5 font-mono font-bold text-indigo-900 border border-indigo-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                </div>
+                                <div class="flex justify-between gap-2 pt-1 text-[9px] text-slate-500">
+                                    <span>Maksimum sesuai RPC:</span>
+                                    <b id="modalGrossMaxText" class="font-mono text-indigo-700">Rp 0</b>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- WA Preview Box -->
@@ -3994,6 +4016,74 @@ body.v15-mobile-admin-active #viewAdmin button{
             document.getElementById('debtorModal').classList.remove('hidden');
         }
 
+        function normalizeWaOfferType(value) {
+            const raw = String(value || '').trim().toUpperCase();
+            if (raw === 'TOP-UP' || raw === 'TOP UP' || raw === 'TOPUP') return 'TOPUP';
+            if (raw === 'MENGULANG') return 'MENGULANG';
+            if (raw === 'NEW') return 'NEW';
+            return raw;
+        }
+
+        function getWaDefaultGross(item, offerType) {
+            if (!item) return 0;
+            const mode = normalizeWaOfferType(offerType);
+            if (mode === 'NEW') return Number(item.plafonGrossNew || 0);
+            if (mode === 'MENGULANG') return Number(item.plafonGrossMengulang || 0);
+            return Number(item.plafonGrossTopUp || 0);
+        }
+
+        function syncWaGrossEditor(resetToMaximum = false) {
+            const input = document.getElementById('modalGrossInput');
+            const maxText = document.getElementById('modalGrossMaxText');
+            if (!input) return;
+
+            const item =
+                window.v9Selected ||
+                loanDatabase.find(l => String(l.loan_id) === String(selectedLoanId));
+
+            const offerType = normalizeWaOfferType(
+                window.v9SelectedOfferType ||
+                document.querySelector('input[name="offerType"]:checked')?.value ||
+                ''
+            );
+
+            const maxGross = Math.max(0, Math.round(getWaDefaultGross(item, offerType)));
+            input.max = String(maxGross);
+
+            if (maxText) {
+                maxText.textContent = 'Rp ' + maxGross.toLocaleString('id-ID');
+            }
+
+            let current = Number(input.value || 0);
+
+            if (resetToMaximum || !current || current > maxGross) {
+                current = maxGross;
+            }
+
+            // Pembulatan ke kelipatan Rp1 juta agar sama dengan simulasi plafond.
+            if (current > 0) {
+                current = Math.floor(current / 1000000) * 1000000;
+            }
+
+            input.value = String(Math.max(0, current));
+            window.v9WaCustomGross = Math.max(0, current);
+        }
+
+        function onModalGrossChange(value) {
+            const input = document.getElementById('modalGrossInput');
+            if (!input) return;
+
+            const maxGross = Number(input.max || 0);
+            let gross = Number(value || 0);
+
+            if (!Number.isFinite(gross) || gross < 0) gross = 0;
+            if (maxGross > 0 && gross > maxGross) gross = maxGross;
+
+            // Tidak perlu membulatkan selama mengetik; preview memakai nilai aktual.
+            window.v9WaCustomGross = gross;
+            updateWaPreview();
+        }
+
         function onModalLoanChange() {
             updateWaPreview();
         }
@@ -4001,6 +4091,13 @@ body.v15-mobile-admin-active #viewAdmin button{
         function onModalTenorChange(val) {
             if (selectedLoanId) {
                 updateLoanTenor(selectedLoanId, val);
+
+                if (window.v9WaOnlyMode) {
+                    // Perubahan tenor mengubah plafond maksimum menurut RPC.
+                    // Gross editor mengikuti maksimum baru agar penawaran tetap eligible.
+                    syncWaGrossEditor(true);
+                    updateWaPreview();
+                }
             }
         }
 
@@ -4009,25 +4106,37 @@ body.v15-mobile-admin-active #viewAdmin button{
 
             try{
                 document.querySelectorAll('input[name="offerType"]').forEach(r=>r.disabled=false);
-                const offerBlock=document.querySelector('input[name="offerType"]')?.closest('.grid > div');
+
+                const offerInput = document.querySelector('input[name="offerType"]');
+                const offerBlock = offerInput ? offerInput.closest('.grid > div') : null;
                 if(offerBlock) offerBlock.style.display='';
 
-                const gross=document.querySelector('input[name="nominalType"][value="GROSS"]');
+                const gross = document.querySelector('input[name="nominalType"][value="GROSS"]');
                 if(gross) gross.disabled=false;
-                const nominalBlock=document.querySelector('input[name="nominalType"]')?.closest('.grid > div');
+
+                const nominalInput = document.querySelector('input[name="nominalType"]');
+                const nominalBlock = nominalInput ? nominalInput.closest('.grid > div') : null;
                 if(nominalBlock) nominalBlock.style.display='';
 
-                const targetBlock=document.getElementById('modalLoanTarget')?.closest('.grid > div');
+                const target = document.getElementById('modalLoanTarget');
+                const targetBlock = target ? target.closest('.grid > div') : null;
                 if(targetBlock) targetBlock.style.display='';
 
                 window.v9WaOnlyMode=false;
-            }catch(e){}
+                window.v9WaCustomGross=0;
+            }catch(e){
+                console.warn('closeDebtorModal restore:', e);
+            }
         }
 
 function updateWaPreview() {
             const loanTargetVal = document.getElementById('modalLoanTarget').value;
-            const offerType = document.querySelector('input[name="offerType"]:checked').value;
-            const nominalType = document.querySelector('input[name="nominalType"]:checked').value;
+            const offerType = normalizeWaOfferType(
+                window.v9SelectedOfferType ||
+                document.querySelector('input[name="offerType"]:checked')?.value ||
+                ''
+            );
+            const nominalType = document.querySelector('input[name="nominalType"]:checked')?.value || 'NET';
 
             let targetItem = loanDatabase.find(l => l.no_pinjaman === loanTargetVal) || loanDatabase.find(l => l.loan_id === selectedLoanId);
             if (!targetItem) return;
@@ -4042,9 +4151,43 @@ function updateWaPreview() {
             let jenisPenawaranStr = '';
             let infoDetail = '';
 
+            // Jika editor WA aktif, plafond gross dapat diturunkan dari maksimum.
+            // Nilai database utama tidak diubah.
+            const defaultGross = getWaDefaultGross(targetItem, offerType);
+            let customGross = Number(window.v9WaCustomGross || 0);
+
+            if (!window.v9WaOnlyMode || customGross <= 0) {
+                customGross = defaultGross;
+            }
+
+            if (defaultGross > 0 && customGross > defaultGross) {
+                customGross = defaultGross;
+            }
+
+            const customAngsuran = calculateInstallmentFromPlafon(
+                customGross,
+                activeTenor,
+                targetItem.tipe_pinjaman,
+                offerType
+            );
+
+            const customFees = calculateCreditFees(
+                customGross,
+                activeTenor,
+                targetItem.tipe_pinjaman,
+                deb.status_pegawai,
+                deb.tenorRules?.usiaTahun || 0,
+                offerType === 'MENGULANG' ? Number(targetItem.baki_debet || 0) : 0,
+                customAngsuran,
+                offerType === 'MENGULANG' ? Number(targetItem.bunga_berjalan || 0) : 0,
+                offerType === 'MENGULANG' ? Number(targetItem.musisi_asuransi || 0) : 0,
+                offerType
+            );
+
             if (offerType === 'NEW') {
-                nominalPlafonGross = targetItem.plafonGrossNew;
-                nominalNetPencairan = targetItem.potensiNew;
+                nominalPlafonGross = customGross;
+                nominalAngsuran = customAngsuran;
+                nominalNetPencairan = customFees.netPencairan;
                 jenisPenawaranStr = 'Pengajuan Kredit Baru';
 
                 if (nominalType === 'GROSS') {
@@ -4053,9 +4196,9 @@ function updateWaPreview() {
                     infoDetail = `Sebagai pegawai *${statusStr}*, Bapak/Ibu memiliki estimasi *Pencairan Bersih (Nett) s.d. Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}* (sudah memperhitungkan seluruh estimasi biaya) dengan jangka waktu s.d. *${activeTenor} bulan*.`;
                 }
             } else if (offerType === 'TOPUP') {
-                nominalAngsuran = targetItem.maxAngsuranTopUp;
-                nominalPlafonGross = targetItem.plafonGrossTopUp;
-                nominalNetPencairan = targetItem.potensiPlafonTopUp;
+                nominalAngsuran = customAngsuran;
+                nominalPlafonGross = customGross;
+                nominalNetPencairan = customFees.netPencairan;
                 jenisPenawaranStr = `Top-Up Sisa RPC (${targetItem.tipe_pinjaman})`;
 
                 if (nominalType === 'GROSS') {
@@ -4064,8 +4207,9 @@ function updateWaPreview() {
                     infoDetail = `Berdasarkan kalkulasi fasilitas kredit *${targetItem.tipe_pinjaman}* (${targetItem.sumber_penghasilan}) Bapak/Ibu, Bapak/Ibu masih memiliki *sisa RPC angsuran sebesar Rp ${Math.round(nominalAngsuran).toLocaleString('id-ID')}/bulan*.\n\nDengan sisa RPC tersebut, Bapak/Ibu berpotensi menerima *Pencairan Bersih (Nett) Top-Up sebesar Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}* (setelah dipotong biaya-biaya kredit) dengan tenor s.d. *${activeTenor} bulan*.`;
                 }
             } else if (offerType === 'MENGULANG') {
-                nominalPlafonGross = targetItem.plafonGrossMengulang || 0;
-                nominalNetPencairan = targetItem.potensiMengulang;
+                nominalAngsuran = customAngsuran;
+                nominalPlafonGross = customGross;
+                nominalNetPencairan = customFees.netPencairan;
                 jenisPenawaranStr = `Pembaruan Kredit (Renewal No. ${targetItem.no_pinjaman})`;
 
                 if (nominalType === 'GROSS') {
@@ -4075,7 +4219,14 @@ function updateWaPreview() {
                 }
             }
 
-            const msg = `Assalamualaikum, Yth. Bapak/Ibu *${deb.nama}*,\n\nPerkenalkan saya Didin dari *Bank bjb*.\n\nIjin menginformasikan promo *${jenisPenawaranStr}* khusus *${statusStr}*.\n\n${infoDetail}\n\nProses cepat, Promo Bunga sampai akhir bulan ini. Apakah Bapak/Ibu berminat untuk simulasi perhitungan lengkapnya?\n\nTerima kasih.`;
+            const ringkasanPenawaran =
+                `\n\n*Ringkasan Penawaran:*` +
+                `\n• Plafond Gross: *Rp ${Math.round(nominalPlafonGross).toLocaleString('id-ID')}*` +
+                `\n• Tenor: *${activeTenor} bulan*` +
+                `\n• Estimasi Angsuran: *Rp ${Math.round(nominalAngsuran).toLocaleString('id-ID')}/bulan*` +
+                `\n• Estimasi Nett: *Rp ${Math.round(nominalNetPencairan).toLocaleString('id-ID')}*`;
+
+            const msg = `Assalamualaikum, Yth. Bapak/Ibu *${deb.nama}*,\n\nPerkenalkan saya Didin dari *Bank bjb*.\n\nIjin menginformasikan promo *${jenisPenawaranStr}* khusus *${statusStr}*.\n\n${infoDetail}${ringkasanPenawaran}\n\nProses cepat, Promo Bunga sampai akhir bulan ini. Apakah Bapak/Ibu berminat untuk simulasi perhitungan lengkapnya?\n\nTerima kasih.`;
 
             document.getElementById('waPreviewText').value = msg;
         }
@@ -4102,7 +4253,8 @@ function updateWaPreview() {
             let offerType = '';
             let nominalType = '';
             try {
-                offerType = document.querySelector('input[name="offerType"]:checked')?.value || '';
+                offerType = window.v9SelectedOfferType ||
+                            document.querySelector('input[name="offerType"]:checked')?.value || '';
                 nominalType = document.querySelector('input[name="nominalType"]:checked')?.value || '';
             } catch (e) {}
 
@@ -4124,11 +4276,30 @@ function updateWaPreview() {
                 jenis_penawaran: offerType,
                 nominal_type: nominalType,
                 tenor: item.selectedTenor || '',
-                potensi_nett: Number(
-                    offerType === 'NEW' ? item.potensiNew :
-                    offerType === 'TOPUP' ? item.potensiPlafonTopUp :
-                    item.potensiMengulang
-                ) || 0
+                plafond_gross: Number(window.v9WaCustomGross || getWaDefaultGross(item, offerType) || 0),
+                estimasi_angsuran: calculateInstallmentFromPlafon(
+                    Number(window.v9WaCustomGross || getWaDefaultGross(item, offerType) || 0),
+                    Number(item.selectedTenor || 0),
+                    item.tipe_pinjaman,
+                    normalizeWaOfferType(offerType)
+                ),
+                potensi_nett: calculateCreditFees(
+                    Number(window.v9WaCustomGross || getWaDefaultGross(item, offerType) || 0),
+                    Number(item.selectedTenor || 0),
+                    item.tipe_pinjaman,
+                    item.cifRef?.status_pegawai || '',
+                    item.cifRef?.tenorRules?.usiaTahun || 0,
+                    normalizeWaOfferType(offerType) === 'MENGULANG' ? Number(item.baki_debet || 0) : 0,
+                    calculateInstallmentFromPlafon(
+                        Number(window.v9WaCustomGross || getWaDefaultGross(item, offerType) || 0),
+                        Number(item.selectedTenor || 0),
+                        item.tipe_pinjaman,
+                        normalizeWaOfferType(offerType)
+                    ),
+                    normalizeWaOfferType(offerType) === 'MENGULANG' ? Number(item.bunga_berjalan || 0) : 0,
+                    normalizeWaOfferType(offerType) === 'MENGULANG' ? Number(item.musisi_asuransi || 0) : 0,
+                    normalizeWaOfferType(offerType)
+                ).netPencairan || 0
             };
 
             // Satu debitur tetap satu baris. Jika dikirim lagi, datanya diperbarui
@@ -4149,7 +4320,9 @@ function updateWaPreview() {
         }
 
         function sendWaDirect() {
-            const targetItem = loanDatabase.find(l => String(l.loan_id) === String(selectedLoanId));
+            const targetItem = window.v9Selected ||
+                loanDatabase.find(l => String(l.loan_id) === String(selectedLoanId));
+
             if (!targetItem || !targetItem.cifRef || !targetItem.cifRef.no_hp) {
                 alert("Nomor WhatsApp/HP debitur tidak tersedia!");
                 return;
@@ -4168,12 +4341,8 @@ function updateWaPreview() {
 
             const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-            // Gunakan halaman/tab yang sama, bukan membuka tab baru.
+            // Same-tab navigation, as requested.
             window.location.href = waUrl;
-
-            try {
-                if (typeof window.renderV9Activity === 'function') window.renderV9Activity();
-            } catch (e) {}
         }
 
 // --- EXCEL TEMPLATE DOWNLOADERS ---
@@ -6019,56 +6188,79 @@ function openSelected(card){
 }
 
 function openWhatsapp(){
-  if(typeof selectedLoanId==='undefined' || !selectedLoanId){
-    alert('Pilih debitur terlebih dahulu pada menu Debitur.');
+  const selected = window.v9Selected ||
+    loanDatabase.find(l => String(l.loan_id) === String(selectedLoanId));
+
+  if(!selected){
+    alert('Pilih baris debitur terlebih dahulu.');
     go('debitur');
     return;
   }
 
-  const targetItem=getLoans().find(l=>String(l.loan_id)===String(selectedLoanId));
-  if(!targetItem){
-    alert('Data debitur tidak ditemukan.');
-    return;
+  let offerType = normalizeWaOfferType(
+    window.v9SelectedOfferType ||
+    selected.__offerType ||
+    selected.offerType ||
+    ''
+  );
+
+  // Explicit NEW fallback for synthetic/new-debtor rows.
+  if(!offerType && Number(selected.potensiNew || 0) > 0 && !selected.facilityRef){
+    offerType = 'NEW';
   }
 
-  const offerType=String(window.v9SelectedOfferType || targetItem.__offerType || '').toUpperCase();
   if(!offerType){
-    alert('Pilih baris penawaran terlebih dahulu (NEW / TOP-UP / MENGULANG).');
+    alert('Jenis penawaran pada baris yang dipilih belum tersedia.');
     return;
   }
 
   try{
-    window.v9WaOnlyMode=true;
-    window.v9SelectedOfferType=offerType;
+    window.v9WaOnlyMode = true;
+    window.v9SelectedOfferType = normalizeWaOfferType(offerType);
+    window.v9WaCustomGross = 0;
 
-    if(typeof openDebtorModal==='function'){
-      openDebtorModal(String(targetItem.loan_id || selectedLoanId));
+    // Reuse the proven V17 modal/calculation engine.
+    openDebtorModal(String(selected.loan_id));
+
+    // Force the selected offer type after the modal is populated.
+    const radio = document.querySelector(
+      'input[name="offerType"][value="' + offerType + '"]'
+    );
+    if(!radio){
+      throw new Error('Kontrol jenis penawaran ' + offerType + ' tidak ditemukan.');
     }
 
-    document.querySelectorAll('input[name="offerType"]').forEach(r=>{
-      r.checked=(String(r.value).toUpperCase()===offerType);
-      r.disabled=true;
-    });
+    radio.checked = true;
+    document.querySelectorAll('input[name="offerType"]').forEach(r => r.disabled = true);
 
-    const offerBlock=document.querySelector('input[name="offerType"]')?.closest('.grid > div');
-    if(offerBlock) offerBlock.style.display='none';
+    // Keep the controls in DOM, only hide visually.
+    const offerInput = document.querySelector('input[name="offerType"]');
+    const offerBlock = offerInput ? offerInput.closest('.grid > div') : null;
+    if(offerBlock) offerBlock.style.display = 'none';
 
-    const net=document.querySelector('input[name="nominalType"][value="NET"]');
-    const gross=document.querySelector('input[name="nominalType"][value="GROSS"]');
-    if(net) net.checked=true;
-    if(gross) gross.disabled=true;
+    const net = document.querySelector('input[name="nominalType"][value="NET"]');
+    const gross = document.querySelector('input[name="nominalType"][value="GROSS"]');
+    if(net) net.checked = true;
+    if(gross) gross.disabled = true;
 
-    const nominalBlock=document.querySelector('input[name="nominalType"]')?.closest('.grid > div');
-    if(nominalBlock) nominalBlock.style.display='none';
+    const nominalInput = document.querySelector('input[name="nominalType"]');
+    const nominalBlock = nominalInput ? nominalInput.closest('.grid > div') : null;
+    if(nominalBlock) nominalBlock.style.display = 'none';
 
-    const targetBlock=document.getElementById('modalLoanTarget')?.closest('.grid > div');
-    if(targetBlock) targetBlock.style.display='none';
+    const target = document.getElementById('modalLoanTarget');
+    const targetBlock = target ? target.closest('.grid > div') : null;
+    if(targetBlock) targetBlock.style.display = 'none';
 
-    if(typeof updateWaPreview==='function') updateWaPreview();
+    // Gross awal = plafond maksimum hasil simulasi untuk tenor aktif.
+    syncWaGrossEditor(true);
+
+    // Preview is still generated by the existing V17 engine.
+    if(typeof updateWaPreview === 'function') updateWaPreview();
+
   }catch(err){
-    console.error('openWhatsapp:',err);
-    window.v9WaOnlyMode=false;
-    alert('Editor WhatsApp tidak dapat dibuka.');
+    console.error('openWhatsapp:', err);
+    window.v9WaOnlyMode = false;
+    alert('Editor WhatsApp tidak dapat dibuka. Detail: ' + (err.message || err));
   }
 }
 
@@ -6140,10 +6332,15 @@ function bind(){
     selectedLoanId=id;
     window.v9SelectedOfferType=String(row.dataset.offerType || action?.dataset.actionOfferType || '').toUpperCase();
     window.v9Selected=getLoans().find(o=>String(val(o,['loan_id','LOAN_ID','no_pinjaman','NO_PINJAMAN']))===String(id)) || null;
+
+    // Explicit NEW fallback.
+    if(!window.v9SelectedOfferType && window.v9Selected && Number(window.v9Selected.potensiNew||0)>0 && !window.v9Selected.facilityRef){
+      window.v9SelectedOfferType='NEW';
+    }
     document.querySelectorAll('#v9DebtorList tbody tr[data-loan-id]').forEach(r=>r.classList.remove('v9-row-selected'));
     row.classList.add('v9-row-selected');
     if(action){
-      window.v9SelectedOfferType=String(action.dataset.actionOfferType || row.dataset.offerType || '').toUpperCase();
+      window.v9SelectedOfferType=String(action.dataset.actionOfferType || row.dataset.offerType || window.v9SelectedOfferType || '').toUpperCase();
       openSelected({dataset:{loanId:id}});
     }
   });
