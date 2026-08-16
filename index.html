@@ -3733,7 +3733,7 @@ body.app-locked > main { display:none !important; }
           cache:'no-store',
           signal:controller ? controller.signal : undefined
         });
-        if(timer) clear(timer);
+        if(timer) clearTimeout(timer);
         const text=await response.text();
         let result;
         try{ result=JSON.parse(text); }catch(e){ throw new Error('Respons server bukan JSON. Periksa deployment Apps Script dan akses Web App.'); }
@@ -4644,6 +4644,32 @@ window.renderAdminAOChart = function(filteredData){
     }
   });
 })();
+</script>
+
+
+<script id="v4-clear-compatibility">
+window.clear = function () {
+  try {
+    ['filterProduk','filterSumber','filterJenisPegawai','filterAO','filterStatus',
+     'sortPotensi','adminInteractiveAO'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.value = 'ALL';
+    });
+    var adminSearch = document.getElementById('adminAOFilterAdditive');
+    if (adminSearch) adminSearch.value = '';
+    var search = document.getElementById('searchInput');
+    if (search) search.value = '';
+    var metric = document.getElementById('adminAOChartMetric');
+    if (metric) metric.value = 'fasilitas';
+    if (typeof clearAdminAOSelection === 'function') clearAdminAOSelection();
+    if (typeof filterData === 'function') filterData();
+    if (typeof renderAdminAOChart === 'function') renderAdminAOChart();
+    if (typeof renderAdminDashboardAdditive === 'function') renderAdminDashboardAdditive();
+  } catch (e) {
+    console.warn('clear() compatibility handler:', e);
+  }
+};
+window.clearFilters = window.clear;
 </script>
 
 </body>
