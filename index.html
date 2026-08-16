@@ -194,6 +194,31 @@ body.app-locked > main { display:none !important; }
 #userSessionBadge.show{display:flex}
 #logoutBtn{display:none}
 #logoutBtn.show{display:inline-flex}
+
+/* =========================================================
+   ADMIN DASHBOARD - ADDITIVE MODULE
+   Tidak mengubah CSS/fungsi existing.
+========================================================= */
+.admin-dashboard-additive{display:grid;gap:20px;margin-bottom:20px}
+.admin-summary-grid-additive{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.admin-card-additive{background:var(--ui-card,#fff);border:1px solid rgba(226,232,240,.9);border-radius:18px;padding:18px;box-shadow:0 8px 25px rgba(15,23,42,.055)}
+.admin-card-label-additive{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b}
+.admin-card-value-additive{margin-top:7px;font-size:24px;font-weight:800;color:#0f172a}
+.admin-card-sub-additive{margin-top:4px;font-size:10px;color:#64748b}
+.admin-panel-additive{background:#fff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,.055)}
+.admin-panel-header-additive{padding:16px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.admin-panel-title-additive{font-size:14px;font-weight:800;color:#0f172a}
+.admin-panel-subtitle-additive{font-size:11px;color:#64748b;margin-top:3px}
+.admin-table-wrap-additive{overflow-x:auto}
+.admin-table-additive{width:100%;border-collapse:collapse;font-size:11px}
+.admin-table-additive th{padding:10px 12px;background:#f8fafc;color:#475569;font-weight:700;text-align:left;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+.admin-table-additive td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#334155;white-space:nowrap}
+.admin-table-additive tbody tr:hover{background:#f8fafc}
+.admin-filter-additive{padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;font-size:11px;outline:none;background:#fff}
+.admin-filter-additive:focus{border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.12)}
+.admin-empty-additive{padding:30px;text-align:center;color:#94a3b8;font-size:12px}
+@media(max-width:900px){.admin-summary-grid-additive{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.admin-summary-grid-additive{grid-template-columns:1fr}.admin-panel-header-additive{flex-direction:column;align-items:flex-start}}
 </style>
 
 <style id="mobile-upload-fix">
@@ -438,6 +463,77 @@ body.app-locked > main { display:none !important; }
 
         <!-- ==================== Halaman 2: PANEL ADMIN & UPLOAD DATA ==================== -->
         <div id="viewAdmin" class="hidden space-y-6">
+            <!-- =====================================================
+                 ADMIN DASHBOARD ADDITIVE MODULE
+                 Modul tambahan; panel administrasi existing tetap utuh.
+            ====================================================== -->
+            <div id="adminDashboardAdditive" class="admin-dashboard-additive">
+                <div class="admin-panel-additive">
+                    <div class="admin-panel-header-additive">
+                        <div>
+                            <div class="admin-panel-title-additive">
+                                <i class="fa-solid fa-chart-pie text-indigo-600 mr-1"></i>
+                                Dashboard Administrator
+                            </div>
+                            <div class="admin-panel-subtitle-additive">
+                                Monitoring keseluruhan data kredit dan penghasilan
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div id="adminDashboardUserAdditive" class="text-xs font-bold text-indigo-700">ADMIN</div>
+                            <div id="adminDashboardUpdatedAdditive" class="text-[10px] text-slate-400">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-summary-grid-additive">
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Total Debitur</div><div id="adminTotalDebiturAdditive" class="admin-card-value-additive">0</div><div class="admin-card-sub-additive">Berdasarkan CIF unik</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Total Fasilitas</div><div id="adminTotalFasilitasAdditive" class="admin-card-value-additive">0</div><div class="admin-card-sub-additive">Seluruh fasilitas kredit</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Total AO</div><div id="adminTotalAOAdditive" class="admin-card-value-additive">0</div><div class="admin-card-sub-additive">Kode AO dalam data</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Data Penghasilan</div><div id="adminTotalPenghasilanAdditive" class="admin-card-value-additive">0</div><div class="admin-card-sub-additive">Record penghasilan</div></div>
+                </div>
+
+                <div class="admin-summary-grid-additive">
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Potensi NEW</div><div id="adminPotensiNewAdditive" class="admin-card-value-additive">Rp 0</div><div class="admin-card-sub-additive">Net pencairan</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Potensi Mengulang</div><div id="adminPotensiMengulangAdditive" class="admin-card-value-additive">Rp 0</div><div class="admin-card-sub-additive">Net pencairan</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Potensi Top-Up</div><div id="adminPotensiTopUpAdditive" class="admin-card-value-additive">Rp 0</div><div class="admin-card-sub-additive">Net top-up</div></div>
+                    <div class="admin-card-additive"><div class="admin-card-label-additive">Maks. Angsuran Top-Up</div><div id="adminAngsuranTopUpAdditive" class="admin-card-value-additive">Rp 0</div><div class="admin-card-sub-additive">Potensi per bulan</div></div>
+                </div>
+
+                <div class="admin-panel-additive">
+                    <div class="admin-panel-header-additive">
+                        <div>
+                            <div class="admin-panel-title-additive"><i class="fa-solid fa-users-gear text-indigo-600 mr-1"></i>Monitoring AO</div>
+                            <div class="admin-panel-subtitle-additive">Ringkasan data berdasarkan KODE_AO</div>
+                        </div>
+                        <input id="adminAOFilterAdditive" class="admin-filter-additive" type="text" placeholder="Cari KODE AO..." oninput="renderAdminDashboardAdditive()">
+                    </div>
+                    <div class="admin-table-wrap-additive">
+                        <table class="admin-table-additive">
+                            <thead><tr><th>KODE AO</th><th>DEBITUR</th><th>FASILITAS</th><th>NEW</th><th>MENGULANG</th><th>TOP-UP</th></tr></thead>
+                            <tbody id="adminAOTableBodyAdditive"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-panel-additive">
+                    <div class="admin-panel-header-additive">
+                        <div>
+                            <div class="admin-panel-title-additive"><i class="fa-solid fa-database text-indigo-600 mr-1"></i>Status Dataset</div>
+                            <div class="admin-panel-subtitle-additive">Data yang sedang digunakan aplikasi</div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="bg-slate-50 rounded-xl p-3"><div class="text-[10px] text-slate-400 font-bold">KREDIT RAW</div><div id="adminRawKreditAdditive" class="text-lg font-bold text-slate-800">0</div></div>
+                            <div class="bg-slate-50 rounded-xl p-3"><div class="text-[10px] text-slate-400 font-bold">PENGHASILAN RAW</div><div id="adminRawPenghasilanAdditive" class="text-lg font-bold text-slate-800">0</div></div>
+                            <div class="bg-slate-50 rounded-xl p-3"><div class="text-[10px] text-slate-400 font-bold">LOAN DATABASE</div><div id="adminLoanDatabaseAdditive" class="text-lg font-bold text-slate-800">0</div></div>
+                            <div class="bg-slate-50 rounded-xl p-3"><div class="text-[10px] text-slate-400 font-bold">CIF DATABASE</div><div id="adminCifDatabaseAdditive" class="text-lg font-bold text-slate-800">0</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             
             <!-- Admin Top Status Banner -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -955,6 +1051,7 @@ body.app-locked > main { display:none !important; }
                 viewAO.classList.add('hidden');
                 navBtnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
                 navBtnAO.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-indigo-200 hover:text-white hover:bg-indigo-800/60";
+                setTimeout(renderAdminDashboardAdditive, 50);
             }
         }
 
@@ -1986,6 +2083,96 @@ body.app-locked > main { display:none !important; }
             if (val >= 1000000000) return 'Rp ' + (val / 1000000000).toFixed(2) + ' M';
             if (val >= 1000000) return 'Rp ' + (val / 1000000).toFixed(1) + ' Jt';
             return 'Rp ' + Math.round(val).toLocaleString('id-ID');
+        }
+
+
+
+        /* =========================================================
+           ADMIN DASHBOARD ADDITIVE MODULE
+           Hanya membaca data existing; tidak mengganti fungsi lama.
+        ========================================================= */
+        function setAdminTextAdditive(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function renderAdminDashboardAdditive() {
+            const role = String(window.currentUser?.role || currentUser?.role || '').toUpperCase();
+            if (!['ADMIN','SUPERVISOR'].includes(role)) return;
+
+            const kredit = Array.isArray(kreditRawData) ? kreditRawData : [];
+            const penghasilan = Array.isArray(penghasilanRawData) ? penghasilanRawData : [];
+            const loans = Array.isArray(loanDatabase) ? loanDatabase : [];
+            const cifMap = (typeof cifDatabase === 'object' && cifDatabase) ? cifDatabase : {};
+
+            const totalDebitur = Object.keys(cifMap).length;
+            const totalFasilitas = loans.length;
+            const aoSet = new Set();
+            kredit.forEach(function(x){
+                const ao = String(x.kode_ao || x.KODE_AO || '').trim().toUpperCase();
+                if (ao) aoSet.add(ao);
+            });
+            loans.forEach(function(x){
+                const ao = String(x.kode_ao || x.cifRef?.kode_ao || '').trim().toUpperCase();
+                if (ao) aoSet.add(ao);
+            });
+
+            setAdminTextAdditive('adminTotalDebiturAdditive', totalDebitur.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminTotalFasilitasAdditive', totalFasilitas.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminTotalAOAdditive', aoSet.size.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminTotalPenghasilanAdditive', penghasilan.length.toLocaleString('id-ID'));
+
+            const totalNew = loans.reduce((sum, x) => sum + Number(x.potensiNew || 0), 0);
+            const totalMengulang = loans.reduce((sum, x) => sum + Number(x.potensiMengulang || 0), 0);
+            const totalTopUp = loans.reduce((sum, x) => sum + Number(x.potensiPlafonTopUp || 0), 0);
+            const totalAngsuran = loans.reduce((sum, x) => sum + Number(x.maxAngsuranTopUp || 0), 0);
+
+            setAdminTextAdditive('adminPotensiNewAdditive', formatRupiahShort(totalNew));
+            setAdminTextAdditive('adminPotensiMengulangAdditive', formatRupiahShort(totalMengulang));
+            setAdminTextAdditive('adminPotensiTopUpAdditive', formatRupiahShort(totalTopUp));
+            setAdminTextAdditive('adminAngsuranTopUpAdditive', formatRupiahShort(totalAngsuran));
+
+            setAdminTextAdditive('adminRawKreditAdditive', kredit.length.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminRawPenghasilanAdditive', penghasilan.length.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminLoanDatabaseAdditive', loans.length.toLocaleString('id-ID'));
+            setAdminTextAdditive('adminCifDatabaseAdditive', totalDebitur.toLocaleString('id-ID'));
+
+            const name = window.currentUser?.name || currentUser?.name || window.currentUser?.email || currentUser?.email || 'ADMIN';
+            setAdminTextAdditive('adminDashboardUserAdditive', name + ' • ' + role);
+            setAdminTextAdditive('adminDashboardUpdatedAdditive', 'Update: ' + new Date().toLocaleString('id-ID'));
+
+            const search = String(document.getElementById('adminAOFilterAdditive')?.value || '').trim().toUpperCase();
+            const stats = {};
+
+            loans.forEach(function(loan){
+                const ao = String(loan.kode_ao || loan.cifRef?.kode_ao || '-').trim().toUpperCase();
+                if (search && !ao.includes(search)) return;
+                if (!stats[ao]) stats[ao] = {ao:ao, debitur:new Set(), fasilitas:0, newValue:0, mengulang:0, topup:0};
+                stats[ao].fasilitas += 1;
+                const cif = String(loan.cif || loan.cifRef?.cif || '').trim();
+                if (cif) stats[ao].debitur.add(cif);
+                stats[ao].newValue += Number(loan.potensiNew || 0);
+                stats[ao].mengulang += Number(loan.potensiMengulang || 0);
+                stats[ao].topup += Number(loan.potensiPlafonTopUp || 0);
+            });
+
+            const tbody = document.getElementById('adminAOTableBodyAdditive');
+            if (!tbody) return;
+            const rows = Object.values(stats).sort((a,b) => a.ao.localeCompare(b.ao,'id'));
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="admin-empty-additive">Tidak ada data AO.</div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(function(item){
+                return '<tr>' +
+                    '<td class="font-bold text-indigo-700">' + esc(item.ao) + '</td>' +
+                    '<td>' + item.debitur.size.toLocaleString('id-ID') + '</td>' +
+                    '<td>' + item.fasilitas.toLocaleString('id-ID') + '</td>' +
+                    '<td class="font-semibold text-blue-700">' + formatRupiahShort(item.newValue) + '</td>' +
+                    '<td class="font-semibold text-emerald-700">' + formatRupiahShort(item.mengulang) + '</td>' +
+                    '<td class="font-semibold text-amber-700">' + formatRupiahShort(item.topup) + '</td>' +
+                    '</tr>';
+            }).join('');
         }
 
         function renderDashboard() {
