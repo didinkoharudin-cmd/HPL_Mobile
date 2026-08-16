@@ -918,6 +918,7 @@ body.app-locked > main { display:none !important; }
 }
 </style>
 
+<script id="v6-timeout-config">window.DATABASE_LOAD_TIMEOUT_MS = 180000;</script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen app-locked">
 
@@ -979,7 +980,7 @@ body.app-locked > main { display:none !important; }
                     Sistem Analisis Kredit & Penawaran Debitur
                 </h1>
                 <p class="text-indigo-200 text-xs mt-0.5">
-                    Presisi Per No Pinjaman, RPC, Tenor Pegawai & Configurator WA
+                    Kredit Konsumer Karawang
                 </p>
             </div>
             
@@ -1436,7 +1437,7 @@ body.app-locked > main { display:none !important; }
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <i class="fa-solid fa-coins text-amber-600"></i> Pengaturan Tarif & Biaya-Biaya Kredit
                         </h3>
-                        <p class="text-xs text-slate-500">Pengaturan biaya , jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
+                        <p class="text-xs text-slate-500">Pengaturan biaya provisi, jenjang administrasi, asuransi berdasarkan usia, dan multiplier tabungan wajib.</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="resetFeeParamsToDefault()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition">
@@ -2367,14 +2368,13 @@ body.app-locked > main { display:none !important; }
             }
 
             // 1. Biaya Provisi
-            jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
-
-tarifProvisi =
-    tenorBulan < 84
-        ? 0.02 / 100
-        : 0.15 / 100;
-
-biayaProvisi =   Math.round(jangkaWaktuProvisiTahun * plafonGross * tarifProvisi );
+            const pLow = (feeParams.provisiLow || 0.02) / 100;
+            const pHigh = (feeParams.provisiHigh || 0.15) / 100;
+            const tarifProvisi = tenorBulan < 84 ? pLow : pHigh;
+            const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
+            const biayaProvisi = Math.round(
+                jangkaWaktuProvisiTahun * plafonGross * tarifProvisi
+            );
 
             // 2. Biaya Administrasi
             let biayaAdmin = feeParams.adminTier1 || 200000;
@@ -4686,6 +4686,39 @@ window.renderAdminAOChart = function(filteredData){
 
 
 
+
+
+<script id="v6-database-progress-helper">
+window.showDatabaseProgressV6 = function(message, percent) {
+  let box = document.getElementById('databaseProgressV6');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'databaseProgressV6';
+    box.style.cssText =
+      'position:fixed;left:12px;right:12px;bottom:14px;z-index:99999;' +
+      'background:#fff;border:1px solid #cbd5e1;border-radius:12px;' +
+      'box-shadow:0 8px 28px rgba(0,0,0,.14);padding:10px 12px;' +
+      'font:12px Arial,sans-serif;color:#334155;';
+    document.body.appendChild(box);
+  }
+  const pct = Math.max(5, Math.min(100, Number(percent) || 5));
+  box.innerHTML =
+    '<div style="font-weight:700;margin-bottom:5px">Mengambil database...</div>' +
+    '<div id="databaseProgressV6Text">' + (message || 'Memulai proses...') + '</div>' +
+    '<div style="height:5px;background:#e2e8f0;border-radius:99px;margin-top:7px;overflow:hidden">' +
+    '<div id="databaseProgressV6Bar" style="height:100%;width:' + pct + '%;background:#2563eb;transition:width .3s"></div></div>';
+};
+window.updateDatabaseProgressV6 = function(message, percent) {
+  const text = document.getElementById('databaseProgressV6Text');
+  const bar = document.getElementById('databaseProgressV6Bar');
+  if (text) text.textContent = message || '';
+  if (bar) bar.style.width = Math.max(5, Math.min(100, Number(percent) || 5)) + '%';
+};
+window.hideDatabaseProgressV6 = function() {
+  const box = document.getElementById('databaseProgressV6');
+  if (box) box.remove();
+};
+</script>
 
 </body>
 </html>
