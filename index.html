@@ -9458,8 +9458,8 @@ function simBuildCaptureBlob(){
 
       x.fillStyle='#f5f7fb';x.fillRect(0,0,W,H);
       x.fillStyle='#064cad';x.fillRect(0,0,W,190);
-      x.fillStyle='#ffffff';x.font='700 46px Arial';x.fillText('SIMULASI KREDIT',70,82);
-      x.font='24px Arial';x.fillText('Bank bjb • Estimasi Penawaran',70,125);
+      x.fillStyle='#ffffff';x.font='700 46px Arial';x.fillText('SIMULASI KREDIT KONSUMER',70,82);
+      x.font='24px Arial';x.fillText('bank bjb Cabang Karawang • Estimasi Penawaran',70,125);
 
       const card=(y,h)=>{
         x.fillStyle='#ffffff';x.beginPath();
@@ -9511,8 +9511,8 @@ function simBuildCaptureBlob(){
       txt('DITERIMA NETT',simMoney(s.fees.netPencairan),yy,true);
 
       x.fillStyle='#64748b';x.font='20px Arial';
-      x.fillText('Simulasi bersifat estimasi dan mengikuti parameter kredit yang berlaku.',55,1325);
-      x.fillText('Tanggal: '+new Date().toLocaleString('id-ID'),55,1365);
+      x.fillText('Simulasi ini tidak mengikat dan dapat berubah sesuai ketentuan bank yang berlaku.',55,1325);
+      x.fillText('Dicetak Tanggal: '+new Date().toLocaleString('id-ID'),55,1365);
 
       c.toBlob(blob=>{
         if(blob) resolve({blob,s});
