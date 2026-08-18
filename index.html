@@ -4531,7 +4531,7 @@ button:active{transform:scale(.97)}
 
             const jangkaWaktuProvisiTahun = Math.ceil(tenorBulan / 12);
             const tarifProvisi = isG2HProvisi
-                ? 0.25 / 100
+                ? 1 / 100
                 : (tenorBulan < 84 ? 0.02 / 100 : 0.15 / 100);
 
             const biayaProvisi = isG2HProvisi
@@ -8876,7 +8876,7 @@ function simNormOffer(v){
 }
 
 const V18_SPECIAL_PRODUCTS={
- 'G2H-THT-PNS':{source:'THT',sumber:'THT',jenisPegawai:'PNS',rpcPercent:0,maxTenorProduct:38,rate:8.5,eligibility:36},
+ 'G2H-THT-PNS':{source:'THT',sumber:'THT',jenisPegawai:'PNS',rpcPercent:0,maxTenorProduct:38,rate:9.5,eligibility:36},
  'G7G-GRACE PERIOD-PNS':{source:'PENSIUN',sumber:'PENSIUN',jenisPegawai:'PNS',rpcPercent:.90,maxTenorProduct:180,rate:12,graceRate:8,eligibility:60}
 };
 function v18Num(v){return Number(String(v??'').replace(/\./g,'').replace(/,/g,'.').replace(/[^\d.-]/g,''))||0}
@@ -8976,7 +8976,7 @@ function simFeeCalc(gross,tenor,product,status,age,baki,installment,runningInter
 
   const jangkaWaktuProvisiTahun=Math.ceil(tenor/12);
   const tarifProvisi=isG2HProvisi
-    ? 0.25/100
+    ? 1/100
     : (tenor<84 ? 0.02/100 : 0.15/100);
 
   const biayaProvisi=isG2HProvisi
